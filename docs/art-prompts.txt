@@ -44,3 +44,33 @@ Redraw the attached picture exactly, same size, framing, angle and lighting, but
 
 ----- WHERE THEY GO -----
 Sheet 6 + 9: an animated title screen (characters bob and peek over the empty room). Sheet 7: pillars in room corners, torches on walls, barrels and rocks as room decorations, gold heap in the treasure room. Sheet 8: room walls and floors, door archways, the number tablets.
+
+
+=================== ROUND 3: EVERY BUTTON, PANEL, ICON AND EFFECT ===================
+6 images, same chat as round 2 (attach the title picture, paste the round 2 STYLE line first).
+Buttons and panels are blank on purpose: the game prints the words on top and stretches them to fit.
+
+----- SHEET 10: BUTTONS -----
+Make a sprite sheet of 6 blank game buttons in a 3 by 2 grid on a plain solid white background, with wide white space between them so none touch or overlap. Top row: a big round glossy red button with a cute cartoon mouth and two little white teeth in the middle; a square stone button with a raised arrow pointing up carved into it; a small square plain purple stone button. Bottom row: three wide rounded rectangle buttons, about four times wider than tall, each with a glossy rim and a plain flat middle with nothing on it: one gold, one mint green, one purple stone. Front view, no shadows, no text.
+
+----- SHEET 11: PANELS AND FRAMES -----
+Make a sprite sheet of 9 blank interface panels in a 3 by 3 grid on a plain solid white background, with wide white space between them so none touch or overlap. Every panel has a plain, empty middle with nothing drawn in it. Left to right, top row first: a large dark purple stone tablet with rounded corners and a thin gold trim around the edge; a long dark wooden signboard about five times wider than tall; a small square dark stone frame; a small dark plaque with rounded ends about three times wider than tall; a cream speech bubble with a small tail at the bottom; a gold ribbon banner with folded ends; a sheet of old parchment with a red pin at the top; a small square stone card with a thin gold edge; a square ring of dungeon stone wall seen from straight above, with a completely empty plain white middle. Front view, no shadows, no text.
+
+----- SHEET 12: INTERFACE ICONS -----
+Make a sprite sheet of 16 simple, bold game icons in a 4 by 4 grid on a plain solid white background, with wide white space between them so none touch or overlap. All icons the same size and easy to read when tiny. Left to right, top row first: a speaker with sound waves; a speaker with a small red X; a pause sign (two rounded bars); a music note; a music note with a small red X; a little house; a gold padlock; a red and white target; a chunky arrow pointing right; two crossed swords; a small shopping bag with a gold coin on it; a wrapped gift box with a bow; a little t-shirt; a glowing light bulb; two curved arrows chasing each other in a circle; a gear. No text, no shadows.
+
+----- SHEET 13: EFFECTS AND POWERS -----
+Make a sprite sheet of 16 simple, bold game icons in a 4 by 4 grid on a plain solid white background, with wide white space between them so none touch or overlap. All icons the same size and easy to read when tiny. Left to right, top row first: a flame; a party popper with confetti; a cluster of three sparkles; a lightning bolt; a pair of scissors; a half moon; a round cartoon bomb with a lit fuse; a comic-style impact burst; a puff of white smoke; a ring of little dizzy stars; a chunky arrow pointing up; a chunky arrow pointing down; a lit candle; a pair of glowing pale lavender paw prints; an empty round gem socket; a round glowing gold gem. No text, no shadows.
+
+----- SHEET 14: HEARTS AND MATH PIECES -----
+Make a sprite sheet of 9 game pieces in a 3 by 3 grid on a plain solid white background, with wide white space between them so none touch or overlap. Left to right, top row first: a glossy full red heart; an empty heart container, dark purple with a thick outline; a red heart with a small white crack down the middle; a round red counter token; a round blue counter token; a wooden board with exactly 2 rows of 5 empty square boxes, seen from straight above; a round red abacus bead; a round cream abacus bead; a wooden frame with two empty horizontal rods and no beads. Front view, no shadows, no text.
+
+----- SHEET 15: SCREEN BACKGROUND -----
+A square dark dungeon stone wall texture that fills the whole image edge to edge: dark purple-gray blocks with soft moss in a few cracks, low contrast and fairly dark so bright buttons and text on top stay easy to read. Make the left and right edges match and the top and bottom edges match so it can repeat as a tile. No objects, no light sources, no text.
+
+----- OPTIONAL: LOGO -----
+(Image tools often misspell words. If the letters come out wrong, the game keeps its own lettering.)
+The words DIGIT DUNGEON as a chunky game logo on two lines, DIGIT on top in glossy gold, DUNGEON below in cream stone letters with a thick dark-plum outline, a few sparkles. Plain solid white background. Spell it exactly: D-I-G-I-T, D-U-N-G-E-O-N.
+
+----- WHERE THEY GO -----
+10: CHOMP, d-pad (rotated for all 4 directions), menu and icon buttons. 11: popups, rule sign, peek and map frames, coin and star counters, toasts, banners, remember card, attack and shop cards, room wall. 12: sound, pause, home, lock, goal, door arrows, boss and shop map markers, closet, hints, comeback, grown-ups. 13: streaks, celebrations, boss attacks (Zap, Snip, Half Chomp, Big Boom, Ten Smash), hits, poofs, dizzy monsters, level up, trapdoor, floor banner, monster footprints, rule progress gems. 14: hearts (full, empty, cracked), ten-frame and pairs counters, the boss bead rack. 15: background behind everything.
