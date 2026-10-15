@@ -231,7 +231,7 @@ $('#btn-closet').addEventListener('click', openCloset);
 })();
 window.addEventListener('resize', () => { fit(); if (run && room) renderMap(); });
 if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('#stage'));
-document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); if (Sound.ctx) Sound.ctx.suspend(); } else { if (Sound.ctx) Sound.ctx.resume(); if (run) run.tick = Date.now(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); Sound.pause(); } else { if (Sound.ctx) Sound.wake(false); if (run) run.tick = Date.now(); } });
 
 window.DD = { get run() { return run; }, get room() { return room; }, get hero() { return hero; }, get save() { return save; }, tryMove, chomp, goThrough, enterRoom, bossPick, bossAnswer, trapdoor, takeItem, openShop, buy, closeOverlay, newRun, endRun, planMonsters };
 document.addEventListener('DOMContentLoaded', () => { Clips.init(); Music.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });

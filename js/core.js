@@ -9,7 +9,7 @@
    ===================================================================== */
 
 
-const BUILD = 'v8';   // bump with the ?v3 tags in index.html on every release
+const BUILD = 'v9';   // bump with the ?v3 tags in index.html on every release
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -48,10 +48,50 @@ function loadSave() { try { const raw = localStorage.getItem(SAVE_KEY); if (raw)
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
 let save = loadSave();
 
-/* ---------- sound ---------- */
+/* ---------- sound ----------
+   iPhones and iPads cut web audio off when a notification, call or Siri plays: Safari marks the audio engine
+   "interrupted" and it can stay silent or crackly afterwards. When we see that (or the audio clock stalls),
+   her next tap builds a fresh engine (taps are allowed to start sound). Decoded voice and music are kept,
+   and the music fades back in. */
+const quiet = p => { if (p && p.catch) p.catch(() => {}); };
 const Sound = {
-  ctx: null,
-  init() { if (this.ctx) return; try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} },
+  ctx: null, broken: false, pausing: false, lastA: 0, lastW: 0, stalls: 0, revivals: 0,
+  init() { if (!this.ctx) this.make(); },
+  make() {
+    let c; try { c = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+    this.ctx = c; this.lastW = 0; this.stalls = 0;
+    c.onstatechange = () => {
+      if (c !== this.ctx) return;
+      if (c.state === 'running') c.ran = true;
+      else if (c.ran && c.state !== 'closed' && !this.pausing && !document.hidden) this.broken = true;   // cut off by the system
+    };
+  },
+  kick() { const c = this.ctx; if (c && c.state !== 'running' && c.state !== 'closed') { try { quiet(c.resume()); } catch (e) {} } },
+  wake(gesture) {     // on every tap, and when the page comes back
+    if (!this.ctx) { this.make(); this.kick(); return; }
+    if (this.broken && gesture) { this.revive(); return; }
+    this.pausing = false;
+    const c = this.ctx; if (c.state === 'running') return;
+    this.kick();
+    setTimeout(() => { if (c === this.ctx && c.ran && c.state !== 'running' && !document.hidden && !this.pausing) this.broken = true; }, 600);
+  },
+  pause() { this.pausing = true; if (this.ctx) { try { quiet(this.ctx.suspend()); } catch (e) {} } },
+  revive() {          // replace the audio engine (must run inside a tap so the new one is allowed to play)
+    const old = this.ctx; this.broken = false; this.pausing = false; this.revivals++;
+    if (old) { old.onstatechange = null; try { quiet(old.close()); } catch (e) {} }
+    this.ctx = null; Clips.nodes = []; Clips.endAt = 0; Music.reset();
+    this.make(); if (!this.ctx) return;
+    this.kick(); Music.start();
+  },
+  watch() {           // a running engine whose clock stopped moving is broken too
+    const c = this.ctx, w = performance.now() / 1000;
+    if (c && c.state === 'running' && !document.hidden && this.lastW) {
+      const dw = w - this.lastW, da = c.currentTime - this.lastA;
+      this.stalls = dw > 1 && da < dw * 0.25 ? this.stalls + 1 : 0;
+      if (this.stalls >= 2) this.broken = true;
+    }
+    this.lastW = w; this.lastA = c ? c.currentTime : 0;
+  },
   tone(f, d, type = 'square', vol = .08, slide = 0, delay = 0) {
     const c = this.ctx; if (!c) return;
     const t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
@@ -62,7 +102,7 @@ const Sound = {
   },
   play(n) {
     if (!save.settings.sound || !this.ctx) return;
-    if (this.ctx.state === 'suspended') this.ctx.resume();
+    this.kick();
     const T = this.tone.bind(this);
     switch (n) {
       case 'tap': T(660, .04, 'triangle', .04); break;
@@ -128,7 +168,7 @@ const Clips = {
     return out.length ? out : null;
   },
   play(ids, queue) {
-    const ctx = Sound.ctx; if (ctx.state === 'suspended') ctx.resume();
+    const ctx = Sound.ctx; Sound.kick();
     let t = ctx.currentTime + 0.03;
     if (queue && this.endAt > t) t = this.endAt + 0.08; else this.stop();
     for (const id of ids) {
@@ -157,7 +197,7 @@ const Music = {
       return;
     }
     if (this.on) return;
-    const ctx = Sound.ctx; if (ctx.state === 'suspended') ctx.resume();
+    const ctx = Sound.ctx; Sound.kick();
     if (!this.gain) { this.gain = ctx.createGain(); this.gain.connect(ctx.destination); }
     this.gain.gain.cancelScheduledValues(ctx.currentTime); this.gain.gain.setValueAtTime(0, ctx.currentTime);
     this.gain.gain.linearRampToValueAtTime(this.LEVEL, ctx.currentTime + 2.5);       // fade in
@@ -184,6 +224,7 @@ const Music = {
     g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(this.DUCK, t + 0.15);
     g.setValueAtTime(this.DUCK, Math.max(t + 0.15, until)); g.linearRampToValueAtTime(this.LEVEL, Math.max(t + 0.15, until) + 0.6);
   },
+  reset() { clearInterval(this.timer); this.on = false; this.gain = null; this.sources = []; },   // engine replaced: old nodes are gone
   toggle(onOff) { save.settings.music = onOff; persist(); onOff ? this.start() : this.stop(); },
 };
 const Voice = {
@@ -212,4 +253,7 @@ const Voice = {
   stop() { this.ttsStop(); Clips.stop(); }
 };
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => Voice.pick();
-document.addEventListener('pointerdown', () => { Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume(); Clips.decode(); Music.start(); Voice.unlock(); }, true);
+document.addEventListener('pointerdown', () => { Sound.wake(true); Clips.decode(); Music.start(); Voice.unlock(); }, true);
+document.addEventListener('touchend', () => Sound.wake(true), true);     // older iPads only unlock audio on touchend
+['pageshow', 'focus'].forEach(ev => window.addEventListener(ev, () => { if (Sound.ctx) Sound.wake(false); }));
+setInterval(() => Sound.watch(), 1500);

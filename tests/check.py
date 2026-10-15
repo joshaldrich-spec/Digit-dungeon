@@ -289,6 +289,16 @@ async def main():
             (function wait() { if (Clips.buf) { save.settings.voice = true; Voice.say('Double 6 is 12!'); res({ dur: Clips.buf.duration, scheduled: Clips.nodes.length }); }
               else if (Date.now() - t0 > 8000) res(null); else setTimeout(wait, 100); })(); })""")
         report('voice recording decodes and plays', bool(played) and played['scheduled'] == 4, json.dumps(played))
+        # a notification cuts the audio off (like iOS does): the next tap builds a fresh engine and everything plays again
+        await page.evaluate("""new Promise(res => { save.settings.music = true; Music.start(); const t0 = Date.now();
+            (function w() { if (Music.on && Music.sources.length || Date.now() - t0 > 8000) res(); else setTimeout(w, 100); })(); })""")
+        await page.evaluate("window._oldCtx = Sound.ctx; Sound.ctx.suspend().then(() => 1)"); await page.wait_for_timeout(200)
+        cut = await page.evaluate("Sound.broken")
+        await page.touchscreen.tap(195, 4); await page.wait_for_timeout(900)
+        back = await page.evaluate("""(() => { Voice.say('Double 6 is 12!'); const c = Sound.ctx;
+            return { noticed: %s, fresh: c !== window._oldCtx, old: window._oldCtx.state, state: c.state, music: Music.on && Music.sources.length > 0, voice: Clips.nodes.length, revivals: Sound.revivals }; })()""" % ('true' if cut else 'false'))
+        report('sound comes back after a notification cuts it off', back['noticed'] and back['fresh'] and back['old'] == 'closed' and back['state'] == 'running' and back['music'] and back['voice'] == 4, json.dumps(back))
+        await page.evaluate("Music.toggle(false); save.settings.voice = false")
         # number clips line up with their numbers: six/seven/sixteen/seventeen/sixty/seventy open with an "s" hiss,
         # one/eight/nine/ten/eleven/eighty/ninety don't. A clip map shifted by one in either direction fails this.
         hiss = await page.evaluate("""() => { const d = Clips.buf.getChannelData(0), sr = Clips.buf.sampleRate, out = {};
