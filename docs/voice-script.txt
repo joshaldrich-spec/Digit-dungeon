@@ -1,15 +1,6 @@
-DIGIT DUNGEON: VOICE SCRIPT
+Read this script aloud for a kids' math game. Voice: a warm, cheerful, gentle storyteller talking to a 7-year-old. Clear and unhurried, upbeat, never shouty. Read numbers and single words in a calm, even tone. Read every line below exactly once, in order, with a full one-second pause after every line. Do not add, skip, combine or repeat anything.
 
-5 recordings, 232 lines in all.
-For each part: paste the VOICE DIRECTIONS, then that part's lines, and generate the audio.
-Save each recording as part1, part2, and so on, then send all of them to me. I'll cut them into clips.
-If Gemini stops partway through a part, split that part in half and record each half separately.
-
------ VOICE DIRECTIONS (paste with every part) -----
-Read the lines below for a kids' math game called Digit Dungeon. Voice: a warm, cheerful, gentle storyteller talking to a 7-year-old. Clear and unhurried, friendly and upbeat, never shouty. Read numbers and single words in a calm, even tone.
-Read every line exactly once, in order. Leave a full one-second pause after every line. Do not add, skip, combine or repeat anything.
-
-===== PART 1 of 5: Numbers zero to fifty-five (56 lines) =====
+Part one.
 
 Zero.
 One.
@@ -68,7 +59,7 @@ Fifty-three.
 Fifty-four.
 Fifty-five.
 
-===== PART 2 of 5: Numbers fifty-six to one hundred ten (55 lines) =====
+Part two.
 
 Fifty-six.
 Fifty-seven.
@@ -126,7 +117,7 @@ One hundred eight.
 One hundred nine.
 One hundred ten.
 
-===== PART 3 of 5: Math words, room rules, directions (43 lines) =====
+Part three.
 
 plus
 minus
@@ -172,7 +163,7 @@ You beat Queen Grumbles!
 You beat Count Countula!
 Amazing!
 
-===== PART 4 of 5: Coaching (helping after a mistake) (37 lines) =====
+Part four.
 
 Start at
 Count on:
@@ -212,7 +203,7 @@ Slide away the top row of ten.
 Slide away the beads on the bottom row. The full ten is left!
 Half of
 
-===== PART 5 of 5: Cheers, treasure, shop, endings (41 lines) =====
+Part five.
 
 You checked every tile!
 Sharp eyes!
