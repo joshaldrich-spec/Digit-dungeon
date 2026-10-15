@@ -22,16 +22,20 @@ function tryMove(dx, dy) {
   const mon = monsterAt(nx, ny);
   if (mon) {
     if (mon.dizzy > 0) { bonk(mon); endTurn(); return; }   // dizzy monsters can be bonked
-    Sound.play('bump'); nudgeHero(dx, dy); return;         // awake ones just block (no turn used)
+    nudgeHero(dx, dy); return startFight(mon, false);      // awake ones: squash it with a math power (no turn used)
   }
   hero.x = nx; hero.y = ny; Sound.play('step');
   onEnterCell(); endTurn();
 }
 function endTurn() {
   run.turn++; if (hero.safe > 0) hero.safe--;
-  const died = room.type === 'normal' && !room.cleared && room.monsters && room.monsters.length ? runMonsters() : false;
+  const hit = room.type === 'normal' && !room.cleared && room.monsters && room.monsters.length ? runMonsters() : null;
   renderActors(); renderTelegraph(); saveRun();
-  if (died) die('monster');
+  if (hit) {          // a monster stepped onto her footprint square: it's a squash fight (after its lunge shows)
+    const token = uid(); run.fight = { pending: true, ambush: true, token };
+    if (typeof stopWalk === 'function') stopWalk();
+    setTimeout(() => { if (run && run.fight && run.fight.token === token) startFight(hit, true); }, 300);
+  }
 }
 function runMonsters() {
   let hitBy = null;
@@ -43,15 +47,13 @@ function runMonsters() {
     if (monsterAt(n.x, n.y, m)) return;
     m.x = n.x; m.y = n.y;
   });
-  let died = false;
   if (hitBy) {
-    const m = hitBy; m.lunge = [hero.x - m.x, hero.y - m.y]; m.dizzy = 2;      // lunges in, bounces off dizzy
-    died = monsterHurt();
-    poofAt((m.x + hero.x) / 2, (m.y + hero.y) / 2, '💥');
+    const m = hitBy; m.lunge = [hero.x - m.x, hero.y - m.y];                   // lunges in...
+    poofAt((m.x + hero.x) / 2, (m.y + hero.y) / 2, '💥'); Sound.play('bump');
     setTimeout(() => { m.lunge = null; if (room && room.monsters && room.monsters.includes(m)) renderActors(); }, 190);
   }
   planMonsters();
-  return died;
+  return hitBy;       // ...and a squash fight starts (see endTurn)
 }
 function planMonsters() {
   if (!room || !room.monsters) return;
@@ -75,21 +77,69 @@ function planMonsters() {
     if (step) { m.next = { x: m.x + step[0], y: m.y + step[1] }; taken.add(key(m.next.x, m.next.y)); }
   });
 }
-function monsterHurt() {
-  if (run.shield) { run.shield = false; Sound.play('hit'); floatAt(hero.x, hero.y, '🫧 blocked!'); Voice.say('Bubble blocked it!'); renderHUD(); return false; }
-  run.hearts = Math.max(0, run.hearts - 1); hero.safe = 3; run.lastHurt = 'monster';
-  Sound.play('hurt'); heartFx(); heroMood('ouch', 800); floatAt(hero.x, hero.y, '−½ ❤️', 'bad'); Voice.say('Ouch!');
-  const r = $('#room'); r.classList.remove('shake'); void r.offsetWidth; r.classList.add('shake');
-  const el = actorEls.get('hero'); if (el) { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); }
-  renderHUD();
-  return run.hearts <= 0;
-}
 function bonk(m) {
   room.monsters = room.monsters.filter(o => o !== m);
   Sound.play('hit'); poofAt(m.x, m.y, '⭐'); floatAt(m.x, m.y, 'BONK!'); Voice.say('Bonk!');
   room.pickups.push({ id: uid(), type: 'coin', x: m.x, y: m.y });
 }
-function die(cause) { run.over = true; run.lastHurt = cause; renderHUD(); setTimeout(() => endRun(false), 900); }
+/* ---------- squash fights: running into a monster ----------
+   Walking into a monster, tapping it, or a monster stepping onto her footprint square starts a quick fight:
+   pick one of two math powers, answer it, and the monster is squashed (+1 star, it drops a coin). A wrong
+   answer costs half a heart (the Bubble Shield blocks one per room), shows a picture hint, and she tries again
+   with that choice crossed out, so every fight still ends in a squash once she gets it. */
+function startFight(m, ambush) {
+  if (!room || !room.monsters || !room.monsters.includes(m) || run.over) { run.fight = null; return; }
+  if (typeof stopWalk === 'function') stopWalk();
+  const moves = pickPowers(Object.keys(POWERS), 2, 20, [], run.lastPower);
+  run.fight = { mid: m.id, kind: m.kind, ambush, step: moves.length > 1 ? 'choose' : 'answer', moves, prob: moves.length > 1 ? null : moves[0], wrong: [], hinted: false };
+  Sound.play('boss'); renderFight(); saveRun();
+  const intro = ambush && Clips.ids('A monster jumped out!') ? 'A monster jumped out! ' : '';   // said once that line is recorded
+  Voice.say(intro + (run.fight.prob ? run.fight.prob.say : 'Pick an attack!'));
+}
+function renderFight() {
+  const f = run.fight; if (!f) return;
+  let body = '';
+  if (f.step === 'choose') body = `<p>Pick an attack!</p><div class="attacks">${f.moves.map((p, i) => `<button class="atk pow" data-act="atk" data-i="${i}"><span class="ai">${p.icon}</span><b>${p.name}</b></button>`).join('')}</div>`;
+  else if (f.step === 'answer') body = problemHTML(f.prob, f.wrong, f.hinted);
+  else body = `<p class="squash-t">SQUASH!</p><p>+1 ⭐ &nbsp; +1 🪙</p>`;
+  openOverlay(`<div class="fight-wrap ${f.step === 'won' ? 'won' : ''}${f.step === 'answer' && (f.prob.pic || f.hinted) ? ' compact' : ''}"><div class="boss-hearts">${heartsHTML()}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div>
+    <div class="fight-spr ${f.kind}">${f.kind === 'grumble' ? grumbleSVG() : wispSVG()}</div><div class="boss-name">${f.ambush ? 'A monster jumped out!' : 'Squash it!'}</div>${body}</div>`,
+    { cls: 'boss-card fight-card', actions: { atk: el => fightPick(+el.dataset.i), ans: el => fightAnswer(el.dataset.v), peek: peekAgain } });
+}
+function fightPick(i) {
+  const f = run.fight; tickTime();
+  f.prob = f.moves[i]; f.step = 'answer'; f.wrong = []; f.hinted = false; run.lastPower = f.prob.id;
+  renderFight(); saveRun(); Voice.say(f.prob.say);
+}
+function fightAnswer(v) {
+  const f = run.fight, p = f && f.prob; if (!p || f.step !== 'answer') return; tickTime();
+  if (String(v) === p.ans) {
+    record(p.skill, true, p.fact); save.stars++; run.stars++; run.correct++; run.streak++; mend();
+    f.step = 'won'; Sound.play('hit'); renderFight(); saveRun();
+    Voice.say(p.right); if (Clips.ids('Squash!')) Voice.say('Squash!', { queue: true });
+    setTimeout(() => { if (run && run.fight === f) { closeOverlay(); squash(f.mid); } }, 1300);
+  } else {
+    record(p.skill, false, p.fact); run.wrong++; run.streak = 0; Sound.play('bad');
+    if (!f.hinted && p.miss) noteMiss(p.miss);
+    f.wrong.push(String(v)); f.hinted = true;
+    let died = false, blockedIt = false;
+    if (run.shield && save.settings.mistakes) { run.shield = false; blockedIt = true; renderHUD(); } else died = wrongCost();
+    renderFight(); const c = $('#ov-card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    if (blockedIt) { Voice.say('Bubble blocked it!'); Voice.say(p.hint.say, { queue: true }); } else Voice.say(p.hint.say);
+    if (died) { run.over = true; run.lastHurt = 'monster'; setTimeout(() => endRun(false), 2600); }
+    saveRun();
+  }
+}
+function squash(mid) {
+  const m = room.monsters.find(x => x.id === mid); run.fight = null;
+  if (m) {
+    room.monsters = room.monsters.filter(o => o !== m);
+    poofAt(m.x, m.y, '⭐'); floatAt(m.x, m.y, 'SQUASH!');
+    room.pickups.push({ id: uid(), type: 'coin', x: m.x, y: m.y });
+  }
+  hero.safe = Math.max(hero.safe, 1); heroMood('cheer', 1000);
+  renderAll(); saveRun();
+}
 function nudgeHero(dx, dy) {
   const el = actorEls.get('hero'); if (!el) return;
   el.style.setProperty('--bx', dx * 14 + '%'); el.style.setProperty('--by', dy * 14 + '%');
@@ -291,7 +341,11 @@ function coinQuestion(before, price) {
   ask(); Voice.say(`Bonus question! You had ${before} coins. You spent ${price}. How many coins are left?`);
 }
 
-/* ---------- boss: number-rack take-away ---------- */
+/* ---------- boss: number-rack take-away, mixed with math powers ----------
+   Every turn offers one take-away attack on the bead rack and one power of a different kind (doubles,
+   ten-friends, quick looks, even/odd, skip-count hops). A power hits for the number she works out, and the
+   rack + "15 − 6 = 9" show the take-away that hit made. Each boss has favorite powers. */
+const BOSS_FAVOR = [['double', 'friends', 'flash'], ['parity', 'hop', 'friends'], ['hop', 'flash', 'double']];
 function startBoss() {
   if (run.boss && run.boss.floor === run.floor) { renderBoss(); return; }
   const hp = run.floor === 1 ? rnd(12, 15) : run.floor === 2 ? rnd(14, 18) : rnd(17, 20);
@@ -299,7 +353,7 @@ function startBoss() {
   Sound.play('boss'); renderBoss(); saveRun();
   Voice.say(`${BOSSES[run.floor - 1].name} appears! Shrink its health to zero with your number powers!`);
 }
-function bossMoves(hp) {
+function takeMoves(hp) {
   const c = [];
   if (hp > 10) c.push({ id: 'ten', icon: '💥', name: 'Ten Smash', k: 10 });
   if (hp > 10 && hp % 10) c.push({ id: 'ones', icon: '✂️', name: 'Snip', k: hp % 10 });
@@ -307,8 +361,15 @@ function bossMoves(hp) {
   if (hp <= 5) c.push({ id: 'final', icon: '⭐', name: 'Final Chomp', k: hp });
   if (hp > 3) c.push({ id: 'zap', icon: '⚡', name: 'Zap', k: rnd(2, Math.min(4, hp - 1)) });
   if (hp >= 11 && run.floor >= 2 && hp - 9 <= 9) c.push({ id: 'boom', icon: '💣', name: 'Big Boom', k: rnd(hp - 9, 9) });
-  const out = []; for (const m of shuffle(c)) { if (!out.some(o => o.k === m.k)) out.push(m); if (out.length === 2) break; }
-  return out;
+  return c.map(m => ({ ...m, kind: 'take' }));
+}
+function bossMoves(hp) {
+  const takes = shuffle(takeMoves(hp)), b = run.boss || {};
+  const power = pickPowers(['double', 'friends', 'flash', 'parity', 'hop'], 1, Math.min(hp, 10), BOSS_FAVOR[run.floor - 1] || [], b.lastPower)[0];
+  const out = [takes[0]];
+  if (power) out.push({ ...power, kind: 'power' });
+  else { const t2 = takes.find(m => m.k !== takes[0].k); if (t2) out.push(t2); }
+  return shuffle(out.filter(Boolean));
 }
 function bossHint(hp, m) {
   const r = hp - m.k;
@@ -318,42 +379,54 @@ function bossHint(hp, m) {
   if (m.id === 'final') return 'Take them all away. Zero left!';
   return subStrategy(hp, m.k).text;
 }
+/* a take-away attack as a problem, so every fight question works the same way */
+function takeProblem(hp, m) {
+  const ans = hp - m.k, set = new Set([ans]);
+  shuffle([ans + 1, ans - 1, ans + 2, ans - 2, m.id === 'ten' ? ans + 10 : -1].filter(v => v >= 0 && v <= 20)).forEach(v => { if (set.size < 3) set.add(v); });
+  const h = bossHint(hp, m), small = hp <= 20 && m.k <= 10;
+  return { kind: 'take', id: m.id, name: m.name, icon: m.icon, skill: 'rack', ans: String(ans), power: m.k, choices: shuffle([...set]).map(String),
+    q: `${hp} − ${m.k} = <span class="qmark">?</span>`, say: `${hp} minus ${m.k} equals what?`, right: '', hint: { text: h, say: h },
+    fact: small ? { kind: 'fact', a: hp, b: m.k, op: '−' } : null, miss: small ? { type: 'fact', key: `f:${hp}-${m.k}`, a: hp, b: m.k, op: '−', val: ans } : null };
+}
 function renderBoss() {
   const b = run.boss, B = BOSSES[run.floor - 1];
   let body = '';
-  if (b.step === 'intro') body = `<p><b>${B.name}</b> blocks the way!</p><p class="sub">Shrink its health to 0 with take-away powers.</p><button class="btn red big" data-act="go">Fight!</button>`;
-  else if (b.step === 'choose') body = `<p>Pick an attack!</p><div class="attacks">${b.moves.map((m, i) => `<button class="atk" data-act="atk" data-i="${i}"><span class="ai">${m.icon}</span><b>${m.name}</b><span class="ak">−${m.k}</span></button>`).join('')}</div>`;
-  else if (b.step === 'answer') body = `<p class="boss-q">${b.hp} − ${b.move.k} = <span class="qmark">?</span></p><div class="choices">${b.choices.map(v => `<button class="ch" data-act="ans" data-v="${v}" ${b.wrong.includes(v) ? 'disabled' : ''}>${v}</button>`).join('')}</div>${b.hint ? `<p class="hint">💡 ${b.hint}</p>` : ''}`;
+  if (b.step === 'intro') body = `<p><b>${B.name}</b> blocks the way!</p><p class="sub">Shrink its health to 0 with your number powers.</p><button class="btn red big" data-act="go">Fight!</button>`;
+  else if (b.step === 'choose') body = `${b.last ? `<p class="lasthit">${b.last.from} − ${b.last.dmg} = ${b.last.from - b.last.dmg}</p>` : ''}<p>Pick an attack!</p><div class="attacks">${b.moves.map((m, i) => `<button class="atk${m.kind === 'power' ? ' pow' : ''}" data-act="atk" data-i="${i}"><span class="ai">${m.icon}</span><b>${m.name}</b><span class="ak">${m.kind === 'take' ? '−' + m.k : '−?'}</span></button>`).join('')}</div>`;
+  else if (b.step === 'answer') body = problemHTML(b.prob, b.wrong, b.hinted);
   else if (b.step === 'win') body = `<p><b>You beat ${B.name}!</b> 🎉</p><p>+10 ⭐ &nbsp; +5 🪙</p><button class="btn gold big" data-act="trap">${run.floor < 3 ? 'Jump down the trapdoor ⬇️' : 'Claim your trophy 🏆'}</button>`;
-  const hearts = heartsHTML();
-  openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}"><div class="boss-hearts">${hearts}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackHTML(b.hp, b.gone || 0)}</div>${body}</div>`,
+  const hearts = heartsHTML(), ans = b.step === 'answer' && b.prob;
+  const fit = ans && (b.prob.pic || b.hinted) ? (b.prob.kind === 'take' ? ' compact' : ' compact has-pic') : '';   // room for the picture + hint on a phone
+  openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}${fit}"><div class="boss-hearts">${hearts}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackHTML(b.hp, b.gone || 0)}</div>${body}</div>`,
     { cls: 'boss-card', actions: {
       go: () => { b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); Voice.say('Pick an attack!'); saveRun(); },
-      atk: el => bossPick(+el.dataset.i), ans: el => bossAnswer(+el.dataset.v),
+      atk: el => bossPick(+el.dataset.i), ans: el => bossAnswer(el.dataset.v), peek: peekAgain,
       trap: () => { closeOverlay(); trapdoor(); } } });
   b.flash = false; b.gone = 0;
 }
 function bossPick(i) {
   const b = run.boss, m = b.moves[i]; tickTime();
-  b.move = m; b.ans = b.hp - m.k; b.wrong = []; b.hint = null;
-  const set = new Set([b.ans]);
-  shuffle([b.ans + 1, b.ans - 1, b.ans + 2, b.ans - 2, m.id === 'ten' ? b.ans + 10 : -1].filter(v => v >= 0 && v <= 20)).forEach(v => { if (set.size < 3) set.add(v); });
-  b.choices = shuffle([...set]); b.step = 'answer';
-  renderBoss(); saveRun(); Voice.say(`${b.hp} minus ${m.k} equals what?`);
+  b.prob = m.kind === 'power' ? m : takeProblem(b.hp, m); b.move = m; b.ans = b.prob.ans; b.choices = b.prob.choices;
+  b.wrong = []; b.hinted = false; b.last = null; b.step = 'answer';
+  if (m.kind === 'power') b.lastPower = m.id;
+  renderBoss(); saveRun(); Voice.say(b.prob.say);
 }
 function bossAnswer(v) {
-  const b = run.boss; tickTime();
-  if (v === b.ans) {
-    record('rack', true); save.stars++; run.stars++; run.correct++; mend();
-    b.gone = b.move.k; b.hp = b.ans; b.flash = true; Sound.play('hit');
+  const b = run.boss, p = b.prob; tickTime();
+  if (String(v) === p.ans) {
+    record(p.skill, true, p.fact); save.stars++; run.stars++; run.correct++; mend();
+    const from = b.hp; b.hp = Math.max(0, b.hp - p.power); b.gone = from - b.hp; b.flash = true; Sound.play('hit');
+    b.last = p.kind === 'power' ? { from, dmg: from - b.hp } : null;
     if (b.hp === 0) return bossWin();
-    b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); saveRun(); Voice.say(`Hit! ${b.hp} left.`);
+    b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); saveRun();
+    Voice.say(`${p.right ? p.right + ' ' : ''}Hit! ${b.hp} left.`);
   } else {
-    record('rack', false); run.wrong++; b.wrong.push(v); b.hint = bossHint(b.hp, b.move); Sound.play('bad');
-    if (b.hp <= 20 && b.move.k <= 10) noteMiss({ type: 'fact', key: `f:${b.hp}-${b.move.k}`, a: b.hp, b: b.move.k, op: '−', val: b.hp - b.move.k });
+    record(p.skill, false, p.fact); run.wrong++; Sound.play('bad');
+    if (!b.hinted && p.miss) noteMiss(p.miss);
+    b.wrong.push(String(v)); b.hinted = true;
     const died = wrongCost();
     renderBoss(); const c = $('#ov-card'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
-    Voice.say(b.hint);
+    Voice.say(p.hint.say);
     if (died) { run.over = true; setTimeout(() => endRun(false), 2600); }
     saveRun();
   }

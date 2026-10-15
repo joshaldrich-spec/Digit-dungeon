@@ -13,15 +13,16 @@ A math roguelite for 2nd grade (Bridges in Mathematics, Grade 2, Unit 1). Plain 
 | `js/curriculum.js` | The math: skills, fact pools, rules that build each room |
 | `js/coaching.js` | Strategy coaching, mistake cards, remember cards |
 | `js/art.js` | Sprite file list, fallback drawings, exact math pictures |
+| `js/powers.js` | Math powers for fights: doubles, ten-friends, quick-look ten-frames, even/odd, skip-count hops, facts (each with its picture hint) |
 | `js/dungeon.js` | Items, floor maps, run setup, lesson/comeback/normal rooms |
-| `js/play.js` | Turns, monsters, chomping, learning loop, shop, boss, end of run |
+| `js/play.js` | Turns, monsters, squash fights, chomping, learning loop, shop, boss, end of run |
 | `js/render.js` | Drawing the room, HUD, footprints, minimap |
 | `js/ui.js` | Overlays, title, closet, grown-ups panel, input, start-up |
 | `art/` | Sprites (`.webp`, backgrounds removed); `art/hero/` has one per Closet color; `art/tops/` and `art/shoes/` are layers that line up with the hero |
 | `audio/voice.mp3`, `audio/voice.js` | The Gemini voice recording cut into 232 clips, and the index the game uses to string them into sentences |
 | `audio/music.mp3` | Background music loop (composed by `tools/music.py`) |
 | `audio/voice-lines.json` | Master list of voice clips (id, recording part, text) |
-| `docs/` | Gemini voice script and art prompts |
+| `docs/` | Gemini voice scripts (`voice-script-2.txt` is the next short recording) and art prompts |
 | `tests/check.py` | One command that checks the math (including kid-style play by real button presses), monsters, learning loop, input, voice, music, a full run and layouts |
 | `tools/voice/` | How the recording was cut (alignment, clip list) |
 | `tools/cut_ui.py`, `tools/cut_sheets.py` | Cut Gemini sprite sheets into game art |

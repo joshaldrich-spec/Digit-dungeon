@@ -6,7 +6,7 @@ REPO = '/home/claude/digit-dungeon'
 sr, X = wavfile.read(f'{S}/full.wav'); X = X.astype(np.float32) / 32768
 db = np.load(f'{S}/db.npy')
 assign = json.load(open(f'{S}/assign.json'))
-lines = json.load(open(f'{REPO}/audio/voice-lines.json'))
+lines = [l for l in json.load(open(f'{REPO}/audio/voice-lines.json')) if not l.get('pending')]   # pending = written but not recorded yet
 spans = sorted((v[0], v[1]) for v in assign.values())
 
 def bounds(a, b):

@@ -195,7 +195,7 @@ function pathTo(gx, gy) {
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const nx = x + dx, ny = y + dy, k = key(nx, ny);
       const mm = inGrid(nx, ny) && monsterAt(nx, ny);
-      if (!inGrid(nx, ny) || k in prev || (mm && !(mm.dizzy > 0 && nx === gx && ny === gy))) continue;   // a dizzy monster she tapped: walk up and bonk it
+      if (!inGrid(nx, ny) || k in prev || (mm && !(nx === gx && ny === gy))) continue;   // a monster she tapped: walk up to it (bonk or squash)
       prev[k] = [x, y]; q.push([nx, ny]);
     }
   }
@@ -212,7 +212,8 @@ function walkTo(gx, gy) {
     const path = pathTo(gx, gy);
     if (!path || !path.length) { Sound.play('bump'); return showGoal(null); }
     const [nx, ny] = path[0];
-    if (dangerAt(nx, ny)) { nudgeHero(nx - hero.x, ny - hero.y); Sound.play('bump'); return showGoal(null); }   // never walk into danger on its own
+    const fightIt = nx === gx && ny === gy && monsterAt(nx, ny);                      // the monster she tapped: walk into it
+    if (dangerAt(nx, ny) && !fightIt) { nudgeHero(nx - hero.x, ny - hero.y); Sound.play('bump'); return showGoal(null); }   // never walk into danger on its own
     if (path.length > 1) showGoal(gx, gy);
     const from = key(hero.x, hero.y); tryMove(nx - hero.x, ny - hero.y);
     if (key(hero.x, hero.y) !== from && (hero.x !== gx || hero.y !== gy)) walkTimer = setTimeout(step, 170); else showGoal(null);

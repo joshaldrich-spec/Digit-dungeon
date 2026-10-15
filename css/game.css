@@ -268,6 +268,29 @@ img{object-fit:contain}
 .atk .ai{font-size:32px;line-height:1.1}.atk b{font-size:17px}.atk .ak{font-size:26px;font-weight:700;color:var(--gold)}
 .boss-q{font-size:42px!important;font-weight:700;margin:8px 0!important}
 .qmark{color:var(--gold)}
+/* math powers (boss turns + squash fights) */
+.atk.pow .ak{color:var(--mint)}
+.lasthit{display:inline-block;margin:2px 0 0!important;padding:2px 12px;border-radius:999px;background:rgba(0,0,0,.28);font-size:20px!important;font-weight:700;color:var(--gold)}
+.pq{font-size:34px!important;line-height:1.15}
+.bign{display:block;font-size:54px;line-height:1;color:var(--gold)}
+.ch.word{width:126px;font-size:28px}
+.ppic{position:relative;margin:4px auto 0;max-width:260px;cursor:pointer}
+.ppic svg{width:100%;height:auto;display:block}
+.flashpic svg{animation:flashHide 3.4s ease-in forwards}
+@keyframes flashHide{0%,72%{opacity:1}100%{opacity:.05}}
+.peek-tag{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:var(--cream);opacity:0;pointer-events:none}
+.flashpic .peek-tag{animation:peekShow 3.4s ease-in forwards}
+@keyframes peekShow{0%,80%{opacity:0}100%{opacity:1}}
+.hint .hpic{max-width:200px;margin:0 auto 6px}.hint .hpic svg{max-height:96px}.hint .hpic svg{width:100%;height:auto;display:block}
+.boss-wrap.compact .boss-spr{width:min(24vw,96px)}
+.boss-wrap.has-pic .rack{display:none}
+.fight-spr{width:min(34vw,140px);margin:0 auto;animation:bob 1.4s ease-in-out infinite}
+.fight-spr svg,.fight-spr img{width:100%;height:auto;display:block}
+.fight-wrap.compact .fight-spr{width:min(22vw,86px)}
+.fight-wrap.won .fight-spr{animation:squashed .5s ease-in forwards;transform-origin:50% 100%}
+@keyframes squashed{30%{transform:scale(1.15,.85)}100%{transform:scale(1.6,.12);opacity:.85}}
+@media (min-height:1000px){.boss-wrap.compact .boss-spr{width:150px}.fight-wrap.compact .fight-spr{width:130px}.hint .hpic{max-width:280px}.hint .hpic svg{max-height:140px}}
+.squash-t{font-size:44px!important;font-weight:700;color:var(--gold);margin:6px 0!important;animation:pop .3s ease-out}
 /* grown-ups */
 .gu{text-align:left}
 .gu table{width:100%;border-collapse:collapse;font-size:15px}

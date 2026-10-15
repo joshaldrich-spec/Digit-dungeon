@@ -79,7 +79,7 @@ const neighbor = (r, d) => run.map.rooms[key(r.x + DIRS[d][0], r.y + DIRS[d][1])
 const doorCell = d => ({ n: { x: 2, y: 0 }, s: { x: 2, y: 4 }, e: { x: 4, y: 2 }, w: { x: 0, y: 2 } })[d];
 const tileAt = (x, y) => room && room.tiles ? room.tiles.find(t => t.x === x && t.y === y) : null;
 const overlayOpen = () => $('#ov').classList.contains('show');
-const blocked = () => transitioning || overlayOpen() || !run || run.over;
+const blocked = () => transitioning || overlayOpen() || !run || run.over || !!run.fight;
 
 function newRun() {
   run = { ver: 2, floor: 1, hearts: 6, maxHearts: 6, crack: false, coins: 0, items: [], glow: 0, shield: false, map: genFloor(1), pos: '0,0',
@@ -97,7 +97,7 @@ function newRun() {
   banner('🕯️', 'Floor 1', FLOOR_NAMES[0]);
 }
 function continueRun() {
-  run = save.run; hero = run.hero; room = run.map.rooms[run.pos]; run.tick = Date.now(); run.over = false;
+  run = save.run; hero = run.hero; room = run.map.rooms[run.pos]; run.tick = Date.now(); run.over = false; run.fight = null;
   showScreen('game'); $('#scr-game').dataset.floor = run.floor;
   clearActors(); renderAll(); Hint.poke();
   if (room.type === 'boss' && !room.cleared) { if (run.boss) renderBoss(); else startBoss(); }
@@ -186,7 +186,7 @@ function comebackRule(item, nC, nT) {
   return made;
 }
 function enterRoom(r, entry = { x: 2, y: 2 }) {
-  run.pos = key(r.x, r.y); room = r; r.visited = true; r.known = true;
+  run.pos = key(r.x, r.y); room = r; r.visited = true; r.known = true; run.fight = null;
   Object.keys(r.doors).forEach(d => neighbor(r, d).known = true);
   if (r.type === 'normal' && !r.gen) {
     if (r.special === 'lesson') genLessonRoom(r);

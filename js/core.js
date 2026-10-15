@@ -9,7 +9,7 @@
    ===================================================================== */
 
 
-const BUILD = 'v10';   // bump with the ?v3 tags in index.html on every release
+const BUILD = 'v11';   // bump with the ?v3 tags in index.html on every release
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);

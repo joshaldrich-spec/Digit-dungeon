@@ -1158,5 +1158,41 @@
   "id": "s_math_bonus",
   "part": 5,
   "text": "Math bonus! One more coin!"
+ },
+ {
+  "id": "s_squash",
+  "part": 6,
+  "text": "Squash!",
+  "pending": true
+ },
+ {
+  "id": "s_what_make_ten",
+  "part": 6,
+  "text": "and what make ten?",
+  "pending": true
+ },
+ {
+  "id": "s_how_many_dots",
+  "part": 6,
+  "text": "How many dots?",
+  "pending": true
+ },
+ {
+  "id": "s_even_or_odd",
+  "part": 6,
+  "text": "even or odd?",
+  "pending": true
+ },
+ {
+  "id": "s_what_next",
+  "part": 6,
+  "text": "what comes next?",
+  "pending": true
+ },
+ {
+  "id": "s_monster_jumped",
+  "part": 6,
+  "text": "A monster jumped out!",
+  "pending": true
  }
 ]
