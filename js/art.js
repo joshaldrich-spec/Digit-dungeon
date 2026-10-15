@@ -23,6 +23,7 @@ const ART = {
   boss1: 'art/boss1.webp', boss2: 'art/boss2.webp', boss3: 'art/boss3.webp',
   coin: 'art/coin.webp', heart: 'art/heart.webp', chest: 'art/chest.webp',
   shopkeeper: 'art/shopkeeper.webp', trapdoor: 'art/trapdoor.webp',
+  title: 'art/title.webp',   // title screen picture (shown by index.html + css; listed here so it preloads)
 };
 /* preload every sprite; forget any that fail so the drawing is used instead */
 function loadArt() {

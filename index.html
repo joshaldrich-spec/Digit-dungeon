@@ -12,24 +12,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/game.css?v5">
+<link rel="stylesheet" href="css/game.css?v6">
 </head>
 <body>
 <div id="app">
 
 <section id="scr-title" class="screen active">
+  <div class="title-bg"></div>
   <div class="title-box">
-    <div class="logo"><span>Digit</span><span>Dungeon</span></div>
-    <div class="title-hero" id="title-hero"></div>
-    <div class="title-name" id="title-name"></div>
+    <div class="title-art"><img src="art/title.webp" alt="" draggable="false" onerror="document.getElementById('scr-title').classList.add('no-art')"><div class="logo"><span>Digit</span><span>Dungeon</span></div></div>
+    <div class="title-who"><div class="title-hero" id="title-hero"></div><div class="title-name" id="title-name"></div></div>
     <div class="title-stats" id="title-stats"></div>
     <div class="title-btns">
       <button class="btn gold big" id="btn-continue" hidden>▶ Continue</button>
       <button class="btn mint big" id="btn-play">New Run</button>
       <button class="btn" id="btn-closet">👕 Closet</button>
     </div>
+    <button class="grownups-btn" id="btn-grownups">Grown-ups · hold</button>
   </div>
-  <button class="grownups-btn" id="btn-grownups">Grown-ups · hold</button>
 </section>
 
 <section id="scr-game" class="screen" data-floor="1">
@@ -81,14 +81,14 @@
 <div class="fx" id="fx"></div>
 </div>
 
-<script src="audio/voice.js?v5"></script>
-<script src="js/core.js?v5"></script>
-<script src="js/curriculum.js?v5"></script>
-<script src="js/coaching.js?v5"></script>
-<script src="js/art.js?v5"></script>
-<script src="js/dungeon.js?v5"></script>
-<script src="js/play.js?v5"></script>
-<script src="js/render.js?v5"></script>
-<script src="js/ui.js?v5"></script>
+<script src="audio/voice.js?v6"></script>
+<script src="js/core.js?v6"></script>
+<script src="js/curriculum.js?v6"></script>
+<script src="js/coaching.js?v6"></script>
+<script src="js/art.js?v6"></script>
+<script src="js/dungeon.js?v6"></script>
+<script src="js/play.js?v6"></script>
+<script src="js/render.js?v6"></script>
+<script src="js/ui.js?v6"></script>
 </body>
 </html>

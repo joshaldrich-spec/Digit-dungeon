@@ -220,6 +220,13 @@ async def main():
             (function wait() { if (Clips.buf) { save.settings.voice = true; Voice.say('Double 6 is 12!'); res({ dur: Clips.buf.duration, scheduled: Clips.nodes.length }); }
               else if (Date.now() - t0 > 8000) res(null); else setTimeout(wait, 100); })(); })""")
         report('voice recording decodes and plays', bool(played) and played['scheduled'] == 4, json.dumps(played))
+        # number clips line up with their numbers: six/seven/sixteen/seventeen/sixty/seventy open with an "s" hiss,
+        # one/eight/nine/ten/eleven/eighty/ninety don't. A clip map shifted by one in either direction fails this.
+        hiss = await page.evaluate("""() => { const d = Clips.buf.getChannelData(0), sr = Clips.buf.sampleRate, out = {};
+            for (const k of [6, 7, 16, 17, 60, 70, 1, 8, 9, 10, 11, 80, 90]) { const [s, len] = Clips.map['n' + k], a = Math.floor(s * sr), b = a + Math.floor(Math.min(len, .15) * sr);
+              let e = 0, h = 0; for (let i = a + 1; i < b; i++) { e += d[i] * d[i]; h += (d[i] - d[i - 1]) ** 2; } out[k] = +(h / (e + 1e-12)).toFixed(2); } return out; }""")
+        s_ok = all(hiss[str(k)] > 0.4 for k in [6, 7, 16, 17, 60, 70]); q_ok = all(hiss[str(k)] < 0.15 for k in [1, 8, 9, 10, 11, 80, 90])
+        report('number clips match their numbers (s-sound check)', s_ok and q_ok, json.dumps(hiss))
         report('full run: 3 floors, treasure, shop, bosses, trophy', trophy, '' if trophy else ' > '.join(log[-8:]))
 
         for (w, hgt, name) in [(390, 844, 'phone'), (375, 667, 'small-phone'), (820, 1180, 'ipad'), (1180, 820, 'ipad-landscape')]:

@@ -22,3 +22,25 @@ A title picture with no text: the green blob hero standing at the glowing entran
 
 ----- STAYS DRAWN BY THE GAME -----
 Ten-frames, bead racks, number lines, pairs pictures, numbers on tiles, half-hearts in the top bar and monster footprints are drawn by the game so the math is always exact.
+
+
+=================== ROUND 2: EVERY PIECE OF THE TITLE PICTURE ===================
+4 images in one Gemini chat. Attach the title picture (art/title.webp) at the start, paste STYLE, then one sheet at a time.
+
+----- STYLE -----
+Use the attached picture as the style guide for everything in this chat: same thick dark-plum outlines, same warm torch-lit colors, same soft shading and glossy highlights, same cute friendly-spooky look. No text, letters or numbers anywhere in any image.
+
+----- SHEET 6: CHARACTERS (title poses) -----
+Make a sprite sheet of the three characters from the attached picture, drawn in full and on their own, in one row, evenly spaced, on a plain solid white background with wide white space between them. Left: the lavender ghost with its little arms, one arm waving, surprised happy face. Middle: the green blob hero with both little arms raised, big happy open smile. Right: the orange puffball monster with its little hands, grumpy frown, standing in full view. Keep each character's colors and face exactly as in the picture, and make all three about the same height. Nothing touches or overlaps. No shadows, no text.
+
+----- SHEET 7: DUNGEON PROPS -----
+Make a sprite sheet of 9 dungeon props from the attached picture in a 3 by 3 grid on a plain solid white background, with wide white space between every prop so none touch or overlap. Left to right, top row first: a short stone pillar with a rounded top and base and green moss patches; a wall torch with a warm flame in an iron holder; a wooden barrel with dark bands; a heap of gold treasure with coins spilling off it; a single gold coin with a star, seen from the front; a small stack of gold star coins lying flat; a large gray boulder with a little moss on top; a cluster of small gray rocks and pebbles; a tuft of grass with a small patch of moss. Front view for everything. No labels, no text, no shadows.
+
+----- SHEET 8: DOORWAY AND STONE -----
+Make a sprite sheet on a plain solid white background with wide white space between every piece so none touch or overlap. Top row, two squares that each fill their own square edge to edge with no outline around them: left, a stone brick wall like the back wall of the attached picture, seen from the front; right, the rounded cobblestone floor from the attached picture, seen from straight above. Keep both low contrast so characters and numbers placed on top stay easy to read. Bottom row, two pieces: left, the glowing stone archway from the attached picture on its own, seen from the front, with warm golden light and a dark passage inside; right, one cream stone slab like the two in the front of the picture, seen slightly from above, completely blank on top. No text.
+
+----- SHEET 9: EMPTY BACKGROUND -----
+Redraw the attached picture exactly, same size, framing, angle and lighting, but empty: remove the green hero, the lavender ghost, the orange puffball monster, all the gold coins and both cream stone slabs. Keep the pillars, torches, arches, glowing doorway, treasure in the tunnel, barrels, rocks, moss and floor exactly where they are. Square image with the full background, no text.
+
+----- WHERE THEY GO -----
+Sheet 6 + 9: an animated title screen (characters bob and peek over the empty room). Sheet 7: pillars in room corners, torches on walls, barrels and rocks as room decorations, gold heap in the treasure room. Sheet 8: room walls and floors, door archways, the number tablets.
