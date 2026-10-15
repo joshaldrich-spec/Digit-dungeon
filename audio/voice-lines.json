@@ -1,0 +1,1162 @@
+[
+ {
+  "id": "n0",
+  "part": 1,
+  "text": "Zero."
+ },
+ {
+  "id": "n1",
+  "part": 1,
+  "text": "One."
+ },
+ {
+  "id": "n2",
+  "part": 1,
+  "text": "Two."
+ },
+ {
+  "id": "n3",
+  "part": 1,
+  "text": "Three."
+ },
+ {
+  "id": "n4",
+  "part": 1,
+  "text": "Four."
+ },
+ {
+  "id": "n5",
+  "part": 1,
+  "text": "Five."
+ },
+ {
+  "id": "n6",
+  "part": 1,
+  "text": "Six."
+ },
+ {
+  "id": "n7",
+  "part": 1,
+  "text": "Seven."
+ },
+ {
+  "id": "n8",
+  "part": 1,
+  "text": "Eight."
+ },
+ {
+  "id": "n9",
+  "part": 1,
+  "text": "Nine."
+ },
+ {
+  "id": "n10",
+  "part": 1,
+  "text": "Ten."
+ },
+ {
+  "id": "n11",
+  "part": 1,
+  "text": "Eleven."
+ },
+ {
+  "id": "n12",
+  "part": 1,
+  "text": "Twelve."
+ },
+ {
+  "id": "n13",
+  "part": 1,
+  "text": "Thirteen."
+ },
+ {
+  "id": "n14",
+  "part": 1,
+  "text": "Fourteen."
+ },
+ {
+  "id": "n15",
+  "part": 1,
+  "text": "Fifteen."
+ },
+ {
+  "id": "n16",
+  "part": 1,
+  "text": "Sixteen."
+ },
+ {
+  "id": "n17",
+  "part": 1,
+  "text": "Seventeen."
+ },
+ {
+  "id": "n18",
+  "part": 1,
+  "text": "Eighteen."
+ },
+ {
+  "id": "n19",
+  "part": 1,
+  "text": "Nineteen."
+ },
+ {
+  "id": "n20",
+  "part": 1,
+  "text": "Twenty."
+ },
+ {
+  "id": "n21",
+  "part": 1,
+  "text": "Twenty-one."
+ },
+ {
+  "id": "n22",
+  "part": 1,
+  "text": "Twenty-two."
+ },
+ {
+  "id": "n23",
+  "part": 1,
+  "text": "Twenty-three."
+ },
+ {
+  "id": "n24",
+  "part": 1,
+  "text": "Twenty-four."
+ },
+ {
+  "id": "n25",
+  "part": 1,
+  "text": "Twenty-five."
+ },
+ {
+  "id": "n26",
+  "part": 1,
+  "text": "Twenty-six."
+ },
+ {
+  "id": "n27",
+  "part": 1,
+  "text": "Twenty-seven."
+ },
+ {
+  "id": "n28",
+  "part": 1,
+  "text": "Twenty-eight."
+ },
+ {
+  "id": "n29",
+  "part": 1,
+  "text": "Twenty-nine."
+ },
+ {
+  "id": "n30",
+  "part": 1,
+  "text": "Thirty."
+ },
+ {
+  "id": "n31",
+  "part": 1,
+  "text": "Thirty-one."
+ },
+ {
+  "id": "n32",
+  "part": 1,
+  "text": "Thirty-two."
+ },
+ {
+  "id": "n33",
+  "part": 1,
+  "text": "Thirty-three."
+ },
+ {
+  "id": "n34",
+  "part": 1,
+  "text": "Thirty-four."
+ },
+ {
+  "id": "n35",
+  "part": 1,
+  "text": "Thirty-five."
+ },
+ {
+  "id": "n36",
+  "part": 1,
+  "text": "Thirty-six."
+ },
+ {
+  "id": "n37",
+  "part": 1,
+  "text": "Thirty-seven."
+ },
+ {
+  "id": "n38",
+  "part": 1,
+  "text": "Thirty-eight."
+ },
+ {
+  "id": "n39",
+  "part": 1,
+  "text": "Thirty-nine."
+ },
+ {
+  "id": "n40",
+  "part": 1,
+  "text": "Forty."
+ },
+ {
+  "id": "n41",
+  "part": 1,
+  "text": "Forty-one."
+ },
+ {
+  "id": "n42",
+  "part": 1,
+  "text": "Forty-two."
+ },
+ {
+  "id": "n43",
+  "part": 1,
+  "text": "Forty-three."
+ },
+ {
+  "id": "n44",
+  "part": 1,
+  "text": "Forty-four."
+ },
+ {
+  "id": "n45",
+  "part": 1,
+  "text": "Forty-five."
+ },
+ {
+  "id": "n46",
+  "part": 1,
+  "text": "Forty-six."
+ },
+ {
+  "id": "n47",
+  "part": 1,
+  "text": "Forty-seven."
+ },
+ {
+  "id": "n48",
+  "part": 1,
+  "text": "Forty-eight."
+ },
+ {
+  "id": "n49",
+  "part": 1,
+  "text": "Forty-nine."
+ },
+ {
+  "id": "n50",
+  "part": 1,
+  "text": "Fifty."
+ },
+ {
+  "id": "n51",
+  "part": 1,
+  "text": "Fifty-one."
+ },
+ {
+  "id": "n52",
+  "part": 1,
+  "text": "Fifty-two."
+ },
+ {
+  "id": "n53",
+  "part": 1,
+  "text": "Fifty-three."
+ },
+ {
+  "id": "n54",
+  "part": 1,
+  "text": "Fifty-four."
+ },
+ {
+  "id": "n55",
+  "part": 1,
+  "text": "Fifty-five."
+ },
+ {
+  "id": "n56",
+  "part": 2,
+  "text": "Fifty-six."
+ },
+ {
+  "id": "n57",
+  "part": 2,
+  "text": "Fifty-seven."
+ },
+ {
+  "id": "n58",
+  "part": 2,
+  "text": "Fifty-eight."
+ },
+ {
+  "id": "n59",
+  "part": 2,
+  "text": "Fifty-nine."
+ },
+ {
+  "id": "n60",
+  "part": 2,
+  "text": "Sixty."
+ },
+ {
+  "id": "n61",
+  "part": 2,
+  "text": "Sixty-one."
+ },
+ {
+  "id": "n62",
+  "part": 2,
+  "text": "Sixty-two."
+ },
+ {
+  "id": "n63",
+  "part": 2,
+  "text": "Sixty-three."
+ },
+ {
+  "id": "n64",
+  "part": 2,
+  "text": "Sixty-four."
+ },
+ {
+  "id": "n65",
+  "part": 2,
+  "text": "Sixty-five."
+ },
+ {
+  "id": "n66",
+  "part": 2,
+  "text": "Sixty-six."
+ },
+ {
+  "id": "n67",
+  "part": 2,
+  "text": "Sixty-seven."
+ },
+ {
+  "id": "n68",
+  "part": 2,
+  "text": "Sixty-eight."
+ },
+ {
+  "id": "n69",
+  "part": 2,
+  "text": "Sixty-nine."
+ },
+ {
+  "id": "n70",
+  "part": 2,
+  "text": "Seventy."
+ },
+ {
+  "id": "n71",
+  "part": 2,
+  "text": "Seventy-one."
+ },
+ {
+  "id": "n72",
+  "part": 2,
+  "text": "Seventy-two."
+ },
+ {
+  "id": "n73",
+  "part": 2,
+  "text": "Seventy-three."
+ },
+ {
+  "id": "n74",
+  "part": 2,
+  "text": "Seventy-four."
+ },
+ {
+  "id": "n75",
+  "part": 2,
+  "text": "Seventy-five."
+ },
+ {
+  "id": "n76",
+  "part": 2,
+  "text": "Seventy-six."
+ },
+ {
+  "id": "n77",
+  "part": 2,
+  "text": "Seventy-seven."
+ },
+ {
+  "id": "n78",
+  "part": 2,
+  "text": "Seventy-eight."
+ },
+ {
+  "id": "n79",
+  "part": 2,
+  "text": "Seventy-nine."
+ },
+ {
+  "id": "n80",
+  "part": 2,
+  "text": "Eighty."
+ },
+ {
+  "id": "n81",
+  "part": 2,
+  "text": "Eighty-one."
+ },
+ {
+  "id": "n82",
+  "part": 2,
+  "text": "Eighty-two."
+ },
+ {
+  "id": "n83",
+  "part": 2,
+  "text": "Eighty-three."
+ },
+ {
+  "id": "n84",
+  "part": 2,
+  "text": "Eighty-four."
+ },
+ {
+  "id": "n85",
+  "part": 2,
+  "text": "Eighty-five."
+ },
+ {
+  "id": "n86",
+  "part": 2,
+  "text": "Eighty-six."
+ },
+ {
+  "id": "n87",
+  "part": 2,
+  "text": "Eighty-seven."
+ },
+ {
+  "id": "n88",
+  "part": 2,
+  "text": "Eighty-eight."
+ },
+ {
+  "id": "n89",
+  "part": 2,
+  "text": "Eighty-nine."
+ },
+ {
+  "id": "n90",
+  "part": 2,
+  "text": "Ninety."
+ },
+ {
+  "id": "n91",
+  "part": 2,
+  "text": "Ninety-one."
+ },
+ {
+  "id": "n92",
+  "part": 2,
+  "text": "Ninety-two."
+ },
+ {
+  "id": "n93",
+  "part": 2,
+  "text": "Ninety-three."
+ },
+ {
+  "id": "n94",
+  "part": 2,
+  "text": "Ninety-four."
+ },
+ {
+  "id": "n95",
+  "part": 2,
+  "text": "Ninety-five."
+ },
+ {
+  "id": "n96",
+  "part": 2,
+  "text": "Ninety-six."
+ },
+ {
+  "id": "n97",
+  "part": 2,
+  "text": "Ninety-seven."
+ },
+ {
+  "id": "n98",
+  "part": 2,
+  "text": "Ninety-eight."
+ },
+ {
+  "id": "n99",
+  "part": 2,
+  "text": "Ninety-nine."
+ },
+ {
+  "id": "n100",
+  "part": 2,
+  "text": "One hundred."
+ },
+ {
+  "id": "n101",
+  "part": 2,
+  "text": "One hundred one."
+ },
+ {
+  "id": "n102",
+  "part": 2,
+  "text": "One hundred two."
+ },
+ {
+  "id": "n103",
+  "part": 2,
+  "text": "One hundred three."
+ },
+ {
+  "id": "n104",
+  "part": 2,
+  "text": "One hundred four."
+ },
+ {
+  "id": "n105",
+  "part": 2,
+  "text": "One hundred five."
+ },
+ {
+  "id": "n106",
+  "part": 2,
+  "text": "One hundred six."
+ },
+ {
+  "id": "n107",
+  "part": 2,
+  "text": "One hundred seven."
+ },
+ {
+  "id": "n108",
+  "part": 2,
+  "text": "One hundred eight."
+ },
+ {
+  "id": "n109",
+  "part": 2,
+  "text": "One hundred nine."
+ },
+ {
+  "id": "n110",
+  "part": 2,
+  "text": "One hundred ten."
+ },
+ {
+  "id": "w_plus",
+  "part": 3,
+  "text": "plus"
+ },
+ {
+  "id": "w_minus",
+  "part": 3,
+  "text": "minus"
+ },
+ {
+  "id": "w_is",
+  "part": 3,
+  "text": "is"
+ },
+ {
+  "id": "w_equals",
+  "part": 3,
+  "text": "equals"
+ },
+ {
+  "id": "w_and",
+  "part": 3,
+  "text": "and"
+ },
+ {
+  "id": "w_so",
+  "part": 3,
+  "text": "so"
+ },
+ {
+  "id": "w_even",
+  "part": 3,
+  "text": "even!"
+ },
+ {
+  "id": "w_odd",
+  "part": 3,
+  "text": "odd!"
+ },
+ {
+  "id": "w_left",
+  "part": 3,
+  "text": "left."
+ },
+ {
+  "id": "w_more",
+  "part": 3,
+  "text": "more."
+ },
+ {
+  "id": "w_more_is",
+  "part": 3,
+  "text": "more is"
+ },
+ {
+  "id": "w_coins",
+  "part": 3,
+  "text": "coins."
+ },
+ {
+  "id": "w_equals_what",
+  "part": 3,
+  "text": "equals what?"
+ },
+ {
+  "id": "r_make",
+  "part": 3,
+  "text": "Chomp the facts that make"
+ },
+ {
+  "id": "r_take_make",
+  "part": 3,
+  "text": "Chomp the take-away facts that make"
+ },
+ {
+  "id": "r_even",
+  "part": 3,
+  "text": "Chomp the even numbers!"
+ },
+ {
+  "id": "r_odd",
+  "part": 3,
+  "text": "Chomp the odd numbers!"
+ },
+ {
+  "id": "r_by2",
+  "part": 3,
+  "text": "Chomp the numbers we say when we count by twos!"
+ },
+ {
+  "id": "r_by5",
+  "part": 3,
+  "text": "Chomp the numbers we say when we count by fives!"
+ },
+ {
+  "id": "r_by10",
+  "part": 3,
+  "text": "Chomp the numbers we say when we count by tens!"
+ },
+ {
+  "id": "r_by2_from1",
+  "part": 3,
+  "text": "Chomp the numbers we say when we count by twos, starting at one!"
+ },
+ {
+  "id": "r_by10_from",
+  "part": 3,
+  "text": "Chomp the numbers we say when we count by tens, starting at"
+ },
+ {
+  "id": "r_frames",
+  "part": 3,
+  "text": "Chomp the ten frames that show"
+ },
+ {
+  "id": "r_comeback",
+  "part": 3,
+  "text": "Comeback room!"
+ },
+ {
+  "id": "d_pick_door",
+  "part": 3,
+  "text": "Pick a door!"
+ },
+ {
+  "id": "d_room_clear",
+  "part": 3,
+  "text": "Room cleared! Pick a door."
+ },
+ {
+  "id": "d_chest",
+  "part": 3,
+  "text": "Step on the treasure chest!"
+ },
+ {
+  "id": "d_shop",
+  "part": 3,
+  "text": "Step on Hoot the owl to shop."
+ },
+ {
+  "id": "d_trapdoor",
+  "part": 3,
+  "text": "Step on the trapdoor!"
+ },
+ {
+  "id": "d_name",
+  "part": 3,
+  "text": "Name your hero!"
+ },
+ {
+  "id": "d_floor1",
+  "part": 3,
+  "text": "Floor one. The Cellar."
+ },
+ {
+  "id": "d_floor2",
+  "part": 3,
+  "text": "Floor two. The Caves."
+ },
+ {
+  "id": "d_floor3",
+  "part": 3,
+  "text": "Floor three. The Depths."
+ },
+ {
+  "id": "b_appears1",
+  "part": 3,
+  "text": "Big Blobbo appears!"
+ },
+ {
+  "id": "b_appears2",
+  "part": 3,
+  "text": "Queen Grumbles appears!"
+ },
+ {
+  "id": "b_appears3",
+  "part": 3,
+  "text": "Count Countula appears!"
+ },
+ {
+  "id": "b_shrink",
+  "part": 3,
+  "text": "Shrink its health to zero with your number powers!"
+ },
+ {
+  "id": "b_pick",
+  "part": 3,
+  "text": "Pick an attack!"
+ },
+ {
+  "id": "b_hit",
+  "part": 3,
+  "text": "Hit!"
+ },
+ {
+  "id": "b_beat1",
+  "part": 3,
+  "text": "You beat Big Blobbo!"
+ },
+ {
+  "id": "b_beat2",
+  "part": 3,
+  "text": "You beat Queen Grumbles!"
+ },
+ {
+  "id": "b_beat3",
+  "part": 3,
+  "text": "You beat Count Countula!"
+ },
+ {
+  "id": "b_amazing",
+  "part": 3,
+  "text": "Amazing!"
+ },
+ {
+  "id": "c_start_at",
+  "part": 4,
+  "text": "Start at"
+ },
+ {
+  "id": "c_count_on",
+  "part": 4,
+  "text": "Count on:"
+ },
+ {
+  "id": "c_count_back",
+  "part": 4,
+  "text": "Count back:"
+ },
+ {
+  "id": "c_double",
+  "part": 4,
+  "text": "Double"
+ },
+ {
+  "id": "c_ten_friends",
+  "part": 4,
+  "text": "are ten-friends!"
+ },
+ {
+  "id": "c_ten_and",
+  "part": 4,
+  "text": "Ten and"
+ },
+ {
+  "id": "c_one_more",
+  "part": 4,
+  "text": "One more is"
+ },
+ {
+  "id": "c_makes_ten",
+  "part": 4,
+  "text": "makes ten."
+ },
+ {
+  "id": "c_zero_same",
+  "part": 4,
+  "text": "Plus zero stays the same:"
+ },
+ {
+  "id": "c_take_zero",
+  "part": 4,
+  "text": "Take away zero. Still"
+ },
+ {
+  "id": "c_all_gone",
+  "part": 4,
+  "text": "Take them all away. Zero left!"
+ },
+ {
+  "id": "c_is_ten_and",
+  "part": 4,
+  "text": "is ten and"
+ },
+ {
+  "id": "c_take_the_ten",
+  "part": 4,
+  "text": "Take the ten."
+ },
+ {
+  "id": "c_take_the",
+  "part": 4,
+  "text": "Take the"
+ },
+ {
+  "id": "c_ten_left",
+  "part": 4,
+  "text": "Ten left!"
+ },
+ {
+  "id": "c_take",
+  "part": 4,
+  "text": "Take"
+ },
+ {
+  "id": "c_to_ten",
+  "part": 4,
+  "text": "to get to ten."
+ },
+ {
+  "id": "c_then_take",
+  "part": 4,
+  "text": "Then take"
+ },
+ {
+  "id": "c_more_leaves",
+  "part": 4,
+  "text": "more. That leaves"
+ },
+ {
+  "id": "c_left_over",
+  "part": 4,
+  "text": "One is left over."
+ },
+ {
+  "id": "c_partner",
+  "part": 4,
+  "text": "Every dot has a partner."
+ },
+ {
+  "id": "c_ends_in",
+  "part": 4,
+  "text": "It ends in"
+ },
+ {
+  "id": "c_by2_say",
+  "part": 4,
+  "text": "Counting by twos, we say"
+ },
+ {
+  "id": "c_by5_say",
+  "part": 4,
+  "text": "Counting by fives, we say"
+ },
+ {
+  "id": "c_by10_say",
+  "part": 4,
+  "text": "Counting by tens, we say"
+ },
+ {
+  "id": "c_we_skip",
+  "part": 4,
+  "text": "We skip"
+ },
+ {
+  "id": "c_we_start_at",
+  "part": 4,
+  "text": "We start at"
+ },
+ {
+  "id": "c_frame_shows",
+  "part": 4,
+  "text": "This ten frame shows"
+ },
+ {
+  "id": "c_full_ten",
+  "part": 4,
+  "text": "One full ten."
+ },
+ {
+  "id": "c_full_ten_and",
+  "part": 4,
+  "text": "A full ten and"
+ },
+ {
+  "id": "c_row_of_5",
+  "part": 4,
+  "text": "One full row of five."
+ },
+ {
+  "id": "c_row5_and",
+  "part": 4,
+  "text": "A row of five and"
+ },
+ {
+  "id": "c_dots",
+  "part": 4,
+  "text": "dots."
+ },
+ {
+  "id": "c_dot",
+  "part": 4,
+  "text": "dot."
+ },
+ {
+  "id": "c_slide_ten",
+  "part": 4,
+  "text": "Slide away the top row of ten."
+ },
+ {
+  "id": "c_bottom_row",
+  "part": 4,
+  "text": "Slide away the beads on the bottom row. The full ten is left!"
+ },
+ {
+  "id": "c_half_of",
+  "part": 4,
+  "text": "Half of"
+ },
+ {
+  "id": "p_clean1",
+  "part": 5,
+  "text": "You checked every tile!"
+ },
+ {
+  "id": "p_clean2",
+  "part": 5,
+  "text": "Sharp eyes!"
+ },
+ {
+  "id": "p_clean3",
+  "part": 5,
+  "text": "Careful chomping!"
+ },
+ {
+  "id": "p_clean4",
+  "part": 5,
+  "text": "Perfect room!"
+ },
+ {
+  "id": "p_clean5",
+  "part": 5,
+  "text": "Great thinking!"
+ },
+ {
+  "id": "p_fix1",
+  "part": 5,
+  "text": "You fixed your mistakes. That is how brains grow!"
+ },
+ {
+  "id": "p_fix2",
+  "part": 5,
+  "text": "You kept trying. Nice!"
+ },
+ {
+  "id": "p_fix3",
+  "part": 5,
+  "text": "Mistakes help us learn. Room cleared!"
+ },
+ {
+  "id": "p_fix4",
+  "part": 5,
+  "text": "You figured it out!"
+ },
+ {
+  "id": "p_nice_one",
+  "part": 5,
+  "text": "Nice one!"
+ },
+ {
+  "id": "p_on_fire",
+  "part": 5,
+  "text": "On fire!"
+ },
+ {
+  "id": "p_six_row",
+  "part": 5,
+  "text": "Six in a row!"
+ },
+ {
+  "id": "p_champ",
+  "part": 5,
+  "text": "Chomp champ!"
+ },
+ {
+  "id": "p_level_up",
+  "part": 5,
+  "text": "Level up! Your brain is growing!"
+ },
+ {
+  "id": "p_closet",
+  "part": 5,
+  "text": "Something new in the closet!"
+ },
+ {
+  "id": "p_bonk",
+  "part": 5,
+  "text": "Bonk!"
+ },
+ {
+  "id": "p_ouch",
+  "part": 5,
+  "text": "Ouch!"
+ },
+ {
+  "id": "p_mended",
+  "part": 5,
+  "text": "Your heart is all better!"
+ },
+ {
+  "id": "p_bubble",
+  "part": 5,
+  "text": "Bubble blocked it!"
+ },
+ {
+  "id": "m_remembered",
+  "part": 5,
+  "text": "You remembered!"
+ },
+ {
+  "id": "m_remember",
+  "part": 5,
+  "text": "Remember:"
+ },
+ {
+  "id": "m_again",
+  "part": 5,
+  "text": "You'll see it again next run!"
+ },
+ {
+  "id": "m_paws",
+  "part": 5,
+  "text": "Watch the footprints! Monsters step where the footprints are."
+ },
+ {
+  "id": "m_run_over",
+  "part": 5,
+  "text": "Run over! Great try!"
+ },
+ {
+  "id": "m_champion",
+  "part": 5,
+  "text": "You are the Dungeon Champion!"
+ },
+ {
+  "id": "s_treasure",
+  "part": 5,
+  "text": "Treasure! Pick one prize."
+ },
+ {
+  "id": "i_specs",
+  "part": 5,
+  "text": "Ten-Frame Specs! They show ten-frame pictures of facts."
+ },
+ {
+  "id": "i_socks",
+  "part": 5,
+  "text": "Pair Socks! They show numbers as pairs."
+ },
+ {
+  "id": "i_frog",
+  "part": 5,
+  "text": "Hop Frog! It shows skip-counting hops."
+ },
+ {
+  "id": "i_heart",
+  "part": 5,
+  "text": "Big Heart! One more heart."
+ },
+ {
+  "id": "i_clover",
+  "part": 5,
+  "text": "Lucky Clover! Rooms drop an extra coin."
+ },
+ {
+  "id": "i_snail",
+  "part": 5,
+  "text": "Sleepy Snail! Monsters move slower."
+ },
+ {
+  "id": "i_bubble",
+  "part": 5,
+  "text": "Bubble Shield! It blocks one monster hit in every room."
+ },
+ {
+  "id": "i_flashlight",
+  "part": 5,
+  "text": "Flashlight! It lights up a right answer."
+ },
+ {
+  "id": "s_shop",
+  "part": 5,
+  "text": "Welcome to Hoot's shop!"
+ },
+ {
+  "id": "s_you_have",
+  "part": 5,
+  "text": "You have"
+ },
+ {
+  "id": "s_bonus",
+  "part": 5,
+  "text": "Bonus question!"
+ },
+ {
+  "id": "s_you_had",
+  "part": 5,
+  "text": "You had"
+ },
+ {
+  "id": "s_you_spent",
+  "part": 5,
+  "text": "You spent"
+ },
+ {
+  "id": "s_how_many",
+  "part": 5,
+  "text": "How many coins are left?"
+ },
+ {
+  "id": "s_math_bonus",
+  "part": 5,
+  "text": "Math bonus! One more coin!"
+ }
+]

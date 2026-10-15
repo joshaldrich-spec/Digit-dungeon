@@ -1,0 +1,257 @@
+DIGIT DUNGEON: VOICE SCRIPT
+
+5 recordings, 232 lines in all.
+For each part: paste the VOICE DIRECTIONS, then that part's lines, and generate the audio.
+Save each recording as part1, part2, and so on, then send all of them to me. I'll cut them into clips.
+If Gemini stops partway through a part, split that part in half and record each half separately.
+
+----- VOICE DIRECTIONS (paste with every part) -----
+Read the lines below for a kids' math game called Digit Dungeon. Voice: a warm, cheerful, gentle storyteller talking to a 7-year-old. Clear and unhurried, friendly and upbeat, never shouty. Read numbers and single words in a calm, even tone.
+Read every line exactly once, in order. Leave a full one-second pause after every line. Do not add, skip, combine or repeat anything.
+
+===== PART 1 of 5: Numbers zero to fifty-five (56 lines) =====
+
+Zero.
+One.
+Two.
+Three.
+Four.
+Five.
+Six.
+Seven.
+Eight.
+Nine.
+Ten.
+Eleven.
+Twelve.
+Thirteen.
+Fourteen.
+Fifteen.
+Sixteen.
+Seventeen.
+Eighteen.
+Nineteen.
+Twenty.
+Twenty-one.
+Twenty-two.
+Twenty-three.
+Twenty-four.
+Twenty-five.
+Twenty-six.
+Twenty-seven.
+Twenty-eight.
+Twenty-nine.
+Thirty.
+Thirty-one.
+Thirty-two.
+Thirty-three.
+Thirty-four.
+Thirty-five.
+Thirty-six.
+Thirty-seven.
+Thirty-eight.
+Thirty-nine.
+Forty.
+Forty-one.
+Forty-two.
+Forty-three.
+Forty-four.
+Forty-five.
+Forty-six.
+Forty-seven.
+Forty-eight.
+Forty-nine.
+Fifty.
+Fifty-one.
+Fifty-two.
+Fifty-three.
+Fifty-four.
+Fifty-five.
+
+===== PART 2 of 5: Numbers fifty-six to one hundred ten (55 lines) =====
+
+Fifty-six.
+Fifty-seven.
+Fifty-eight.
+Fifty-nine.
+Sixty.
+Sixty-one.
+Sixty-two.
+Sixty-three.
+Sixty-four.
+Sixty-five.
+Sixty-six.
+Sixty-seven.
+Sixty-eight.
+Sixty-nine.
+Seventy.
+Seventy-one.
+Seventy-two.
+Seventy-three.
+Seventy-four.
+Seventy-five.
+Seventy-six.
+Seventy-seven.
+Seventy-eight.
+Seventy-nine.
+Eighty.
+Eighty-one.
+Eighty-two.
+Eighty-three.
+Eighty-four.
+Eighty-five.
+Eighty-six.
+Eighty-seven.
+Eighty-eight.
+Eighty-nine.
+Ninety.
+Ninety-one.
+Ninety-two.
+Ninety-three.
+Ninety-four.
+Ninety-five.
+Ninety-six.
+Ninety-seven.
+Ninety-eight.
+Ninety-nine.
+One hundred.
+One hundred one.
+One hundred two.
+One hundred three.
+One hundred four.
+One hundred five.
+One hundred six.
+One hundred seven.
+One hundred eight.
+One hundred nine.
+One hundred ten.
+
+===== PART 3 of 5: Math words, room rules, directions (43 lines) =====
+
+plus
+minus
+is
+equals
+and
+so
+even!
+odd!
+left.
+more.
+more is
+coins.
+equals what?
+Chomp the facts that make
+Chomp the take-away facts that make
+Chomp the even numbers!
+Chomp the odd numbers!
+Chomp the numbers we say when we count by twos!
+Chomp the numbers we say when we count by fives!
+Chomp the numbers we say when we count by tens!
+Chomp the numbers we say when we count by twos, starting at one!
+Chomp the numbers we say when we count by tens, starting at
+Chomp the ten frames that show
+Comeback room!
+Pick a door!
+Room cleared! Pick a door.
+Step on the treasure chest!
+Step on Hoot the owl to shop.
+Step on the trapdoor!
+Name your hero!
+Floor one. The Cellar.
+Floor two. The Caves.
+Floor three. The Depths.
+Big Blobbo appears!
+Queen Grumbles appears!
+Count Countula appears!
+Shrink its health to zero with your number powers!
+Pick an attack!
+Hit!
+You beat Big Blobbo!
+You beat Queen Grumbles!
+You beat Count Countula!
+Amazing!
+
+===== PART 4 of 5: Coaching (helping after a mistake) (37 lines) =====
+
+Start at
+Count on:
+Count back:
+Double
+are ten-friends!
+Ten and
+One more is
+makes ten.
+Plus zero stays the same:
+Take away zero. Still
+Take them all away. Zero left!
+is ten and
+Take the ten.
+Take the
+Ten left!
+Take
+to get to ten.
+Then take
+more. That leaves
+One is left over.
+Every dot has a partner.
+It ends in
+Counting by twos, we say
+Counting by fives, we say
+Counting by tens, we say
+We skip
+We start at
+This ten frame shows
+One full ten.
+A full ten and
+One full row of five.
+A row of five and
+dots.
+dot.
+Slide away the top row of ten.
+Slide away the beads on the bottom row. The full ten is left!
+Half of
+
+===== PART 5 of 5: Cheers, treasure, shop, endings (41 lines) =====
+
+You checked every tile!
+Sharp eyes!
+Careful chomping!
+Perfect room!
+Great thinking!
+You fixed your mistakes. That is how brains grow!
+You kept trying. Nice!
+Mistakes help us learn. Room cleared!
+You figured it out!
+Nice one!
+On fire!
+Six in a row!
+Chomp champ!
+Level up! Your brain is growing!
+Something new in the closet!
+Bonk!
+Ouch!
+Your heart is all better!
+Bubble blocked it!
+You remembered!
+Remember:
+You'll see it again next run!
+Watch the footprints! Monsters step where the footprints are.
+Run over! Great try!
+You are the Dungeon Champion!
+Treasure! Pick one prize.
+Ten-Frame Specs! They show ten-frame pictures of facts.
+Pair Socks! They show numbers as pairs.
+Hop Frog! It shows skip-counting hops.
+Big Heart! One more heart.
+Lucky Clover! Rooms drop an extra coin.
+Sleepy Snail! Monsters move slower.
+Bubble Shield! It blocks one monster hit in every room.
+Flashlight! It lights up a right answer.
+Welcome to Hoot's shop!
+You have
+Bonus question!
+You had
+You spent
+How many coins are left?
+Math bonus! One more coin!
