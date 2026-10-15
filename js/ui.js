@@ -3,7 +3,8 @@
 
 /* ---------- overlays, toasts, banners ---------- */
 function openOverlay(html, o = {}) {
-  const card = $('#ov-card'); card.className = 'card ' + (o.cls || ''); card.innerHTML = html; card.scrollTop = 0;
+  if (typeof stopWalk === 'function') stopWalk();
+  const card = $('#ov-card'); card.className = 'card ' + (o.cls || ''); card.innerHTML = artify(html); card.scrollTop = 0;
   $('#ov').classList.add('show'); ovState = o;
   $('#banner').classList.remove('show');
 }
@@ -12,12 +13,12 @@ const toasts = []; let toasting = false;
 function toast(m) { toasts.push(m); if (!toasting) nextToast(); }
 function nextToast() {
   const m = toasts.shift(); if (!m) { toasting = false; return; }
-  toasting = true; const el = $('#toast'); el.textContent = m; el.classList.add('show');
+  toasting = true; const el = $('#toast'); el.innerHTML = artify(esc(m)); el.classList.add('show');
   setTimeout(() => { el.classList.remove('show'); setTimeout(nextToast, 260); }, 1900);
 }
 let bannerT = null;
 function banner(icon, title, sub) {
-  const b = $('#banner'); b.innerHTML = `<div class="bx"><div class="bi">${icon}</div><div class="bt">${esc(title)}</div><div class="bs">${esc(sub || '')}</div></div>`;
+  const b = $('#banner'); b.innerHTML = artify(`<div class="bx"><div class="bi">${icon}</div><div class="bt">${esc(title)}</div><div class="bs">${esc(sub || '')}</div></div>`);
   b.classList.add('show'); clearTimeout(bannerT); bannerT = setTimeout(() => b.classList.remove('show'), 1700);
 }
 function confetti() {
@@ -40,8 +41,9 @@ function openPause() {
     <button class="btn mint big" data-close>Keep playing</button>
     <button class="btn" data-act="voice">${save.settings.voice ? '🔊 Read aloud: on' : '🔇 Read aloud: off'}</button>
     <button class="btn" data-act="sound">${save.settings.sound ? '🎵 Sounds: on' : '🔕 Sounds: off'}</button>
+    <button class="btn" data-act="music">${save.settings.music ? '🎶 Music: on' : '🔕 Music: off'}</button>
     <button class="btn" data-act="home">💾 Save &amp; go home</button></div>`,
-    { actions: { voice: () => { save.settings.voice = !save.settings.voice; persist(); openPause(); }, sound: () => { save.settings.sound = !save.settings.sound; persist(); openPause(); },
+    { actions: { voice: () => { save.settings.voice = !save.settings.voice; persist(); openPause(); }, sound: () => { save.settings.sound = !save.settings.sound; persist(); openPause(); }, music: () => { Music.toggle(!save.settings.music); openPause(); },
       home: () => { saveRun(); closeOverlay(); showTitle(); } } });
 }
 
@@ -51,8 +53,8 @@ function showTitle() {
   $('#title-hero').innerHTML = heroSVG();
   $('#title-name').textContent = save.name ? `${save.name}'s adventure` : '';
   const bits = [`⭐ ${save.stars} stars`]; if (save.best.floor) bits.push(`best: floor ${save.best.floor}`); if (save.best.wins) bits.push(`🏆 ×${save.best.wins}`);
-  $('#title-stats').textContent = bits.join(' · ');
-  $('#btn-continue').hidden = !save.run; if (save.run) $('#btn-continue').textContent = `▶ Continue (floor ${save.run.floor})`;
+  $('#title-stats').innerHTML = artify(esc(bits.join(' · ')));
+  $('#btn-continue').hidden = !save.run; if (save.run) $('#btn-continue').innerHTML = artify(`▶ Continue (floor ${save.run.floor})`);
 }
 function askName(then) {
   openOverlay(`<h2>Name your hero!</h2><div class="name-hero">${heroSVG()}</div><input class="name-in" id="name-in" maxlength="14" placeholder="Hero name" autocomplete="off" autocapitalize="words" value="${esc(save.name)}"><br><button class="btn mint big" data-act="ok">Let's go!</button>`,
@@ -62,9 +64,9 @@ function askName(then) {
 }
 function openCloset() {
   const sw = Object.entries(COLORS).map(([k, c]) => { const lock = save.stars < c.need;
-    return `<button class="sw ${save.cosmetics.color === k ? 'sel' : ''}" data-act="color" data-k="${k}" ${lock ? 'disabled' : ''}><span class="dot" style="background:${c.c}"></span>${lock ? `🔒 ${c.need}⭐` : c.name}</button>`; }).join('');
+    return `<button class="sw ${save.cosmetics.color === k ? 'sel' : ''}" data-act="color" data-k="${k}" ${lock ? 'disabled' : ''}><span class="dot" style="background:${c.c}"></span>${lock ? `<span class="lk">🔒 ${c.need}⭐</span>` : c.name}</button>`; }).join('');
   const hats = Object.entries(HATS).map(([k, h]) => { const lock = save.stars < h.need;
-    return `<button class="sw ${save.cosmetics.hat === k ? 'sel' : ''}" data-act="hat" data-k="${k}" ${lock ? 'disabled' : ''}>${k !== 'none' && ART.hats && ART.hats[k] ? `<img class="swh" src="${ART.hats[k]}" alt="">` : `<svg viewBox="16 -2 68 38">${k === 'none' ? '<text x="50" y="26" text-anchor="middle" font-size="22" fill="#bfaed8">—</text>' : hatSVG(k)}</svg>`}${lock ? `🔒 ${h.need}⭐` : h.name}</button>`; }).join('');
+    return `<button class="sw ${save.cosmetics.hat === k ? 'sel' : ''}" data-act="hat" data-k="${k}" ${lock ? 'disabled' : ''}>${k !== 'none' && ART.hats && ART.hats[k] ? `<img class="swh" src="${ART.hats[k]}" alt="">` : `<svg viewBox="16 -2 68 38">${k === 'none' ? '<text x="50" y="26" text-anchor="middle" font-size="22" fill="#bfaed8">—</text>' : hatSVG(k)}</svg>`}${lock ? `<span class="lk">🔒 ${h.need}⭐</span>` : h.name}</button>`; }).join('');
   openOverlay(`<h2>👕 Closet</h2><div class="closet-hero">${heroSVG()}</div><p class="sub">⭐ ${save.stars} stars · earn more by chomping!</p><h3>Colors</h3><div class="swatches">${sw}</div><h3>Hats</h3><div class="swatches">${hats}</div><div class="stack"><button class="btn mint" data-close>Done</button></div>`,
     { actions: { color: el => { save.cosmetics.color = el.dataset.k; persist(); openCloset(); }, hat: el => { save.cosmetics.hat = el.dataset.k; persist(); openCloset(); } },
       onClose: () => $('#title-hero').innerHTML = heroSVG() });
@@ -97,6 +99,7 @@ function openGrownups() {
     <h3>Settings</h3>
     ${tg('voice', 'Read aloud', 'Rules, coaching and questions are spoken')}
     ${tg('sound', 'Sound effects')}
+    ${tg('music', 'Background music', 'Spooky lo-fi loop, quieter while the voice talks')}
     ${tg('mistakes', 'Mistakes cost ½ heart', 'Off = gentle mode: wrong answers only coach')}
     ${tg('monsters', 'Monsters', 'Off = calm rooms with no wandering monsters')}
     ${tg('readTiles', 'Read each tile when stepped on', 'Extra support for early readers')}
@@ -112,7 +115,7 @@ function openGrownups() {
     <div class="stack"><button class="btn mint" data-close>Done</button><button class="btn small ghost" data-act="reset">Reset all progress</button></div></div>`,
     { actions: { reset: el => { if (!el.dataset.armed) { el.dataset.armed = 1; el.textContent = 'Tap again to erase everything'; el.style.color = 'var(--red)'; return; }
         try { localStorage.removeItem(SAVE_KEY); } catch (e) {} save = defaultSave(); persist(); closeOverlay(); showTitle(); } },
-      onChange: inp => { if (inp.dataset.set) save.settings[inp.dataset.set] = inp.checked; if (inp.dataset.skill) save.settings.skills[inp.dataset.skill] = inp.checked; persist(); } });
+      onChange: inp => { if (inp.dataset.set === 'music') Music.toggle(inp.checked); else if (inp.dataset.set) save.settings[inp.dataset.set] = inp.checked; if (inp.dataset.skill) save.settings.skills[inp.dataset.skill] = inp.checked; persist(); } });
 }
 
 /* =====================================================================
@@ -139,15 +142,47 @@ $('#ov-card').addEventListener('click', e => {
 $('#ov-card').addEventListener('change', e => { if (ovState && ovState.onChange) ovState.onChange(e.target); });
 $('#ov-card').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'name-in' && ovState && ovState.actions.ok) ovState.actions.ok(); });
 
+/* One press = one step, however long the button is held (holding used to repeat and overshoot onto the next tile). */
 $$('.dbtn').forEach(b => {
-  let rep = null, hold = null;
   const [dx, dy] = b.dataset.move.split(',').map(Number);
-  const stop = () => { clearTimeout(hold); clearInterval(rep); b.classList.remove('pressed'); };
-  b.addEventListener('pointerdown', e => { e.preventDefault(); b.classList.add('pressed'); tryMove(dx, dy); hold = setTimeout(() => rep = setInterval(() => tryMove(dx, dy), 210), 380); });
-  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, stop));
+  b.addEventListener('pointerdown', e => { e.preventDefault(); stopWalk(); b.classList.add('pressed'); tryMove(dx, dy); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => b.classList.remove('pressed')));
 });
+/* Tap a tile: the hero walks all the way to it (stopping short of monsters and footprints). Tap the hero: chomp. */
+let walkTimer = null;
+function stopWalk() { clearTimeout(walkTimer); walkTimer = null; }
+function dangerAt(x, y) { return (room.monsters || []).some(m => !(m.dizzy > 0) && ((m.x === x && m.y === y) || (m.next && m.next.x === x && m.next.y === y))); }
+function pathTo(gx, gy) {
+  const prev = { [key(hero.x, hero.y)]: null }, q = [[hero.x, hero.y]];
+  while (q.length) {
+    const [x, y] = q.shift(); if (x === gx && y === gy) break;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, ny = y + dy, k = key(nx, ny);
+      if (!inGrid(nx, ny) || k in prev || monsterAt(nx, ny)) continue;
+      prev[k] = [x, y]; q.push([nx, ny]);
+    }
+  }
+  if (!(key(gx, gy) in prev)) return null;
+  const path = []; let c = [gx, gy];
+  while (prev[key(...c)]) { path.unshift(c); c = prev[key(...c)]; }
+  return path;
+}
+function walkTo(gx, gy) {
+  stopWalk();
+  const step = () => {
+    walkTimer = null;
+    if (blocked() || (hero.x === gx && hero.y === gy)) return;
+    const path = pathTo(gx, gy);
+    if (!path || !path.length) { Sound.play('bump'); return; }
+    const [nx, ny] = path[0];
+    if (dangerAt(nx, ny)) { nudgeHero(nx - hero.x, ny - hero.y); Sound.play('bump'); return; }   // never walk into danger on its own
+    const from = key(hero.x, hero.y); tryMove(nx - hero.x, ny - hero.y);
+    if (key(hero.x, hero.y) !== from && (hero.x !== gx || hero.y !== gy)) walkTimer = setTimeout(step, 170);
+  };
+  step();
+}
 const cb = $('#btn-chomp');
-cb.addEventListener('pointerdown', e => { e.preventDefault(); cb.classList.add('pressed'); chomp(); });
+cb.addEventListener('pointerdown', e => { e.preventDefault(); stopWalk(); cb.classList.add('pressed'); chomp(); });
 ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => cb.addEventListener(ev, () => cb.classList.remove('pressed')));
 $('#btn-glow').addEventListener('click', useGlow);
 $('#btn-say').addEventListener('click', () => Voice.say(ruleInfo().say));
@@ -162,12 +197,12 @@ $('#stage').addEventListener('pointerdown', e => { ptr = e.target.closest('.door
 $('#stage').addEventListener('pointerup', e => {
   if (!ptr || blocked()) { ptr = null; return; }
   const dx = e.clientX - ptr.x, dy = e.clientY - ptr.y, p = ptr; ptr = null;
-  if (Math.hypot(dx, dy) > 30) { Math.abs(dx) > Math.abs(dy) ? tryMove(Math.sign(dx), 0) : tryMove(0, Math.sign(dy)); return; }
+  if (Math.hypot(dx, dy) > 30) { stopWalk(); Math.abs(dx) > Math.abs(dy) ? tryMove(Math.sign(dx), 0) : tryMove(0, Math.sign(dy)); return; }
   const r = $('#grid').getBoundingClientRect(), c = r.width / 5;
   const cx = Math.floor((p.x - r.left) / c), cy = Math.floor((p.y - r.top) / c);
   if (cx < 0 || cy < 0 || cx > 4 || cy > 4) return;
-  const ddx = cx - hero.x, ddy = cy - hero.y; if (!ddx && !ddy) return chomp();
-  Math.abs(ddx) >= Math.abs(ddy) ? tryMove(Math.sign(ddx), 0) : tryMove(0, Math.sign(ddy));
+  if (cx === hero.x && cy === hero.y) { stopWalk(); return chomp(); }
+  walkTo(cx, cy);
 });
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
@@ -193,7 +228,7 @@ $('#btn-closet').addEventListener('click', openCloset);
 })();
 window.addEventListener('resize', () => { fit(); if (run && room) renderMap(); });
 if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('#stage'));
-document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); } else if (run) run.tick = Date.now(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); if (Sound.ctx) Sound.ctx.suspend(); } else { if (Sound.ctx) Sound.ctx.resume(); if (run) run.tick = Date.now(); } });
 
 window.DD = { get run() { return run; }, get room() { return room; }, get hero() { return hero; }, get save() { return save; }, tryMove, chomp, goThrough, enterRoom, bossPick, bossAnswer, trapdoor, takeItem, openShop, buy, closeOverlay, newRun, endRun, planMonsters };
-document.addEventListener('DOMContentLoaded', () => { Clips.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });
+document.addEventListener('DOMContentLoaded', () => { Clips.init(); Music.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });

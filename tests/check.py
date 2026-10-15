@@ -196,6 +196,53 @@ LAYOUT = r"""() => { const vw = innerWidth, vh = innerHeight, box = e => e.getBo
   return { hscroll: document.scrollingElement.scrollWidth > vw + 1, grid_in_view: g.left >= 0 && g.right <= vw && g.top >= 0 && g.bottom <= vh,
            chomp_in_view: c.right <= vw && c.bottom <= vh, cell: Math.round(g.width / 5) }; }"""
 
+
+# ---- kid-style play: read the rule + tiles off the screen, walk with real d-pad presses, press CHOMP
+import re as _re
+def _truth(title, tile):
+    m = _re.match(r'Make (\d+)$', title)
+    if m:
+        e = _re.match(r'(\d+)\s*([+−-])\s*(\d+)$', tile['text']); a, op, b = int(e[1]), e[2], int(e[3])
+        return (a + b if op == '+' else a - b) == int(m[1])
+    if title in ('Even numbers', 'Odd numbers'): return (int(tile['text']) % 2 == 0) == (title == 'Even numbers')
+    m = _re.match(r'Count by (\d+)s(?: from (\d+))?$', title)
+    if m: step = int(m[1]); st = int(m[2]) if m[2] else step; n = int(tile['text']); return n >= st and (n - st) % step == 0
+    m = _re.match(r'Find (\d+)$', title)
+    if m: return tile['dots'] == int(m[1])
+    raise ValueError(title)
+_READ = r"""() => ({ title: document.querySelector('#rule-title').textContent.trim(),
+  tiles: [...document.querySelectorAll('#grid .cell')].map(c => { const t = c.querySelector('.tile'); if (!t) return null; const svg = t.querySelector('svg');
+    const dots = svg ? [...svg.querySelectorAll('circle, image.counter')].filter(e => !/ffc2ca/i.test(e.getAttribute('fill') || '') && !e.classList.contains('x')).length : null;
+    const txt = [...t.childNodes].filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList.contains('rv') && n.tagName !== 'svg')).map(n => n.textContent).join('').replace(/[ \s]+/g, ' ').trim();
+    return { x: +c.dataset.x, y: +c.dataset.y, text: txt, dots }; }).filter(Boolean) })"""
+async def _press(page, sel, hold=80):
+    b = await page.locator(sel).bounding_box(); await page.mouse.move(b['x'] + b['width'] / 2, b['y'] + b['height'] / 2)
+    await page.mouse.down(); await page.wait_for_timeout(hold); await page.mouse.up(); await page.wait_for_timeout(40)
+async def kid_play(page):
+    await page.evaluate(FRESH + " save.roomsEver = 9; save.settings.monsters = false; save.settings.music = false; DD.newRun(); DD.closeOverlay();")
+    specs = [('add', l) for l in range(1, 5)] + [('sub', l) for l in range(1, 4)] + [('evenOdd', l) for l in range(1, 4)] + \
+            [('skip10', 1), ('skip10', 2), ('skip5', 1), ('skip5', 2), ('skip2', 1), ('skip2', 2), ('skip2', 3)] + [('frames', l) for l in range(1, 4)]
+    D = {(0, -1): '.dbtn.up', (0, 1): '.dbtn.down', (-1, 0): '.dbtn.left', (1, 0): '.dbtn.right'}
+    checked, bad = 0, []
+    for skill, lvl in specs:
+        await page.evaluate(f"""() => {{ save.settings.skills = Object.fromEntries(Object.keys(SKILLS).map(k => [k, k === '{skill}'])); sk('{skill}').level = {lvl}; sk('add').level = Math.max(sk('add').level, 2);
+          run.hearts = 12; run.maxHearts = 12; let r = Object.values(run.map.rooms).find(x => x.type === 'normal' && !x.gen);
+          if (!r) {{ run.map = genFloor(1); r = Object.values(run.map.rooms).find(x => x.type === 'normal' && !x.gen); }}
+          hero.x = 2; hero.y = 0; DD.enterRoom(r, {{ x: 2, y: 0 }}); DD.closeOverlay(); }}""")
+        st = await page.evaluate(_READ)
+        for t in st['tiles']:
+            for _ in range(10):
+                hx, hy = await page.evaluate("[DD.hero.x, DD.hero.y]")
+                if (hx, hy) == (t['x'], t['y']): break
+                await _press(page, D[(1 if t['x'] > hx else -1, 0) if t['x'] != hx else (0, 1 if t['y'] > hy else -1)])
+            await _press(page, '#btn-chomp'); await page.wait_for_timeout(40)
+            v = await page.evaluate("""(() => { const ov = document.querySelector('#ov').classList.contains('show'); const c = document.querySelector(`#grid .cell[data-x="${DD.hero.x}"][data-y="${DD.hero.y}"]`);
+                const r = { wrong: ov, eaten: !!(c && c.querySelector('.crumbs')), cleared: DD.room.cleared }; if (ov) DD.closeOverlay(); run.hearts = 12; return r; })()""")
+            checked += 1
+            if (v['eaten'] and not v['wrong']) != _truth(st['title'], t): bad.append(f"{st['title']}: '{t['text'] or t['dots']}'")
+            if v['cleared']: break
+    return checked, bad
+
 async def main():
     t0 = time.time()
     async with async_playwright() as p:
@@ -214,6 +261,23 @@ async def main():
         lp = await page.evaluate(LOOP)
         for k, v in lp.items(): report(k.replace('_', ' '), v)
         trophy, log = await smoke(page)
+        n, bad = await kid_play(page)
+        report(f'kid-style play: {n} chomps by real button presses all scored right', not bad, '; '.join(bad[:6]))
+        inp = await page.evaluate(FRESH + r""" save.roomsEver = 9; save.settings.monsters = false; DD.newRun(); DD.closeOverlay();
+            const r = Object.values(run.map.rooms).find(x => x.type === 'normal' && !x.gen); hero.x = 0; hero.y = 2; DD.enterRoom(r, { x: 0, y: 2 }); DD.closeOverlay(); 1""")
+        bb = await page.locator('.dbtn.right').bounding_box(); await page.mouse.move(bb['x'] + 20, bb['y'] + 20); await page.mouse.down(); await page.wait_for_timeout(1200); await page.mouse.up(); await page.wait_for_timeout(80)
+        report('holding an arrow moves exactly one square', await page.evaluate("hero.x") == 1)
+        await page.evaluate("hero.x = 0; hero.y = 0; renderAll();")
+        g = await page.locator('#grid').bounding_box(); c = g['width'] / 5
+        await page.mouse.click(g['x'] + 4.5 * c, g['y'] + 3.5 * c); await page.wait_for_timeout(1300)
+        report('tapping a tile walks the hero all the way there', await page.evaluate("[hero.x, hero.y]") == [4, 3])
+        tag = await page.evaluate("(() => { const t = DD.room.tiles.find(t => !t.chomped); hero.x = t.x; hero.y = t.y; renderAll(); const g = document.querySelector('#herotag'); return [t.kind === 'frame' ? 'frame' : t.label.replace(/ /g, ''), g.hidden ? null : (t.kind === 'frame' ? (g.querySelector('svg') ? 'frame' : '') : g.textContent.replace(/[\\u2009\\s]/g, ''))]; })()")
+        report('the tag above the hero shows the tile CHOMP will eat', tag[0] == tag[1], json.dumps(tag))
+        mus = await page.evaluate("""new Promise(res => { save.settings.music = true; Sound.init(); Music.start(); const t0 = Date.now();
+            (function w() { if (Music.on && Music.sources.length) { save.settings.voice = true; Voice.say('Double 6 is 12!'); setTimeout(() => res({ dur: Music.buf.duration, ducked: +Music.gain.gain.value.toFixed(2) }), 400); }
+              else if (Date.now() - t0 > 8000) res(null); else setTimeout(w, 100); })(); })""")
+        report('background music plays and dips under the voice', bool(mus) and mus['dur'] > 50 and mus['ducked'] <= 0.1, json.dumps(mus))
+        await page.evaluate("Music.toggle(false); save.settings.voice = false")
         said = await page.evaluate("[...new Set(Voice.log)].filter(t => !Clips.ids(t))")
         report('everything said in a full run uses recorded clips', not said, ' | '.join(said[:8]))
         played = await page.evaluate("""new Promise(res => { Sound.init(); Clips.decode(); const t0 = Date.now();

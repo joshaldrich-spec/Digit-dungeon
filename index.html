@@ -12,7 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/game.css?v6">
+<link rel="stylesheet" href="css/game.css?v7">
+<link rel="stylesheet" href="css/skin.css?v7">
 </head>
 <body>
 <div id="app">
@@ -28,7 +29,7 @@
       <button class="btn mint big" id="btn-play">New Run</button>
       <button class="btn" id="btn-closet">👕 Closet</button>
     </div>
-    <button class="grownups-btn" id="btn-grownups">Grown-ups · hold</button>
+    <button class="grownups-btn" id="btn-grownups">⚙ Grown-ups · hold</button>
   </div>
 </section>
 
@@ -52,6 +53,9 @@
       <button class="door e" id="door-e" data-dir="e" aria-label="East door"></button>
       <button class="door s" id="door-s" data-dir="s" aria-label="South door"></button>
       <button class="door w" id="door-w" data-dir="w" aria-label="West door"></button>
+      <img class="pillar tl" src="art/props/pillar.webp" alt="" onerror="this.remove()"><img class="pillar tr" src="art/props/pillar.webp" alt="" onerror="this.remove()">
+      <img class="pillar bl" src="art/props/pillar.webp" alt="" onerror="this.remove()"><img class="pillar br" src="art/props/pillar.webp" alt="" onerror="this.remove()">
+      <img class="torch l" src="art/props/torch.webp" alt="" onerror="this.remove()"><img class="torch r" src="art/props/torch.webp" alt="" onerror="this.remove()">
       <div class="grid" id="grid"></div>
       <div class="marks" id="marks"></div>
       <div class="actors" id="actors"></div>
@@ -81,14 +85,14 @@
 <div class="fx" id="fx"></div>
 </div>
 
-<script src="audio/voice.js?v6"></script>
-<script src="js/core.js?v6"></script>
-<script src="js/curriculum.js?v6"></script>
-<script src="js/coaching.js?v6"></script>
-<script src="js/art.js?v6"></script>
-<script src="js/dungeon.js?v6"></script>
-<script src="js/play.js?v6"></script>
-<script src="js/render.js?v6"></script>
-<script src="js/ui.js?v6"></script>
+<script src="audio/voice.js?v7"></script>
+<script src="js/core.js?v7"></script>
+<script src="js/curriculum.js?v7"></script>
+<script src="js/coaching.js?v7"></script>
+<script src="js/art.js?v7"></script>
+<script src="js/dungeon.js?v7"></script>
+<script src="js/play.js?v7"></script>
+<script src="js/render.js?v7"></script>
+<script src="js/ui.js?v7"></script>
 </body>
 </html>

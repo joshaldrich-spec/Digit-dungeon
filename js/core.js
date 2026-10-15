@@ -9,7 +9,7 @@
    ===================================================================== */
 
 
-const BUILD = 'v6';   // bump with the ?v3 tags in index.html on every release
+const BUILD = 'v7';   // bump with the ?v3 tags in index.html on every release
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -39,7 +39,7 @@ const SAVE_KEY = 'digit-dungeon-v1';
 function defaultSave() {
   return { v: 1, name: '', stars: 0, cosmetics: { color: 'mint', hat: 'none' }, unlocks: [], best: { floor: 0, wins: 0 },
     runsPlayed: 0, roomCount: 0, roomsEver: 0, chompsEver: 0, remembered: 0, comeback: [], skills: {}, facts: {}, days: {},
-    settings: { voice: true, sound: true, mistakes: true, monsters: true, readTiles: false,
+    settings: { voice: true, sound: true, music: true, mistakes: true, monsters: true, readTiles: false,
       skills: { frames: true, evenOdd: true, skip10: true, skip5: true, skip2: true, add: true, sub: true } },
     run: null };
 }
@@ -137,8 +137,54 @@ const Clips = {
       s.start(t, off, dur); this.nodes.push(s); t += dur - 0.03;
     }
     this.endAt = t;
+    Music.duck(t);
   },
   stop() { this.nodes.forEach(n => { try { n.stop(); } catch (e) {} }); this.nodes = []; this.endAt = 0; },
+};
+/* Music: one composed 16-bar loop (audio/music.mp3, made by tools/music.py). A fresh copy starts every
+   LOOP seconds and the 3 s tail rings into the next pass, so it repeats with no gap. Medium-low volume,
+   ducked while the voice talks. */
+const Music = {
+  LOOP: 54.8571, LEVEL: 0.2, DUCK: 0.08,
+  raw: null, buf: null, gain: null, next: 0, timer: null, on: false, decoding: false,
+  init() { try { fetch('audio/music.mp3').then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { this.raw = b; this.start(); }).catch(() => {}); } catch (e) {} },
+  start() {
+    if (!save.settings.music || !this.raw || !Sound.ctx) return;
+    if (!this.buf) {
+      if (this.decoding) return; this.decoding = true;
+      const ok = b => { this.buf = b; this.decoding = false; this.start(); };
+      try { const p = Sound.ctx.decodeAudioData(this.raw.slice(0), ok, () => { this.decoding = false; }); if (p && p.catch) p.catch(() => {}); } catch (e) { this.decoding = false; }
+      return;
+    }
+    if (this.on) return;
+    const ctx = Sound.ctx; if (ctx.state === 'suspended') ctx.resume();
+    if (!this.gain) { this.gain = ctx.createGain(); this.gain.connect(ctx.destination); }
+    this.gain.gain.cancelScheduledValues(ctx.currentTime); this.gain.gain.setValueAtTime(0, ctx.currentTime);
+    this.gain.gain.linearRampToValueAtTime(this.LEVEL, ctx.currentTime + 2.5);       // fade in
+    this.on = true; this.next = ctx.currentTime + 0.1; this.sources = []; this.pump();
+    this.timer = setInterval(() => this.pump(), 1000);
+  },
+  pump() {
+    const ctx = Sound.ctx; if (!this.on || !ctx) return;
+    while (this.next < ctx.currentTime + 3) {
+      const s = ctx.createBufferSource(); s.buffer = this.buf; s.connect(this.gain); s.start(this.next);
+      this.sources.push(s); this.next += this.LOOP;
+      s.onended = () => { this.sources = this.sources.filter(x => x !== s); };
+    }
+  },
+  stop() {
+    if (!this.on) return; this.on = false; clearInterval(this.timer);
+    const ctx = Sound.ctx, t = ctx.currentTime;
+    this.gain.gain.cancelScheduledValues(t); this.gain.gain.setValueAtTime(this.gain.gain.value, t); this.gain.gain.linearRampToValueAtTime(0, t + 0.6);
+    const old = this.sources; this.sources = []; setTimeout(() => old.forEach(s => { try { s.stop(); } catch (e) {} }), 700);
+  },
+  duck(until) {   // lower the music while the voice speaks
+    if (!this.on || !this.gain) return;
+    const ctx = Sound.ctx, g = this.gain.gain, t = ctx.currentTime;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(this.DUCK, t + 0.15);
+    g.setValueAtTime(this.DUCK, Math.max(t + 0.15, until)); g.linearRampToValueAtTime(this.LEVEL, Math.max(t + 0.15, until) + 0.6);
+  },
+  toggle(onOff) { save.settings.music = onOff; persist(); onOff ? this.start() : this.stop(); },
 };
 const Voice = {
   v: null, unlocked: false, log: null,
@@ -166,4 +212,4 @@ const Voice = {
   stop() { this.ttsStop(); Clips.stop(); }
 };
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => Voice.pick();
-document.addEventListener('pointerdown', () => { Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume(); Clips.decode(); Voice.unlock(); }, true);
+document.addEventListener('pointerdown', () => { Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume(); Clips.decode(); Music.start(); Voice.unlock(); }, true);

@@ -326,7 +326,7 @@ function renderBoss() {
   else if (b.step === 'answer') body = `<p class="boss-q">${b.hp} − ${b.move.k} = <span class="qmark">?</span></p><div class="choices">${b.choices.map(v => `<button class="ch" data-act="ans" data-v="${v}" ${b.wrong.includes(v) ? 'disabled' : ''}>${v}</button>`).join('')}</div>${b.hint ? `<p class="hint">💡 ${b.hint}</p>` : ''}`;
   else if (b.step === 'win') body = `<p><b>You beat ${B.name}!</b> 🎉</p><p>+10 ⭐ &nbsp; +5 🪙</p><button class="btn gold big" data-act="trap">${run.floor < 3 ? 'Jump down the trapdoor ⬇️' : 'Claim your trophy 🏆'}</button>`;
   const hearts = heartsHTML();
-  openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}"><div class="boss-hearts">${hearts}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackSVG(b.hp, b.gone || 0)}</div>${body}</div>`,
+  openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}"><div class="boss-hearts">${hearts}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackHTML(b.hp, b.gone || 0)}</div>${body}</div>`,
     { cls: 'boss-card', actions: {
       go: () => { b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); Voice.say('Pick an attack!'); saveRun(); },
       atk: el => bossPick(+el.dataset.i), ans: el => bossAnswer(+el.dataset.v),
@@ -392,7 +392,7 @@ function endRun(won) {
     ${monsterTip ? `<div class="tipline"><span class="tp">${pawSVG('#d9c8ff')}</span><span>Monsters step on the footprints!</span></div>` : ''}
     ${newU.length ? `<p class="sub">🎁 New in the Closet: <b>${newU.join(', ')}</b></p>` : ''}
     <div class="stack"><button class="btn mint big" data-act="again">Play again</button><button class="btn" data-act="home">Home</button></div>`,
-    { actions: { again: () => { closeOverlay(); newRun(); }, home: () => { closeOverlay(); showTitle(); } } });
+    { cls: 'scene-card', actions: { again: () => { closeOverlay(); newRun(); }, home: () => { closeOverlay(); showTitle(); } } });
   Voice.say(won ? 'You are the Dungeon Champion!' : card ? `Remember: ${card.say}. You'll see it again next run!` : monsterTip ? 'Watch the footprints! Monsters step where the footprints are.' : 'Run over! Great try!');
 }
 function unlocksBetween(a, b) {

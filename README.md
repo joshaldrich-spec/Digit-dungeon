@@ -7,7 +7,8 @@ A math roguelite for 2nd grade (Bridges in Mathematics, Grade 2, Unit 1). Plain 
 | Path | What it holds |
 |---|---|
 | `index.html` | The page: screens and buttons, plus the list of scripts to load |
-| `css/game.css` | All styles |
+| `css/game.css` | Layout and base styles |
+| `css/skin.css` | The Gemini art for buttons, panels, icons, room walls and backgrounds (on when all skin art loads) |
 | `js/core.js` | Helpers, save data, sound effects, read-aloud voice |
 | `js/curriculum.js` | The math: skills, fact pools, rules that build each room |
 | `js/coaching.js` | Strategy coaching, mistake cards, remember cards |
@@ -18,10 +19,13 @@ A math roguelite for 2nd grade (Bridges in Mathematics, Grade 2, Unit 1). Plain 
 | `js/ui.js` | Overlays, title, closet, grown-ups panel, input, start-up |
 | `art/` | Sprites (`.webp`, backgrounds removed); `art/hero/` has one per Closet color |
 | `audio/voice.mp3`, `audio/voice.js` | The Gemini voice recording cut into 232 clips, and the index the game uses to string them into sentences |
+| `audio/music.mp3` | Background music loop (composed by `tools/music.py`) |
 | `audio/voice-lines.json` | Master list of voice clips (id, recording part, text) |
 | `docs/` | Gemini voice script and art prompts |
-| `tests/check.py` | One command that checks the math, monsters, learning loop, a full run and layouts |
+| `tests/check.py` | One command that checks the math (including kid-style play by real button presses), monsters, learning loop, input, voice, music, a full run and layouts |
 | `tools/voice/` | How the recording was cut (alignment, clip list) |
+| `tools/cut_ui.py`, `tools/cut_sheets.py` | Cut Gemini sprite sheets into game art |
+| `tools/music.py` | Composes and renders the background music |
 | `tools/process_art.py` | Turns a Gemini image into a game sprite (removes background, crops, recolors hero) |
 
 Scripts are loaded in order by `index.html` and share globals; there are no imports.
@@ -29,6 +33,6 @@ Scripts are loaded in order by `index.html` and share globals; there are no impo
 ## Releasing a change
 
 1. Change only the files involved.
-2. Run `python3 tests/check.py` (about 30 seconds; add `--shots` for screenshots).
+2. Run `python3 tests/check.py` (about 2 minutes; add `--shots` for screenshots).
 3. Bump the version: `BUILD` in `js/core.js` and the `?vN` tags in `index.html`. That forces iPads to fetch the new files.
 4. Commit. GitHub Pages redeploys in about a minute. The build number shows in the Grown-ups panel.

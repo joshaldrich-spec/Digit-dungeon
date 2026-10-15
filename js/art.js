@@ -24,7 +24,34 @@ const ART = {
   coin: 'art/coin.webp', heart: 'art/heart.webp', chest: 'art/chest.webp',
   shopkeeper: 'art/shopkeeper.webp', trapdoor: 'art/trapdoor.webp',
   title: 'art/title.webp',   // title screen picture (shown by index.html + css; listed here so it preloads)
+  icons: files('icons', ['speaker', 'mute', 'pause', 'music', 'music-off', 'home', 'lock', 'target', 'arrow', 'swords', 'bag', 'gift', 'shirt', 'bulb', 'comeback', 'gear']),
+  fx: files('fx', ['flame', 'popper', 'sparkles', 'zap', 'snip', 'moon', 'bomb', 'burst', 'smoke', 'dizzy', 'up', 'down', 'candle', 'paws', 'gem-empty', 'gem']),
+  math: files('math', ['heart', 'heart-empty', 'heart-crack', 'counter-red', 'counter-blue', 'board', 'bead-red', 'bead-cream', 'rack']),
+  props: files('props', ['pillar', 'torch', 'barrel', 'heap', 'coins', 'boulder', 'rocks', 'grass', 'arch', 'slab']),
+  // used only by css/skin.css (listed so they preload; the skin switches on when they all load)
+  skin: Object.assign(files('bg', ['wall', 'room', 'brick', 'cobble']), files('panels', ['tablet', 'sign', 'frame', 'plaque', 'bubble', 'ribbon', 'parchment', 'card', 'ring']),
+                      files('buttons', ['chomp', 'dpad', 'square', 'gold', 'green', 'purple'])),
 };
+ART.ui.logo = 'art/ui/logo.webp';
+function files(dir, names) { return Object.fromEntries(names.map(n => [dir + ':' + n, `art/${dir}/${n}.webp`]).map(([k, v]) => [k.split(':')[1].replace(/-(\w)/g, (_, c) => c.toUpperCase()), v])); }
+/* geometry measured from the art by tools/cut_ui.py (art/math/layout.json) */
+const BOARD = { x0: 0.0725, x1: 0.925, y0: 0.1298, y1: 0.7981, aspect: 1.9231 };
+const RACK = { rods: [0.218, 0.743] };   // rod heights inside the rack's opening
+/* emoji in any message become the matching art (falls back to the emoji if that art is missing) */
+const EMOJI_ART = () => {
+  const I = ART.icons || {}, F = ART.fx || {}, U = ART.ui || {}, T = ART.items || {}, M = ART.math || {};
+  return { '⭐': U.star, '🪙': ART.coin, '🔊': I.speaker, '🔇': I.mute, '⏸': I.pause, '🎵': I.music, '🎶': I.music, '🔕': I.musicOff, '💾': I.home, '🏠': I.home,
+    '🔒': I.lock, '🎯': I.target, '➜': I.arrow, '▶': I.arrow, '⚔': I.swords, '🛒': I.bag, '🎁': I.gift, '👕': I.shirt, '💡': I.bulb, '🔁': I.comeback, '⚙': I.gear,
+    '🔥': F.flame, '🎉': F.popper, '✨': F.sparkles, '⚡': F.zap, '✂': F.snip, '🌗': F.moon, '💣': F.bomb, '💥': F.burst, '💨': F.smoke, '💫': F.dizzy,
+    '⬆': F.up, '⬇': F.down, '🕯': F.candle, '❤': M.heart, '💖': T.heart, '🧠': U.brain, '🏆': U.trophy, '🏅': U.star, '👑': ART.chest, '🦉': ART.shopkeeper,
+    '🫧': T.bubble, '🔦': T.flashlight, '🥽': T.specs, '🧦': T.socks, '🐸': T.frog, '🍀': T.clover, '🐌': T.snail, '🚪': ART.props && ART.props.arch };
+};
+const EMOJI_RE = /(⭐|🪙|🔊|🔇|⏸|🎵|🎶|🔕|💾|🏠|🔒|🎯|➜|▶|⚔|🛒|🎁|👕|💡|🔁|⚙|🔥|🎉|✨|⚡|✂|🌗|💣|💥|💨|💫|⬆|⬇|🕯|❤|💖|🧠|🏆|🏅|👑|🦉|🫧|🔦|🥽|🧦|🐸|🍀|🐌|🚪)️?/gu;
+function artify(html) {
+  if (typeof html !== 'string') return html;
+  const map = EMOJI_ART();
+  return html.replace(EMOJI_RE, (m, e) => (map[e] ? `<img class="ei" src="${map[e]}" alt="" draggable="false">` : m));
+}
 /* preload every sprite; forget any that fail so the drawing is used instead */
 function loadArt() {
   const jobs = [];
@@ -39,6 +66,9 @@ function applyArt() {
   if (U.tile) { root.setProperty('--tile-img', abs(U.tile)); b.add('has-tile'); }
   if (D.floor1 && D.floor2 && D.floor3) { [1, 2, 3].forEach(i => root.setProperty(`--floor${i}`, abs(D['floor' + i]))); b.add('has-floor'); }
   if (D.doorClosed && D.doorOpen) { root.setProperty('--door-closed', abs(D.doorClosed)); root.setProperty('--door-open', abs(D.doorOpen)); b.add('has-doors'); }
+  if (ART.skin && Object.keys(ART.skin).length === 19) b.add('skin');
+  if (U.logo) $$('.logo').forEach(l => { l.innerHTML = `<img class="logo-img" src="${U.logo}" alt="Digit Dungeon" draggable="false">`; });
+  ['#btn-pause', '#btn-say', '#btn-closet', '#btn-grownups', '#btn-chomp'].forEach(s => { const e = $(s); if (e && !e.dataset.art) { e.dataset.art = 1; e.innerHTML = artify(e.innerHTML); } });
 }
 const icon = (src, emoji, cls = 'ico') => (src ? `<img class="${cls}" src="${src}" alt="" draggable="false">` : emoji);
 const itemIcon = (id, cls) => icon(ART.items && ART.items[id], ITEMS[id] ? ITEMS[id].icon : '', cls);
@@ -135,6 +165,10 @@ const coinSVG = () => ART.coin ? img(ART.coin) : `<svg viewBox="0 0 100 100"><el
 const HEART_P = 'M16 28C6 20 1.5 14 1.5 8.6 1.5 4.5 4.8 1.5 8.8 1.5c2.9 0 5.2 1.5 7.2 4 2-2.5 4.3-4 7.2-4 4 0 7.3 3 7.3 7.1C30.5 14 26 20 16 28z';
 const heartPickupSVG = () => ART.heart ? img(ART.heart) : `<svg viewBox="0 0 32 30"><path d="${HEART_P}" fill="#ff5a6e" stroke="#b8293f" stroke-width="2"/><path d="M7 7c1-1.5 3-2 4.5-1.5" stroke="#ffc2cb" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`;
 function heartSVG(v, crack) {
+  const M = ART.math;
+  if (M && M.heart && M.heartEmpty) {
+    return `<span class="heart ha"><img src="${M.heartEmpty}" alt="">${v === 2 ? `<img src="${M.heart}" alt="">` : v === 1 ? `<img class="halfL" src="${M.heart}" alt="">` : ''}${crack && M.heartCrack ? `<img class="crk ${crack}" src="${M.heartCrack}" alt="">` : ''}</span>`;
+  }
   const id = 'hc' + uid(), cid = 'hk' + uid();
   return `<svg viewBox="0 0 32 30" class="heart"><path d="${HEART_P}" fill="#3a2a4a"/>${crack ? `<clipPath id="${cid}"><rect x="${crack === 'R' ? 16 : 0}" width="16" height="30"/></clipPath><path d="${HEART_P}" fill="#ff5a6e" opacity=".4" clip-path="url(#${cid})"/>` : ''}${v > 0 ? `<clipPath id="${id}"><rect width="${v === 2 ? 32 : 16}" height="30"/></clipPath><path d="${HEART_P}" fill="#ff5a6e" clip-path="url(#${id})"/><path d="M7 7c1-1.5 3-2 4.5-1.5" stroke="#ffc2cb" stroke-width="2.2" fill="none" stroke-linecap="round" clip-path="url(#${id})"/>` : ''}${crack ? '<path d="M16 6 L12.5 11.5 L18 15.5 L13.5 21 L16.5 26" stroke="#fff3da" stroke-width="1.8" fill="none" stroke-linejoin="round"/>' : ''}<path d="${HEART_P}" fill="none" stroke="#140e1c" stroke-width="2"/></svg>`;
 }
@@ -144,6 +178,8 @@ const trapSVG = () => ART.trapdoor ? img(ART.trapdoor) : `<svg viewBox="0 0 100 
 
 /* math models (ink on paper) */
 function framesSVG(segs, o = {}) {
+  const M = ART.math;
+  if ((o.cell || 10) >= 14 && M && M.board && M.counterRed && M.counterBlue) return framesArt(segs, o);
   const cell = o.cell || 10, list = []; segs.forEach(g => { for (let i = 0; i < g.n; i++) list.push(g.cls); });
   const nf = o.frames || Math.max(1, Math.ceil(list.length / 10)), gapF = cell * .4, W = 5 * cell, H = nf * 2 * cell + (nf - 1) * gapF, sw = Math.max(1, cell * .09);
   let s = '';
@@ -162,6 +198,8 @@ function framesSVG(segs, o = {}) {
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
 }
 function pairsSVG(n, size = 16) {
+  const M = ART.math;
+  if (size >= 14 && M && M.counterRed && M.counterBlue) return pairsArt(n, size);
   const cols = Math.ceil(n / 2), gap = size * 1.3, W = cols * gap + 8, H = 2 * gap + 8; let s = '';
   for (let c = 0; c < cols; c++) {
     const x = 4 + c * gap + gap / 2, full = c * 2 + 1 < n;
@@ -196,4 +234,56 @@ function rackSVG(hp, gone = 0) {
     }
   }
   return `<svg viewBox="0 0 ${W} 70" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+
+/* ---- math pictures drawn with the Gemini pieces (positions are still exact) ---- */
+function framesArt(segs, o = {}) {
+  const M = ART.math, cell = o.cell || 10, list = []; segs.forEach(g => { for (let i = 0; i < g.n; i++) list.push(g.cls); });
+  const nf = o.frames || Math.max(1, Math.ceil(list.length / 10));
+  const BW = 5 * cell / (BOARD.x1 - BOARD.x0), BH = BW / BOARD.aspect, gx = BOARD.x0 * BW, gy = BOARD.y0 * BH, ch = (BOARD.y1 - BOARD.y0) * BH / 2, gap = cell * .25;
+  let s = '';
+  for (let f = 0; f < nf; f++) {
+    const oy = f * (BH + gap);
+    s += `<image href="${M.board}" x="0" y="${oy}" width="${BW}" height="${BH}" preserveAspectRatio="none"/>`;
+    for (let k = 0; k < 10; k++) {
+      const i = f * 10 + k; if (i >= list.length) break;
+      const cls = list[i], d = Math.min(cell, ch) * .82, cx = gx + (k % 5) * cell + cell / 2, cy = oy + gy + Math.floor(k / 5) * ch + ch / 2;
+      s += `<image class="counter${cls === 'x' ? ' x' : ''}" href="${cls === 'b' ? M.counterBlue : M.counterRed}" x="${cx - d / 2}" y="${cy - d / 2}" width="${d}" height="${d}"${cls === 'x' ? ' opacity=".35"' : ''}/>`;
+      if (cls === 'x') { const r = d * .3; s += `<path d="M${cx - r} ${cy - r}L${cx + r} ${cy + r}M${cx + r} ${cy - r}L${cx - r} ${cy + r}" stroke="#b8293f" stroke-width="${cell * .12}" stroke-linecap="round"/>`; }
+    }
+  }
+  return `<svg viewBox="0 0 ${BW} ${nf * BH + (nf - 1) * gap}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+function pairsArt(n, size) {
+  const M = ART.math, cols = Math.ceil(n / 2), gap = size * 1.3, W = cols * gap + 8, H = 2 * gap + 8, d = size * .95; let s = '';
+  for (let c = 0; c < cols; c++) {
+    const x = 4 + c * gap + gap / 2, full = c * 2 + 1 < n;
+    if (full) s += `<rect x="${x - size * .62}" y="${4 + gap * .5 - size * .62}" width="${size * 1.24}" height="${gap + size * 1.24}" rx="${size * .62}" fill="none" stroke="#ffc84a" stroke-width="2.4"/>`;
+    for (let r = 0; r < 2; r++) { if (c * 2 + r >= n) break; s += `<image class="counter" href="${full ? M.counterRed : M.counterBlue}" x="${x - d / 2}" y="${4 + gap * .5 + r * gap - d / 2}" width="${d}" height="${d}"/>`; }
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+/* boss number rack: wooden frame (stretched by css) with 5 red + 5 cream beads on each rod */
+function rackHTML(hp, gone = 0) {
+  const M = ART.math;
+  if (!(M && M.rack && M.beadRed && M.beadCream && document.body.classList.contains('skin'))) return rackSVG(hp, gone);
+  let h = '';
+  for (let row = 0; row < 2; row++) for (let i = 0; i < 10; i++) {
+    const idx = row * 10 + i, on = idx < hp, was = idx < hp + gone;
+    h += `<img class="bead${on ? '' : ' off'}${!on && was ? ' gone' : ''}" src="${i < 5 ? M.beadRed : M.beadCream}" style="left:${1 + i * 7.7 + (on ? 0 : 21)}%;top:${RACK.rods[row] * 100}%" alt="">`;
+  }
+  return `<div class="rackA"><div class="rods">${h}</div></div>`;
+}
+/* little room decorations (never in the way: corners of special rooms, a pebble or tuft elsewhere) */
+const DECO_SPOTS = {
+  treasure: [['heap', 0, 0], ['barrel', 4, 0], ['coins', 0, 4], ['barrel', 4, 4]],
+  shop: [['barrel', 0, 0], ['coins', 4, 0], ['barrel', 0, 4], ['heap', 4, 4]],
+  start: [['boulder', 0, 0], ['rocks', 4, 0], ['grass', 4, 4]],
+  boss: [['grass', 0, 0], ['rocks', 4, 0], ['boulder', 0, 4]],
+};
+function roomDeco(r) {
+  if (r.deco) return r.deco;
+  if (DECO_SPOTS[r.type]) return (r.deco = DECO_SPOTS[r.type].map(([p, x, y]) => ({ p, x, y, big: true })));
+  const free = []; for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) if (!(r.tiles || []).some(t => t.x === x && t.y === y) && !(x === 2 && (y === 0 || y === 4)) && !(y === 2 && (x === 0 || x === 4))) free.push({ x, y });
+  return (r.deco = shuffle(free).slice(0, 2).map((c, i) => ({ p: i ? 'grass' : 'rocks', x: c.x, y: c.y })));
 }
