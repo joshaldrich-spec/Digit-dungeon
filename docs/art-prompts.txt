@@ -110,3 +110,15 @@ Make a sprite sheet of 9 simple, bold game icons in a 3 by 3 grid on a plain sol
 
 ----- WHERE THEY GO -----
 The six attack cards in boss fights and monster squashes (Double Fire, Ten-Friend Blast, Flash Frame, Pair Power, Hop Combo, Fact Punch), the splat when a monster gets squashed, the "a monster jumped out!" burst, and the "tap to peek" eyes on Flash Frame.
+
+=================== INTRO VIDEO (Gemini video) ===================
+Attach the title picture (art/title.webp) so the video matches it (square, same characters). Ends on the same framing so
+the game can fade from the video straight into the title screen.
+
+Animate the attached picture into an 8-second intro for a kids' math game. Keep the exact art style, colors and characters of the picture: cute chunky 2D cartoon, thick dark-plum outlines, warm torch-lit dungeon, friendly-spooky, never scary.
+0 to 2 seconds: start in near darkness on the stone archway. The two wall torches puff alight one after the other, and warm golden light spreads across the stones and the gold coins on the floor.
+2 to 4 seconds: a slow, smooth push toward the glowing archway. The coins twinkle. The lavender ghost peeks out from behind the left pillar and gives a little wave; the orange puffball pops up from behind the right pillar with a grumpy little huff.
+4 to 6 seconds: the little green blob hops out of the glowing archway, bounces twice along the stone path and lands in the middle with a happy squish, looking straight at us with a big smile.
+6 to 8 seconds: a soft shower of tiny gold sparkles, then the camera settles and holds perfectly still on the same framing as the attached picture, with every character in its place, for the last second.
+Sound: torches whooshing alight, soft coin tinkles, a gentle magical chime, a springy boing when the blob lands. No music, no voices, no speech.
+No text, letters, numbers or logos anywhere. Smooth, gentle motion with no flashing and no fast cuts.
