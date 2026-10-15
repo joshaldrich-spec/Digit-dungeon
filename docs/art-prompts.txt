@@ -1,114 +1,24 @@
-DIGIT DUNGEON: ART PROMPTS
-27 new images, in 6 batches. The 12 you already made stay as they are.
+DIGIT DUNGEON: ART SHEETS
+5 images to make in one Gemini chat. Start the chat by attaching the green hero image, then paste STYLE, then one sheet at a time.
+Save each image and send them all; the game cuts each sheet into separate sprites.
 
-HOW TO USE
-1. Start a new Gemini chat and attach hero.png (the green blob) so it copies that exact look.
-2. Paste the STYLE line once, then one prompt at a time.
-3. Save each image with the file name shown in [brackets].
-4. Send me a batch whenever it's done. I'll remove the backgrounds, size them, recolor the hero for every Closet color, and put them in the game.
+----- STYLE -----
+Use the attached green blob character as the style guide for everything in this chat. Cute chunky 2D game art for a kids' dungeon game: thick even dark-plum outline, flat bright colors with one soft shade and a glossy highlight, rounded shapes, big shiny eyes on anything with a face. Friendly-spooky, never scary. No text, letters or numbers anywhere in any image.
 
------ STYLE (paste first) -----
-Use the attached character as the style guide for every image in this chat. Cute chunky 2D game art for a kids' dungeon game: thick even dark-plum outline, flat bright colors with one soft shade and a glossy highlight, rounded shapes, big shiny eyes on anything with a face. Friendly-spooky, never scary. Unless I say otherwise: one object, centered, filling most of a square canvas, plain solid white background, no shadow on the ground, no text or letters anywhere.
+----- SHEET 1: HERO MOODS -----
+Make a sprite sheet: the same green blob character three times in one row, evenly spaced, on a plain solid white background with wide white space between them. Keep the exact same body shape, color and size as the attached character in all three. Left: getting bonked, eyes squeezed shut in a wince, cheeks puffed, three little stars spinning above its head. Middle: cheering, eyes closed in happy upside-down U shapes, big open smile, a few small sparkles around it. Right: a little sad but hopeful, droopy eyes with one small tear and a small wobbly smile. Nothing touches or overlaps. No shadows, no text.
 
+----- SHEET 2: TREASURE ITEMS -----
+Make a sprite sheet of 9 game icons in a 3 by 3 grid on a plain solid white background, with wide white space between every icon so none touch or overlap. All icons the same size. Left to right, top row first: chunky round goggles whose lenses each show a tiny grid of 2 rows of 5 squares with red dots in some squares; two matching striped socks side by side; a small happy green frog in mid-hop with a dotted curved arc behind it; a large glossy pink heart with a white plus sign on it; a bright four-leaf clover with a tiny gold coin on its stem; a cute snail with closed sleepy eyes, a striped nightcap and a spiral shell; a shiny see-through soap bubble with a rainbow sheen and a small shield shape inside; a chunky yellow flashlight shining a soft cone of warm light; a single chunky gold star with a glossy highlight. No labels, no numbers, no text, no shadows.
 
-===== BATCH 1: HERO MOODS (I'll make every Closet color from the green one) =====
+----- SHEET 3: HATS AND REWARDS -----
+Make a sprite sheet of 9 game pieces in a 3 by 3 grid on a plain solid white background, with wide white space between every piece so none touch or overlap. Left to right, top row first: a pink hair bow; a cone-shaped party hat, blue with yellow stripes and a red pom-pom; a small gold crown with a red jewel; a tall blue wizard hat with a wide brim and a yellow star on it; a round silver viking helmet with two cream horns; a shiny gold trophy cup with two handles and a star on the front; a cute pink brain character with a happy smile and little sparkles; a wooden treasure chest with gold trim, lid wide open, golden light and sparkles shining out; a blank cream parchment tablet seen from straight above, a rounded square with a thick dark-plum outline, a slightly darker bottom edge and a completely empty middle. Draw the hats on their own, front view, with nobody wearing them. No labels, no numbers, no text, no shadows.
 
-[hero-ouch]
-The same green blob hero, exact same size, shape and pose, getting bonked: eyes squeezed shut in a cartoon wince, cheeks puffed, three little stars spinning above its head.
+----- SHEET 4: FLOORS AND DOORS -----
+Make a sprite sheet on a plain solid white background with wide white space between every piece so none touch or overlap. Top row: three square stone floor slabs seen from straight above, each filling its own square edge to edge with no outline around it. Left slab: muted purple-gray stone with soft cracks and a few pebbles. Middle slab: cool blue-gray cave stone with a little moss in the cracks. Right slab: deep red-purple stone with tiny glowing ember specks in the cracks. Keep all three slabs low contrast and darker than the characters, so numbers placed on top stay easy to read. Bottom row, two pieces: left, a small arched wooden dungeon door with iron bands and a ring handle, shut, set in a stone arch, seen from the front; right, the same stone arch with the door swung open and a dark passage inside lit by a warm golden glow. No text.
 
-[hero-cheer]
-The same green blob hero, exact same size and shape, cheering: eyes closed in happy upside-down U shapes, big open smile, tiny sparkles around it.
+----- SHEET 5: TITLE PICTURE -----
+A title picture with no text: the green blob hero standing at the glowing entrance of a cozy cartoon dungeon, a lavender ghost and an orange puffball monster peeking out from behind stone pillars, gold coins and blank cream stone tablets scattered on the floor. Square image with a full, detailed background (not white).
 
-[hero-sad]
-The same green blob hero, exact same size and shape, a little sad but hopeful: droopy eyes with one small tear, a small wobbly smile.
-
-
-===== BATCH 2: TREASURE ITEMS =====
-
-[item-specs]
-Ten-Frame Specs: a pair of chunky round goggles whose lenses each show a tiny grid of 2 rows of 5 squares with red dots in some squares.
-
-[item-socks]
-Pair Socks: two matching striped socks side by side, a cute matching pair.
-
-[item-frog]
-Hop Frog: a small happy green frog in the middle of a hop, with a dotted curved arc behind it showing its jump.
-
-[item-big-heart]
-Big Heart: a large glossy pink heart with a white plus sign on it.
-
-[item-clover]
-Lucky Clover: a bright four-leaf clover with a tiny gold coin resting on its stem.
-
-[item-snail]
-Sleepy Snail: a cute snail with closed sleepy eyes, a striped nightcap and a spiral shell.
-
-[item-bubble]
-Bubble Shield: a shiny see-through soap bubble with a rainbow sheen and a small shield shape glowing inside.
-
-[item-flashlight]
-Flashlight: a chunky yellow flashlight shining a soft cone of warm light.
-
-
-===== BATCH 3: HATS (only the hat, no character; I'll set it on the hero's head) =====
-
-[hat-bow]
-A single pink hair bow, front view.
-
-[hat-party]
-A single cone-shaped party hat, blue with yellow stripes and a red pom-pom on top, front view.
-
-[hat-crown]
-A single small gold crown with a red jewel, front view.
-
-[hat-wizard]
-A single tall blue wizard hat with a wide brim and a yellow star on it, front view.
-
-[hat-viking]
-A single round silver viking helmet with two cream horns, front view.
-
-
-===== BATCH 4: REWARDS AND ICONS =====
-
-[star]
-A single chunky gold star icon with a glossy highlight, simple enough to read when tiny.
-
-[trophy]
-A shiny gold trophy cup with two handles and a star on the front, a few sparkles around it.
-
-[brain]
-A cute pink brain character with a happy smiling face and little sparkles, proud and cheerful.
-
-[chest-open]
-The same treasure chest as before, now open, with warm golden light and sparkles shining out of it.
-
-
-===== BATCH 5: DUNGEON PIECES (these fill the whole square; no white background) =====
-
-[floor-cellar]
-One square stone floor slab seen from straight above, filling the entire square edge to edge with no border. Muted purple-gray stone with soft cracks and a few pebbles. Low contrast and darker than the characters, so numbers placed on top stay easy to read.
-
-[floor-caves]
-The same kind of floor slab in cool blue-gray cave stone with a little moss in the cracks. Same low contrast.
-
-[floor-depths]
-The same kind of floor slab in deep red-purple stone with tiny glowing ember specks in the cracks. Same low contrast.
-
-[tile-blank]
-A blank cream parchment tablet seen from straight above: a rounded square with a thick dark-plum outline and a slightly darker bottom edge. Completely empty in the middle (numbers get printed on it). Plain white background around it.
-
-[door-closed]
-A small arched wooden dungeon door with iron bands and a ring handle, shut, seen from the front, set in a stone arch. Plain white background.
-
-[door-open]
-The same arched stone doorway with the wooden door swung open, a dark passage inside with a warm golden glow. Plain white background.
-
-
-===== BATCH 6: TITLE PICTURE =====
-
-[title-art]
-A title picture with no text: the green blob hero standing at the glowing entrance of a cozy cartoon dungeon, a lavender ghost and an orange puffball monster peeking out from behind stone pillars, gold coins and cream number tablets scattered on the floor. Square image with a full background (not white).
-
-
------ STAYS DRAWN BY THE GAME (no art needed) -----
-Ten-frames, bead racks, number lines, pairs pictures, numbers on tiles, the half-hearts in the top bar and the monster footprints. The game draws these exactly, so the math is always right.
+----- STAYS DRAWN BY THE GAME -----
+Ten-frames, bead racks, number lines, pairs pictures, numbers on tiles, half-hearts in the top bar and monster footprints are drawn by the game so the math is always exact.
