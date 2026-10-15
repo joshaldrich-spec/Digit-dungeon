@@ -57,6 +57,7 @@ function showTitle() {
   $('#title-name').textContent = save.name ? `${save.name}'s adventure` : '';
   const bits = [`⭐ ${save.stars} stars`]; if (save.best.floor) bits.push(`best: floor ${save.best.floor}`); if (save.best.wins) bits.push(`🏆 ×${save.best.wins}`);
   $('#title-stats').innerHTML = artify(esc(bits.join(' · ')));
+  closetBadge();
   $('#btn-continue').hidden = !save.run; if (save.run) $('#btn-continue').innerHTML = artify(`▶ Continue (floor ${save.run.floor})`);
 }
 function askName(then) {
@@ -65,14 +66,40 @@ function askName(then) {
   Voice.say('Name your hero!');
   setTimeout(() => { const i = $('#name-in'); if (i) i.focus(); }, 120);
 }
-function openCloset() {
-  const sw = Object.entries(COLORS).map(([k, c]) => { const lock = save.stars < c.need;
-    return `<button class="sw ${save.cosmetics.color === k ? 'sel' : ''}" data-act="color" data-k="${k}" ${lock ? 'disabled' : ''}><span class="dot" style="background:${c.c}"></span>${lock ? `<span class="lk">🔒 ${c.need}⭐</span>` : c.name}</button>`; }).join('');
-  const hats = Object.entries(HATS).map(([k, h]) => { const lock = save.stars < h.need;
-    return `<button class="sw ${save.cosmetics.hat === k ? 'sel' : ''}" data-act="hat" data-k="${k}" ${lock ? 'disabled' : ''}>${k !== 'none' && ART.hats && ART.hats[k] ? `<img class="swh" src="${ART.hats[k]}" alt="">` : `<svg viewBox="16 -2 68 38">${k === 'none' ? '<text x="50" y="26" text-anchor="middle" font-size="22" fill="#bfaed8">—</text>' : hatSVG(k)}</svg>`}${lock ? `<span class="lk">🔒 ${h.need}⭐</span>` : h.name}</button>`; }).join('');
-  openOverlay(`<h2>👕 Closet</h2><div class="closet-hero">${heroSVG()}</div><p class="sub">⭐ ${save.stars} stars · earn more by chomping!</p><h3>Colors</h3><div class="swatches">${sw}</div><h3>Hats</h3><div class="swatches">${hats}</div><div class="stack"><button class="btn mint" data-close>Done</button></div>`,
-    { actions: { color: el => { save.cosmetics.color = el.dataset.k; persist(); openCloset(); }, hat: el => { save.cosmetics.hat = el.dataset.k; persist(); openCloset(); } },
-      onClose: () => $('#title-hero').innerHTML = heroSVG() });
+/* Closet: tabs for Colors, Hats, Tops and Shoes. Locked things show what's coming and how many stars it takes.
+   NEW marks anything unlocked she hasn't looked at yet (and the title's Closet button counts them). */
+let closetTab = 'hat';
+function swatchArt(slot, k) {
+  if (k === 'none') return '<svg viewBox="16 -2 68 38"><text x="50" y="26" text-anchor="middle" font-size="22" fill="#bfaed8">—</text></svg>';
+  if (slot === 'color') return `<span class="dot" style="background:${COLORS[k].c}"></span>`;
+  if (slot === 'hat') return ART.hats && ART.hats[k] ? `<img class="swh" src="${ART.hats[k]}" alt="">` : `<svg viewBox="16 -2 68 38">${hatSVG(k)}</svg>`;
+  const src = slot === 'top' ? ART.topIcons && ART.topIcons[k] : ART.shoeIcons && ART.shoeIcons[k];
+  return src ? `<img class="swh" src="${src}" alt="">` : '<span class="dot"></span>';
+}
+function tabIcon(slot) {
+  const pic = { hat: ART.hats && ART.hats.crown, top: ART.topIcons && ART.topIcons.sailor, shoes: ART.shoeIcons && ART.shoeIcons.hightops }[slot];
+  return slot === 'color' || !pic ? '<span class="dot sm"></span>' : `<img src="${pic}" alt="">`;
+}
+function closetBadge() { const b = $('#closet-badge'); if (!b) return; const n = newCount(); b.hidden = !n; b.textContent = n; }
+function openCloset(tab = closetTab) {
+  closetTab = tab; if (!save.seen) save.seen = [...save.unlocks];
+  const sh = SHELVES.find(x => x.slot === tab), items = Object.entries(sh.list()).sort((a, b) => a[1].need - b[1].need);
+  const grid = items.map(([k, it]) => { const lock = save.stars < it.need, fresh = isNewItem(sh.pre + k, it.need);
+    return `<button class="sw ${save.cosmetics[tab] === k ? 'sel' : ''}" data-act="wear" data-k="${k}" ${lock ? 'disabled' : ''}>${fresh ? '<span class="newtag">NEW</span>' : ''}${swatchArt(tab, k)}${lock ? `<span class="lk">🔒 ${it.need}⭐</span>` : `<span class="nm">${esc(it.name)}</span>`}</button>`; }).join('');
+  const tabs = SHELVES.map(x => { const n = x.slot === tab ? 0 : newCount(x.slot);
+    return `<button class="ctab ${x.slot === tab ? 'sel' : ''}" data-act="tab" data-k="${x.slot}">${tabIcon(x.slot)}<span>${x.label}</span>${n ? `<span class="newdot">${n}</span>` : ''}</button>`; }).join('');
+  items.forEach(([k, it]) => { if (isNewItem(sh.pre + k, it.need)) save.seen.push(sh.pre + k); }); persist();   // seen now
+  let cheer = null;
+  openOverlay(`<h2>👕 Closet</h2><div class="closet-hero">${heroSVG()}</div><p class="sub">⭐ ${save.stars} stars · earn more by chomping!</p><div class="ctabs">${tabs}</div><div class="swatches">${grid}</div><div class="stack"><button class="btn mint" data-close>Done</button></div>`,
+    { actions: {
+        tab: el => openCloset(el.dataset.k),
+        wear: el => {        // put it on right here (no re-draw, so the list doesn't jump back to the top)
+          save.cosmetics[tab] = el.dataset.k; persist();
+          $$('#ov-card .sw').forEach(b => b.classList.toggle('sel', b === el));
+          const hero = $('#ov-card .closet-hero'); hero.innerHTML = heroSVG(undefined, undefined, false, 'cheer');
+          clearTimeout(cheer); cheer = setTimeout(() => { if (hero.isConnected) hero.innerHTML = heroSVG(); }, 900);
+        } },
+      onClose: () => { $('#title-hero').innerHTML = heroSVG(); closetBadge(); } });
 }
 
 /* ---------- grown-ups panel ---------- */
@@ -153,7 +180,13 @@ $$('.dbtn').forEach(b => {
 });
 /* Tap a tile: the hero walks all the way to it (stopping short of monsters and footprints). Tap the hero: chomp. */
 let walkTimer = null;
-function stopWalk() { clearTimeout(walkTimer); walkTimer = null; }
+function stopWalk() { clearTimeout(walkTimer); walkTimer = null; showGoal(null); }
+/* a glowing square on the tile she tapped, until the hero gets there (or stops) */
+function showGoal(x, y) {
+  const g = $('#goal'); if (!g) return;
+  if (x == null) { g.hidden = true; return; }
+  g.style.transform = `translate(${x * 100}%,${y * 100}%)`; g.hidden = false;
+}
 function dangerAt(x, y) { return (room.monsters || []).some(m => !(m.dizzy > 0) && ((m.x === x && m.y === y) || (m.next && m.next.x === x && m.next.y === y))); }
 function pathTo(gx, gy) {
   const prev = { [key(hero.x, hero.y)]: null }, q = [[hero.x, hero.y]];
@@ -161,7 +194,8 @@ function pathTo(gx, gy) {
     const [x, y] = q.shift(); if (x === gx && y === gy) break;
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const nx = x + dx, ny = y + dy, k = key(nx, ny);
-      if (!inGrid(nx, ny) || k in prev || monsterAt(nx, ny)) continue;
+      const mm = inGrid(nx, ny) && monsterAt(nx, ny);
+      if (!inGrid(nx, ny) || k in prev || (mm && !(mm.dizzy > 0 && nx === gx && ny === gy))) continue;   // a dizzy monster she tapped: walk up and bonk it
       prev[k] = [x, y]; q.push([nx, ny]);
     }
   }
@@ -174,13 +208,14 @@ function walkTo(gx, gy) {
   stopWalk();
   const step = () => {
     walkTimer = null;
-    if (blocked() || (hero.x === gx && hero.y === gy)) return;
+    if (blocked() || (hero.x === gx && hero.y === gy)) return showGoal(null);
     const path = pathTo(gx, gy);
-    if (!path || !path.length) { Sound.play('bump'); return; }
+    if (!path || !path.length) { Sound.play('bump'); return showGoal(null); }
     const [nx, ny] = path[0];
-    if (dangerAt(nx, ny)) { nudgeHero(nx - hero.x, ny - hero.y); Sound.play('bump'); return; }   // never walk into danger on its own
+    if (dangerAt(nx, ny)) { nudgeHero(nx - hero.x, ny - hero.y); Sound.play('bump'); return showGoal(null); }   // never walk into danger on its own
+    if (path.length > 1) showGoal(gx, gy);
     const from = key(hero.x, hero.y); tryMove(nx - hero.x, ny - hero.y);
-    if (key(hero.x, hero.y) !== from && (hero.x !== gx || hero.y !== gy)) walkTimer = setTimeout(step, 170);
+    if (key(hero.x, hero.y) !== from && (hero.x !== gx || hero.y !== gy)) walkTimer = setTimeout(step, 170); else showGoal(null);
   };
   step();
 }
@@ -223,7 +258,7 @@ $('#btn-play').addEventListener('click', () => {
   else go();
 });
 $('#btn-continue').addEventListener('click', () => { if (save.run) continueRun(); });
-$('#btn-closet').addEventListener('click', openCloset);
+$('#btn-closet').addEventListener('click', () => openCloset());
 (() => {
   const b = $('#btn-grownups'); let t = null;
   b.addEventListener('pointerdown', e => { e.preventDefault(); b.classList.add('holding'); t = setTimeout(() => { b.classList.remove('holding'); openGrownups(); }, 1400); });
@@ -234,4 +269,38 @@ if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('#stage'));
 document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); Sound.pause(); } else { if (Sound.ctx) Sound.wake(false); if (run) run.tick = Date.now(); } });
 
 window.DD = { get run() { return run; }, get room() { return room; }, get hero() { return hero; }, get save() { return save; }, tryMove, chomp, goThrough, enterRoom, bossPick, bossAnswer, trapdoor, takeItem, openShop, buy, closeOverlay, newRun, endRun, planMonsters };
-document.addEventListener('DOMContentLoaded', () => { Clips.init(); Music.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });
+/* Zoom guard. A double-tap or two-finger pinch can zoom Safari in, and the game screen (which blocks browser
+   gestures so taps feel instant) then can't be pinched back out. So zoom gestures are blocked while the page is at
+   normal size; if it does end up zoomed, pinching is allowed again and the page snaps back to normal on its own. */
+const ZoomGuard = {
+  vp: null, base: '', flip: false, timer: null, tries: 0, down: 0,
+  scale() { return window.visualViewport ? visualViewport.scale : 1; },
+  zoomed() { return this.scale() > 1.02; },
+  init() {
+    this.vp = document.querySelector('meta[name=viewport]'); this.base = this.vp ? this.vp.content : '';
+    const block = e => { if (!this.zoomed()) e.preventDefault(); };
+    ['gesturestart', 'gesturechange'].forEach(ev => document.addEventListener(ev, block, { passive: false }));
+    document.addEventListener('touchmove', e => { if (e.touches.length > 1) block(e); }, { passive: false });
+    document.addEventListener('touchstart', e => { this.down = e.touches.length; }, { passive: true, capture: true });
+    ['touchend', 'touchcancel'].forEach(ev => document.addEventListener(ev, e => { this.down = e.touches.length; this.check(); }, { passive: true, capture: true }));
+    if (window.visualViewport) visualViewport.addEventListener('resize', () => this.check());
+  },
+  check() {
+    const z = this.zoomed(); document.body.classList.toggle('zoomed', z);
+    clearTimeout(this.timer); this.timer = null;
+    if (!z) { this.tries = 0; return; }
+    if (this.tries < 3) this.timer = setTimeout(() => this.reset(), 700);
+  },
+  reset() {     // re-applying the viewport makes Safari drop back to normal size
+    if (!this.zoomed() || !this.vp) return;
+    if (this.down) { this.timer = setTimeout(() => this.reset(), 400); return; }   // wait for fingers to lift
+    this.tries++; this.flip = !this.flip;
+    this.vp.content = this.base + (this.flip ? ',minimum-scale=1' : '');
+    window.scrollTo(0, 0);
+    setTimeout(() => this.check(), 450);
+  },
+};
+document.addEventListener('DOMContentLoaded', () => { ZoomGuard.init();
+  if (!save.seen) save.seen = [...save.unlocks];   // first time with the bigger Closet: what she had before isn't NEW
+  checkUnlocks(true); persist();
+  Clips.init(); Music.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });

@@ -390,18 +390,16 @@ function endRun(won) {
     <div class="sumgrid"><div><b>${r.floor}</b><span>floor</span></div><div><b>${r.roomsCleared}</b><span>rooms</span></div><div><b>${r.correct}</b><span>right</span></div><div><b>+${r.stars}</b><span>⭐ kept</span></div></div>
     ${card ? `<div class="remember"><div class="remember-h">${icon(ART.ui && ART.ui.brain, '🧠')} Remember for next time</div><div class="paper">${card.model}</div><div class="remember-t${card.title.length > 14 ? ' long' : ''}">${card.title}</div><div class="sub">🔁 You'll see it again next run!</div></div>` : ''}
     ${monsterTip ? `<div class="tipline"><span class="tp">${pawSVG('#d9c8ff')}</span><span>Monsters step on the footprints!</span></div>` : ''}
-    ${newU.length ? `<p class="sub">🎁 New in the Closet: <b>${newU.join(', ')}</b></p>` : ''}
+    ${newU.length ? `<p class="sub">🎁 New in the Closet: <b>${newU.length > 3 ? newU.length + ' new things!' : newU.join(', ')}</b></p>` : ''}
     <div class="stack"><button class="btn mint big" data-act="again">Play again</button><button class="btn" data-act="home">Home</button></div>`,
     { cls: 'scene-card', actions: { again: () => { closeOverlay(); newRun(); }, home: () => { closeOverlay(); showTitle(); } } });
   Voice.say(won ? 'You are the Dungeon Champion!' : card ? `Remember: ${card.say}. You'll see it again next run!` : monsterTip ? 'Watch the footprints! Monsters step where the footprints are.' : 'Run over! Great try!');
 }
-function unlocksBetween(a, b) {
-  const out = [];
-  Object.values(COLORS).forEach(c => { if (c.need > a && c.need <= b) out.push(c.name + ' color'); });
-  Object.values(HATS).forEach(h => { if (h.need > a && h.need <= b) out.push(h.name); });
-  return out;
-}
+function unlocksBetween(a, b) { return closetItems().filter(i => i.need > a && i.need <= b).map(i => i.name); }
 function checkUnlocks(silent) {
-  [...Object.entries(COLORS).map(([k, c]) => ['c:' + k, c.need, c.name + ' color']), ...Object.entries(HATS).map(([k, h]) => ['h:' + k, h.need, h.name])]
-    .forEach(([id, need, name]) => { if (need && save.stars >= need && !save.unlocks.includes(id)) { save.unlocks.push(id); if (!silent) { toast(`🎁 New in the Closet: ${name}!`); Voice.say('Something new in the closet!', { queue: true }); } } });
+  const got = closetItems().filter(i => i.need && save.stars >= i.need && !save.unlocks.includes(i.id));
+  got.forEach(i => save.unlocks.push(i.id));
+  if (silent || !got.length) return;
+  toast(got.length === 1 ? `🎁 New in the Closet: ${got[0].name}!` : `🎁 ${got.length} new things in the Closet!`);
+  Voice.say('Something new in the closet!', { queue: true });
 }

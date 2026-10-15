@@ -12,8 +12,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/game.css?v9">
-<link rel="stylesheet" href="css/skin.css?v9">
+<link rel="stylesheet" href="css/game.css?v10">
+<link rel="stylesheet" href="css/skin.css?v10">
 </head>
 <body>
 <div id="app">
@@ -27,7 +27,7 @@
     <div class="title-btns">
       <button class="btn gold big" id="btn-continue" hidden>▶ Continue</button>
       <button class="btn mint big" id="btn-play">New Run</button>
-      <button class="btn" id="btn-closet">👕 Closet</button>
+      <button class="btn" id="btn-closet">👕 Closet<span class="cbadge" id="closet-badge" hidden></span></button>
     </div>
     <button class="grownups-btn" id="btn-grownups">⚙ Grown-ups · hold</button>
   </div>
@@ -58,6 +58,7 @@
       <img class="torch l" src="art/props/torch.webp" alt="" onerror="this.remove()"><img class="torch r" src="art/props/torch.webp" alt="" onerror="this.remove()">
       <div class="grid" id="grid"></div>
       <div class="marks" id="marks"></div>
+      <div class="marks"><div class="goal" id="goal" hidden></div></div>
       <div class="actors" id="actors"></div>
       <div class="room-msg" id="room-msg"></div>
     </div>
@@ -85,14 +86,14 @@
 <div class="fx" id="fx"></div>
 </div>
 
-<script src="audio/voice.js?v9"></script>
-<script src="js/core.js?v9"></script>
-<script src="js/curriculum.js?v9"></script>
-<script src="js/coaching.js?v9"></script>
-<script src="js/art.js?v9"></script>
-<script src="js/dungeon.js?v9"></script>
-<script src="js/play.js?v9"></script>
-<script src="js/render.js?v9"></script>
-<script src="js/ui.js?v9"></script>
+<script src="audio/voice.js?v10"></script>
+<script src="js/core.js?v10"></script>
+<script src="js/curriculum.js?v10"></script>
+<script src="js/coaching.js?v10"></script>
+<script src="js/art.js?v10"></script>
+<script src="js/dungeon.js?v10"></script>
+<script src="js/play.js?v10"></script>
+<script src="js/render.js?v10"></script>
+<script src="js/ui.js?v10"></script>
 </body>
 </html>

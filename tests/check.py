@@ -278,6 +278,40 @@ async def main():
         report('tapping a tile walks the hero all the way there', await page.evaluate("[hero.x, hero.y]") == [4, 3])
         tag = await page.evaluate("(() => { const t = DD.room.tiles.find(t => !t.chomped); hero.x = t.x; hero.y = t.y; renderAll(); const g = document.querySelector('#herotag'); return [t.kind === 'frame' ? 'frame' : t.label.replace(/ /g, ''), g.hidden ? null : (t.kind === 'frame' ? (g.querySelector('svg') ? 'frame' : '') : g.textContent.replace(/[\\u2009\\s]/g, ''))]; })()")
         report('the tag above the hero shows the tile CHOMP will eat', tag[0] == tag[1], json.dumps(tag))
+        # tap play: a glowing square marks where she's walking to; tapping a dizzy monster walks up and bonks it
+        await page.evaluate("DD.room.monsters = []; DD.room.tiles.forEach(t => t.chomped = false); hero.x = 0; hero.y = 0; renderAll();")
+        await page.mouse.click(g['x'] + 4.5 * c, g['y'] + 4.5 * c); await page.wait_for_timeout(250)
+        goal_on = await page.evaluate("!document.querySelector('#goal').hidden"); await page.wait_for_timeout(1700)
+        goal_off = await page.evaluate("document.querySelector('#goal').hidden && hero.x === 4 && hero.y === 4")
+        report('a marker shows where she is walking, and goes away when she gets there', goal_on and goal_off)
+        bonk = await page.evaluate("""(() => { hero.x = 0; hero.y = 2; const m = { kind: 'wisp', x: 3, y: 2, dizzy: 3, next: null, hp: 1 }; DD.room.monsters = [m]; renderAll();
+            window._m = m; window._p0 = DD.room.pickups.length; return 1; })()""")
+        await page.mouse.click(g['x'] + 3.5 * c, g['y'] + 2.5 * c); await page.wait_for_timeout(900)
+        report('tapping a dizzy monster walks up and bonks it', await page.evaluate("!DD.room.monsters.includes(window._m) && DD.room.pickups.length === window._p0 + 1 && hero.x === 2"))
+        # zoom guard: blocked at normal size; if Safari zooms in anyway, pinching is allowed and the page snaps back
+        zg = await page.evaluate("""new Promise(res => { const vp = document.querySelector('meta[name=viewport]'), before = vp.content;
+            const e = new Event('gesturestart', { cancelable: true }); document.dispatchEvent(e); const blocked = e.defaultPrevented;
+            ZoomGuard.scale = () => 2.5; ZoomGuard.check(); const cls = document.body.classList.contains('zoomed');
+            const e2 = new Event('gesturestart', { cancelable: true }); document.dispatchEvent(e2); const pinchOk = !e2.defaultPrevented;
+            setTimeout(() => { const reset = vp.content !== before; ZoomGuard.scale = () => 1; ZoomGuard.check();
+              res({ blocked, cls, pinchOk, reset, cleared: !document.body.classList.contains('zoomed') }); }, 900); })""")
+        report('zoom: blocked at normal size, and snaps back if it happens', all(zg.values()), json.dumps(zg))
+        # closet: a save from before tops/shoes (like Molly's) gets the new things marked NEW, nothing she had before
+        cl = await page.evaluate(r"""(() => { const keep = save; const old = { v: 1, name: 'M', stars: 123, cosmetics: { color: 'pink', hat: 'bow' }, unlocks: ['h:bow', 'c:sky', 'h:party', 'c:peach'] };
+            save = merge(defaultSave(), JSON.parse(JSON.stringify(old))); save.seen = save.seen || [...save.unlocks]; checkUnlocks(true);
+            const fresh = closetItems().filter(i => isNewItem(i.id, i.need)).map(i => i.id), old_new = fresh.filter(id => old.unlocks.includes(id));
+            const missing = [];
+            Object.keys(HATS).forEach(k => { if (k !== 'none' && (!ART.hats[k] || !HAT_FIT[k])) missing.push('hat ' + k); });
+            Object.keys(TOPS).forEach(k => { if (k !== 'none' && (!ART.tops[k] || !ART.topIcons[k])) missing.push('top ' + k); });
+            Object.keys(SHOES).forEach(k => { if (k !== 'none' && (!ART.shoes[k] || !ART.shoeIcons[k])) missing.push('shoes ' + k); });
+            openCloset('top'); const tabs = document.querySelectorAll('#ov-card .ctab').length, sw = document.querySelectorAll('#ov-card .sw').length;
+            document.querySelector('#ov-card .sw[data-k=sailor]').click();
+            save.cosmetics.shoes = 'clogs'; const layers = (s => s.querySelectorAll('img').length)((d => { d.innerHTML = heroSVG(undefined, undefined, true); return d; })(document.createElement('div')));
+            const seenNow = save.seen.includes('t:sailor'), wore = save.cosmetics.top; closeOverlay(); save = keep; persist();
+            return { fresh: fresh.length, old_new, missing, tabs, tops_shown: sw, wore, layers, seenNow }; })()""")
+        report(f"closet: {cl['fresh']} new things NEW for a returning player, 4 shelves, outfits layer on the hero",
+               cl['fresh'] == 7 and not cl['old_new'] and not cl['missing'] and cl['tabs'] == 4 and cl['tops_shown'] == 19 and cl['wore'] == 'sailor'
+               and cl['layers'] == 5 and cl['seenNow'], json.dumps(cl))
         mus = await page.evaluate("""new Promise(res => { save.settings.music = true; Sound.init(); Music.start(); const t0 = Date.now();
             (function w() { if (Music.on && Music.sources.length) { save.settings.voice = true; Voice.say('Double 6 is 12!'); setTimeout(() => res({ dur: Music.buf.duration, ducked: +Music.gain.gain.value.toFixed(2) }), 400); }
               else if (Date.now() - t0 > 8000) res(null); else setTimeout(w, 100); })(); })""")

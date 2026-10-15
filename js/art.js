@@ -7,6 +7,8 @@
    drawing below. hero / heroChomp have one image per Closet color.
 ---------------------------------------------------------------------- */
 const HERO_COLORS = ['mint', 'sky', 'peach', 'grape', 'pink', 'gold'];
+const TOP_IDS = ['island', 'sweater', 'overalls', 'sailor', 'apron', 'raincoat', 'bee', 'pajamas', 'robe', 'vest', 'flame', 'bolt', 'dragon', 'stage', 'hanbok', 'holo', 'hunter', 'tiger'];
+const SHOE_IDS = ['frogboots', 'clogs', 'bunny', 'hightops', 'dragon', 'hiking', 'stage', 'wings', 'flower'];
 const ART = {
   hero: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}.webp`])),
   heroChomp: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}-chomp.webp`])),
@@ -15,7 +17,13 @@ const ART = {
   heroSad: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}-sad.webp`])),
   chestOpen: 'art/chest-open.webp',
   items: Object.fromEntries(['specs', 'socks', 'frog', 'heart', 'clover', 'snail', 'bubble', 'flashlight'].map(k => [k, `art/items/${k}.webp`])),
-  hats: Object.fromEntries(['bow', 'party', 'crown', 'wizard', 'viking'].map(k => [k, `art/hats/${k}.webp`])),
+  hats: Object.fromEntries(['bow', 'party', 'crown', 'wizard', 'viking', 'sunhat', 'apple', 'frog', 'flowers', 'bucket', 'mushroom', 'melon', 'blossom', 'bunny',
+    'cap', 'dragon', 'egg', 'sprout', 'zap', 'drop', 'tiara', 'gat', 'tiger'].map(k => [k, `art/hats/${k}.webp`])),
+  // tops and shoes are 256x256 layers that line up with the hero sprites (made by tools/cut_closet.py); -icon is the Closet button
+  tops: byId('tops', TOP_IDS), topIcons: byId('tops', TOP_IDS, '-icon'),
+  shoes: byId('shoes', SHOE_IDS), shoeIcons: byId('shoes', SHOE_IDS, '-icon'),
+  // mouth + cheeks drawn again over a top, for moods whose open mouth dips below the collar
+  heroFace: Object.fromEntries(HERO_COLORS.flatMap(c => ['chomp', 'cheer', 'ouch'].map(m => [`${c}-${m}`, `art/hero/face/${c}-${m}.webp`]))),
   ui: { star: 'art/ui/star.webp', trophy: 'art/ui/trophy.webp', brain: 'art/ui/brain.webp', tile: 'art/ui/tile.webp' },
   dungeon: { floor1: 'art/dungeon/floor-1.webp', floor2: 'art/dungeon/floor-2.webp', floor3: 'art/dungeon/floor-3.webp',
              doorClosed: 'art/dungeon/door-closed.webp', doorOpen: 'art/dungeon/door-open.webp' },
@@ -33,6 +41,7 @@ const ART = {
                       files('buttons', ['chomp', 'dpad', 'square', 'gold', 'green', 'purple'])),
 };
 ART.ui.logo = 'art/ui/logo.webp?' + BUILD;   // versioned so iPads drop the old cut
+function byId(dir, ids, suffix = '') { return Object.fromEntries(ids.map(k => [k, `art/${dir}/${k}${suffix}.webp`])); }
 function files(dir, names) { return Object.fromEntries(names.map(n => [dir + ':' + n, `art/${dir}/${n}.webp`]).map(([k, v]) => [k.split(':')[1].replace(/-(\w)/g, (_, c) => c.toUpperCase()), v])); }
 /* geometry measured from the art by tools/cut_ui.py (art/math/layout.json) */
 const BOARD = { x0: 0.0725, x1: 0.925, y0: 0.1298, y1: 0.7981, aspect: 1.9231 };
@@ -74,7 +83,12 @@ const icon = (src, emoji, cls = 'ico') => (src ? `<img class="${cls}" src="${src
 const itemIcon = (id, cls) => icon(ART.items && ART.items[id], ITEMS[id] ? ITEMS[id].icon : '', cls);
 /* where each hat sits on the hero (percent of the hero box): width, centre x, bottom y, tilt */
 const HAT_FIT = { bow: { w: 34, x: 68, y: 31, r: 16 }, party: { w: 30, x: 50, y: 27, r: 0 }, crown: { w: 40, x: 50, y: 28, r: 0 },
-                  wizard: { w: 58, x: 50, y: 29, r: -4 }, viking: { w: 66, x: 50, y: 34, r: 0 } };
+                  wizard: { w: 58, x: 50, y: 29, r: -4 }, viking: { w: 66, x: 50, y: 34, r: 0 },
+                  sunhat: { w: 74, x: 50, y: 33, r: 0 }, apple: { w: 38, x: 50, y: 25, r: 0 }, frog: { w: 62, x: 50, y: 35, r: 0 }, flowers: { w: 64, x: 50, y: 29, r: 0 },
+                  bucket: { w: 64, x: 50, y: 36, r: 0 }, mushroom: { w: 68, x: 50, y: 33, r: 0 }, melon: { w: 66, x: 50, y: 36, r: 0 }, blossom: { w: 34, x: 70, y: 31, r: 14 },
+                  bunny: { w: 60, x: 50, y: 42, r: 0 }, cap: { w: 66, x: 48, y: 34, r: 0 }, dragon: { w: 66, x: 50, y: 34, r: 0 }, egg: { w: 56, x: 50, y: 31, r: 0 },
+                  sprout: { w: 58, x: 50, y: 43, r: 0 }, zap: { w: 62, x: 50, y: 43, r: 0 }, drop: { w: 62, x: 50, y: 37, r: 0 }, tiara: { w: 48, x: 50, y: 27, r: 0 },
+                  gat: { w: 84, x: 50, y: 32, r: 0 }, tiger: { w: 64, x: 50, y: 37, r: 0 } };
 function hatHTML(k) {
   if (!k || k === 'none') return '';
   if (ART.hats && ART.hats[k]) { const f = HAT_FIT[k]; return `<img class="hat" src="${ART.hats[k]}" alt="" draggable="false" style="width:${f.w}%;left:${f.x}%;top:${f.y}%;transform:translate(-50%,-100%) rotate(${f.r}deg)">`; }
@@ -93,14 +107,45 @@ const COLORS = {
   pink:  { name: 'Bubblegum', c: '#ff8fc7', d: '#c94f8c', need: 320 },
   gold:  { name: 'Gold',  c: '#ffd54a', d: '#c99a12', need: 500 },
 };
+/* Closet. need = stars to unlock (stars are kept forever: one per right answer, more for clearing rooms and bosses).
+   A run earns roughly 30-60, so something new comes along about every run. The three looks (cozy village,
+   creature trainer, idol stage) are mixed in from the start. */
 const HATS = {
   none:   { name: 'No hat', need: 0 },
-  bow:    { name: 'Bow', need: 25 },
-  party:  { name: 'Party hat', need: 75 },
-  crown:  { name: 'Crown', need: 150 },
-  wizard: { name: 'Wizard hat', need: 260 },
-  viking: { name: 'Viking helmet', need: 420 },
+  bow:    { name: 'Bow', need: 25 },     tiara:  { name: 'Moon tiara', need: 50 },  party:    { name: 'Party hat', need: 75 },
+  cap:    { name: 'Trainer cap', need: 110 }, crown: { name: 'Crown', need: 150 },  frog:     { name: 'Frog cap', need: 165 },
+  sprout: { name: 'Sprout', need: 215 }, wizard: { name: 'Wizard hat', need: 260 }, flowers: { name: 'Flower crown', need: 275 },
+  zap:    { name: 'Zap antennas', need: 300 }, sunhat: { name: 'Sun hat', need: 355 }, viking: { name: 'Viking helmet', need: 420 },
+  tiger:  { name: 'Tiger beanie', need: 440 }, bucket: { name: 'Fishing hat', need: 520 }, gat: { name: 'Gat hat', need: 580 },
+  drop:   { name: 'Splash beanie', need: 670 }, dragon: { name: 'Dragon hat', need: 730 }, apple: { name: 'Apple hat', need: 840 },
+  mushroom: { name: 'Mushroom cap', need: 920 }, egg: { name: 'Eggshell', need: 1050 }, melon: { name: 'Melon helmet', need: 1150 },
+  blossom: { name: 'Blossom clip', need: 1260 }, bunny: { name: 'Bunny ears', need: 1320 },
 };
+const TOPS = {
+  none:     { name: 'No top', need: 0 },
+  overalls: { name: 'Overalls', need: 30 },      bolt:   { name: 'Zap jersey', need: 85 },    sailor:  { name: 'Sailor top', need: 120 },
+  hanbok:   { name: 'Hanbok top', need: 180 },   raincoat: { name: 'Raincoat', need: 230 },   stage:   { name: 'Stage jacket', need: 290 },
+  island:   { name: 'Island shirt', need: 340 }, flame:  { name: 'Flame jersey', need: 390 }, tiger:   { name: 'Tiger hoodie', need: 460 },
+  vest:     { name: 'Explorer vest', need: 550 }, pajamas: { name: 'Cloud pajamas', need: 610 }, apron: { name: 'Strawberry dress', need: 700 },
+  dragon:   { name: 'Dragon hoodie', need: 760 }, holo:  { name: 'Star jacket', need: 880 },  sweater: { name: 'Apple sweater', need: 960 },
+  bee:      { name: 'Bee suit', need: 1100 },    robe:   { name: 'Blossom robe', need: 1200 }, hunter: { name: 'Hunter coat', need: 1400 },
+};
+const SHOES = {
+  none:      { name: 'Bare feet', need: 0 },
+  clogs:     { name: 'Flower clogs', need: 15 },  bunny:  { name: 'Bunny slippers', need: 60 }, wings:  { name: 'Wing sneakers', need: 135 },
+  frogboots: { name: 'Frog boots', need: 245 },   hightops: { name: 'Zap sneakers', need: 370 }, hiking: { name: 'Hiking boots', need: 480 },
+  stage:     { name: 'Stage boots', need: 640 },  dragon: { name: 'Dragon slippers', need: 800 }, flower: { name: 'Flower shoes', need: 1000 },
+};
+/* every Closet shelf: unlock ids are prefix + key (c:sky, h:bow, t:sailor, s:clogs) */
+const SHELVES = [
+  { slot: 'color', pre: 'c:', list: () => COLORS, label: 'Colors', what: n => n + ' color' },
+  { slot: 'hat', pre: 'h:', list: () => HATS, label: 'Hats', what: n => n },
+  { slot: 'top', pre: 't:', list: () => TOPS, label: 'Tops', what: n => n },
+  { slot: 'shoes', pre: 's:', list: () => SHOES, label: 'Shoes', what: n => n },
+];
+function closetItems() { return SHELVES.flatMap(sh => Object.entries(sh.list()).map(([k, it]) => ({ id: sh.pre + k, k, slot: sh.slot, need: it.need, name: sh.what(it.name) }))); }
+function isNewItem(id, need) { return need > 0 && save.stars >= need && save.seen && !save.seen.includes(id); }
+function newCount(slot) { return closetItems().filter(i => (!slot || i.slot === slot) && isNewItem(i.id, i.need)).length; }
 const img = src => `<img src="${src}" alt="" draggable="false" onerror="this.style.visibility='hidden'">`;
 function hatSVG(h) {
   switch (h) {
@@ -112,12 +157,17 @@ function hatSVG(h) {
   }
   return '';
 }
-function heroSVG(colorKey = save.cosmetics.color, hatKey = save.cosmetics.hat, open = false, mood = null) {
+function heroSVG(colorKey = save.cosmetics.color, hatKey = save.cosmetics.hat, open = false, mood = null, topKey = save.cosmetics.top, shoeKey = save.cosmetics.shoes) {
   if (ART.hero) {
     const pickC = set => set && (set[colorKey] || set.mint);
     const moodSet = mood && ART['hero' + mood[0].toUpperCase() + mood.slice(1)];
     const src = (moodSet && pickC(moodSet)) || (open && pickC(ART.heroChomp)) || pickC(ART.hero);
-    return `<div class="hero-art">${img(src)}${hatHTML(hatKey)}</div>`;
+    // layers: body, top, mouth again (if it reaches over the collar), shoes, hat
+    const top = topKey && topKey !== 'none' && ART.tops && ART.tops[topKey];
+    const m = mood || (open ? 'chomp' : null), F = ART.heroFace || {};
+    const face = top && m && (F[`${colorKey}-${m}`] || F[`mint-${m}`]);
+    const shoes = shoeKey && shoeKey !== 'none' && ART.shoes && ART.shoes[shoeKey];
+    return `<div class="hero-art">${img(src)}${top ? img(top) : ''}${face ? img(face) : ''}${shoes ? img(shoes) : ''}${hatHTML(hatKey)}</div>`;
   }
   const col = COLORS[colorKey] || COLORS.mint;
   const mouth = open

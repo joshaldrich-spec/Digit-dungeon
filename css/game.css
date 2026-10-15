@@ -11,6 +11,9 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%}
+/* no double-tap zoom anywhere; when Safari did zoom in, pinching works again so it can be undone (see ZoomGuard in ui.js) */
+html,body{touch-action:manipulation}.overlay{touch-action:pan-y}
+body.zoomed #scr-game,body.zoomed .overlay,body.zoomed{touch-action:auto}
 body{position:fixed;inset:0;overflow:hidden;background:radial-gradient(130% 90% at 50% -10%,#33244a 0%,var(--bg) 60%);color:var(--cream);
   font-family:'Fredoka','Avenir Next Rounded','Arial Rounded MT Bold',ui-rounded,system-ui,sans-serif;
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;overscroll-behavior:none}
@@ -221,8 +224,20 @@ img{object-fit:contain}
 .hint{background:rgba(255,200,74,.12);border:2px solid rgba(255,200,74,.45);border-radius:14px;padding:10px 12px;font-size:18px!important}
 .name-hero{width:120px;height:120px;margin:0 auto}
 .name-in{width:100%;max-width:300px;font-size:26px;text-align:center;padding:12px;border-radius:14px;border:3px solid var(--line);background:var(--paper);color:var(--ink);margin:8px 0 16px;outline:none}
-.closet-hero{width:130px;height:130px;margin:0 auto}
-.swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.closet-hero{width:150px;height:150px;margin:34px auto 0}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.ctabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 12px}
+.ctab{position:relative;border:0;border-radius:14px;background:var(--panel2);padding:6px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:14px;font-weight:600;color:var(--cream)}
+.ctab.sel{background:var(--gold);color:#3a2604}
+.ctab img{width:36px;height:28px;object-fit:contain}
+.dot.sm{width:26px;height:26px;border-radius:50%;background:conic-gradient(#6fe0b0,#79c6ff,#b48cff,#ff8fc7,#ffab7a,#ffd54a,#6fe0b0);border:2px solid rgba(0,0,0,.25)}
+.newdot,.cbadge{position:absolute;top:-7px;right:-5px;min-width:22px;height:22px;border-radius:11px;background:#ff4d6d;color:#fff;font-size:13px;font-weight:700;line-height:22px;padding:0 6px;box-shadow:0 0 0 2px #fff;z-index:2}
+.cbadge[hidden]{display:none}
+#btn-closet{position:relative}
+.sw{position:relative}
+.sw .nm{line-height:1.1}
+.newtag{position:absolute;top:-7px;right:-5px;background:#ff4d6d;color:#fff;font-size:11px;font-weight:700;border-radius:9px;padding:2px 7px;box-shadow:0 0 0 2px #fff;z-index:2;animation:newpulse 1.2s ease-in-out infinite}
+@keyframes newpulse{50%{transform:scale(1.12)}}
 .sw{border:3px solid transparent;border-radius:16px;background:var(--panel2);padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:14px;color:var(--cream)}
 .sw.sel{border-color:var(--gold)}
 .sw[disabled]{opacity:.5}
@@ -281,6 +296,9 @@ img{object-fit:contain}
 /* footprints, dizzy, hits */
 .marks{position:absolute;left:var(--pad);top:var(--pad);width:calc(var(--cell)*5);height:calc(var(--cell)*5);pointer-events:none;z-index:1}
 .mark{position:absolute;left:0;top:0;width:var(--cell);height:var(--cell);--mc:#d9c8ff}
+.goal{position:absolute;left:0;top:0;width:var(--cell);height:var(--cell);box-sizing:border-box;border:4px solid #ffd54a;border-radius:22%;box-shadow:0 0 14px rgba(255,213,74,.75),inset 0 0 12px rgba(255,213,74,.55);transition:transform .12s;animation:goalP .6s ease-in-out infinite alternate}
+.goal[hidden]{display:none}
+@keyframes goalP{to{border-color:#fff3c4;box-shadow:0 0 22px rgba(255,213,74,.95),inset 0 0 16px rgba(255,213,74,.7)}}
 .mark.grumble{--mc:#ffb08a}
 .mark.danger{--mc:#ff5a6e;--mf:rgba(255,90,110,.22)}
 .mark .ring{position:absolute;inset:5%;border-radius:22%;border:3px dashed var(--mc);background:var(--mf,rgba(217,200,255,.16))}
@@ -341,7 +359,7 @@ img.big{width:64px;height:64px;object-fit:contain;display:block;margin:0 auto}
 img.hd{width:44px;height:44px;object-fit:contain;vertical-align:middle}
 .trophy img{width:120px;height:120px;object-fit:contain}
 .glow-btn img.ico{width:24px;height:24px}
-.sw img.swh{width:46px;height:34px;object-fit:contain}
+.sw img.swh{width:56px;height:42px;object-fit:contain}
 @keyframes dangerP{to{opacity:.35}}
 @keyframes dizzyW{25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
 @keyframes dz{from{transform:translateX(-50%) rotate(0deg)}to{transform:translateX(-50%) rotate(360deg)}}

@@ -102,3 +102,5 @@ body.skin{background:linear-gradient(180deg,rgba(22,14,34,.55),rgba(18,11,28,.78
 @keyframes beadSlide{from{transform:translate(-160%,-50%);opacity:1}}
 .title-btns .btn{white-space:nowrap;padding-left:16px;padding-right:16px}
 .sw .lk{display:flex;align-items:center;gap:2px;white-space:nowrap}
+.skin .ctab{background:none;border:0 solid transparent;border-image:url(../art/buttons/purple.webp) 80 90 fill / 14px 16px stretch;filter:drop-shadow(0 3px 0 rgba(20,14,28,.8))}
+.skin .ctab.sel{border-image-source:url(../art/buttons/gold.webp);color:#3a2604}
