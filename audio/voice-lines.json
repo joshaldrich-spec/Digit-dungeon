@@ -1162,37 +1162,31 @@
  {
   "id": "s_squash",
   "part": 6,
-  "text": "Squash!",
-  "pending": true
+  "text": "Squash!"
  },
  {
   "id": "s_what_make_ten",
   "part": 6,
-  "text": "and what make ten?",
-  "pending": true
+  "text": "and what make ten?"
  },
  {
   "id": "s_how_many_dots",
   "part": 6,
-  "text": "How many dots?",
-  "pending": true
+  "text": "How many dots?"
  },
  {
   "id": "s_even_or_odd",
   "part": 6,
-  "text": "even or odd?",
-  "pending": true
+  "text": "even or odd?"
  },
  {
   "id": "s_what_next",
   "part": 6,
-  "text": "what comes next?",
-  "pending": true
+  "text": "what comes next?"
  },
  {
   "id": "s_monster_jumped",
   "part": 6,
-  "text": "A monster jumped out!",
-  "pending": true
+  "text": "A monster jumped out!"
  }
 ]

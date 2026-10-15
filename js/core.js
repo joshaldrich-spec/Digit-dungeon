@@ -9,7 +9,7 @@
    ===================================================================== */
 
 
-const BUILD = 'v11';   // bump with the ?v3 tags in index.html on every release
+const BUILD = 'v12';   // bump with the ?v3 tags in index.html on every release
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -147,7 +147,7 @@ const Clips = {
       const tk = speechTokens(c[2]); (this.index[tk[0]] = this.index[tk[0]] || []).push({ id, tk });
     }
     Object.values(this.index).forEach(a => a.sort((x, y) => y.tk.length - x.tk.length));
-    try { fetch(V.file).then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { this.raw = b; this.decode(); }).catch(() => {}); } catch (e) {}
+    try { fetch(V.file + '?' + BUILD).then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { this.raw = b; this.decode(); }).catch(() => {}); } catch (e) {}
   },
   decode() {
     if (this.buf || this.decoding || !this.raw) return;

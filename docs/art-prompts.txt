@@ -101,3 +101,12 @@ Make a sprite sheet of 9 pairs of shoes in a 3 by 3 grid on a plain solid white 
 
 ----- WHERE THEY GO -----
 16 + 17: Closet hats (36 hats in all with the first five). 18 + 19: a new Tops row in the Closet, worn over the lower body under the face. 20: a new Shoes row, worn over the feet. All unlocked with stars, spread out so there's always something new a few runs away.
+
+=================== ROUND 5: MATH POWERS AND SQUASH ===================
+1 image. New Gemini chat: attach the title picture (art/title.webp), paste the round 2 STYLE line, then this sheet.
+
+----- SHEET 21: MATH POWERS AND SQUASH -----
+Make a sprite sheet of 9 simple, bold game icons in a 3 by 3 grid on a plain solid white background, with wide white space between them so none touch or overlap. All icons the same size and easy to read when small. Left to right, top row first: two identical twin fireballs side by side, orange and gold, the same shape and size like a matching pair; a small wooden board with 2 rows of 5 square boxes seen from straight above, 7 boxes holding round red counters and 3 holding round blue counters, with bright sparkles bursting off it; a small wooden board with 2 rows of 5 square boxes holding a few round red counters, with a bright white camera-flash starburst at one corner; four round red counters standing in two pairs, each pair hugged by a glowing gold rounded outline; a happy little green frog in mid-hop above three small curved dotted hop arcs; a chunky stone boxing glove with a plus sign and a minus sign carved on its side; a flat purple goo splat on the ground, wide and squished, with little stars popping off it; a spiky yellow surprise burst with one big exclamation mark in the middle; a pair of big round curious cartoon eyes peeking, with no face around them. No numbers, no letters, no shadows.
+
+----- WHERE THEY GO -----
+The six attack cards in boss fights and monster squashes (Double Fire, Ten-Friend Blast, Flash Frame, Pair Power, Hop Combo, Fact Punch), the splat when a monster gets squashed, the "a monster jumped out!" burst, and the "tap to peek" eyes on Flash Frame.
