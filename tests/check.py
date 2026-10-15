@@ -424,6 +424,23 @@ async def main():
             report(f'every banner title fits its ribbon on {name}', ban['skin'] and not ban['bad'], json.dumps(ban))
             if WANT_SHOTS: await pg.screenshot(path=f'{SHOTS}/{name}-room.png')
             await pg.context.close()
+        # intro video: Play starts it (with a real tap), Skip and the end of the video both land on the title; Grown-ups can turn it off
+        ctx = await b.new_context(viewport={'width': 820, 'height': 1180}, has_touch=True); pg = await ctx.new_page()
+        pg.on('pageerror', lambda e: errors.append(f'intro: {e}'))
+        await pg.goto(URL); await pg.wait_for_timeout(600)
+        start = await pg.evaluate("document.querySelector('#scr-intro').classList.contains('active')")
+        await pg.click('#intro-play', force=True); await pg.wait_for_timeout(1500)
+        rolling = await pg.evaluate("(() => { const v = document.querySelector('#intro-video'); return !v.paused && v.currentTime > .5 && !Music.on; })()")
+        await pg.click('#intro-skip', force=True); await pg.wait_for_timeout(2500)
+        skipped = await pg.evaluate("document.querySelector('#scr-title').classList.contains('active') && Music.on")
+        await pg.reload(); await pg.wait_for_timeout(600); await pg.click('#intro-play', force=True); await pg.wait_for_timeout(500)
+        await pg.evaluate("(() => { const v = document.querySelector('#intro-video'); v.currentTime = v.duration - .25; })()"); await pg.wait_for_timeout(1500)
+        ended = await pg.evaluate("document.querySelector('#scr-title').classList.contains('active')")
+        await pg.evaluate("save.settings.intro = false; persist();"); await pg.reload(); await pg.wait_for_timeout(500)
+        off = await pg.evaluate("document.querySelector('#scr-title').classList.contains('active') && !document.querySelector('#scr-intro').classList.contains('active')")
+        report('intro video: tap Play, Skip or the ending goes to the title, and it can be turned off',
+               start and rolling and skipped and ended and off, json.dumps({'start': start, 'rolling': rolling, 'skipped': skipped, 'ended': ended, 'off': off}))
+        await ctx.close()
         await b.close()
     report('no JavaScript errors', not errors, '; '.join(errors[:3]))
     bad = [n for n, ok in results if not ok]

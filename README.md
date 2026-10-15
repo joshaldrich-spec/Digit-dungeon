@@ -20,6 +20,7 @@ A math roguelite for 2nd grade (Bridges in Mathematics, Grade 2, Unit 1). Plain 
 | `js/ui.js` | Overlays, title, closet, grown-ups panel, input, start-up |
 | `art/` | Sprites (`.webp`, backgrounds removed); `art/hero/` has one per Closet color; `art/tops/` and `art/shoes/` are layers that line up with the hero |
 | `audio/voice.mp3`, `audio/voice.js` | The Gemini voice recording cut into 232 clips, and the index the game uses to string them into sentences |
+| `media/intro.mp4`, `media/intro.webm` | The Gemini intro video (MP4 for iPads, WebM for other browsers) and its Play-screen still |
 | `audio/music.mp3` | Background music loop (composed by `tools/music.py`) |
 | `audio/voice-lines.json` | Master list of voice clips (id, recording part, text) |
 | `docs/` | Gemini voice scripts (`voice-script-2.txt` is the next short recording) and art prompts |

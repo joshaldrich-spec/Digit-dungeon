@@ -12,11 +12,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/game.css?v13">
-<link rel="stylesheet" href="css/skin.css?v13">
+<link rel="stylesheet" href="css/game.css?v14">
+<link rel="stylesheet" href="css/skin.css?v14">
 </head>
 <body>
 <div id="app">
+
+<section id="scr-intro" class="screen">
+  <div class="intro-box">
+    <div class="intro-logo logo"><span>Digit</span><span>Dungeon</span></div>
+    <div class="intro-frame">
+      <video id="intro-video" playsinline preload="auto" poster="media/intro-poster.webp"></video>
+      <button class="intro-skip" id="intro-skip" hidden>Skip ▶</button>
+    </div>
+    <button class="btn gold big" id="intro-play">▶ Play</button>
+  </div>
+</section>
 
 <section id="scr-title" class="screen active">
   <div class="title-bg"></div>
@@ -86,15 +97,15 @@
 <div class="fx" id="fx"></div>
 </div>
 
-<script src="audio/voice.js?v13"></script>
-<script src="js/core.js?v13"></script>
-<script src="js/curriculum.js?v13"></script>
-<script src="js/coaching.js?v13"></script>
-<script src="js/art.js?v13"></script>
-<script src="js/powers.js?v13"></script>
-<script src="js/dungeon.js?v13"></script>
-<script src="js/play.js?v13"></script>
-<script src="js/render.js?v13"></script>
-<script src="js/ui.js?v13"></script>
+<script src="audio/voice.js?v14"></script>
+<script src="js/core.js?v14"></script>
+<script src="js/curriculum.js?v14"></script>
+<script src="js/coaching.js?v14"></script>
+<script src="js/art.js?v14"></script>
+<script src="js/powers.js?v14"></script>
+<script src="js/dungeon.js?v14"></script>
+<script src="js/play.js?v14"></script>
+<script src="js/render.js?v14"></script>
+<script src="js/ui.js?v14"></script>
 </body>
 </html>

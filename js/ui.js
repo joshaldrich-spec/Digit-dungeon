@@ -50,6 +50,34 @@ function openPause() {
       home: () => { saveRun(); closeOverlay(); showTitle(); } } });
 }
 
+/* ---------- intro video ----------
+   On app open: a Play screen over a still from the intro. Her tap starts it with sound (iPads only allow sound after
+   a tap), Skip is always there, and the title fades in when it ends. MP4 for iPads, WebM for other browsers. */
+const Intro = {
+  playing: false,
+  show() {
+    if (save.settings.intro === false || matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+    const v = $('#intro-video');
+    v.innerHTML = `<source src="media/intro.mp4?${BUILD}" type="video/mp4"><source src="media/intro.webm?${BUILD}" type="video/webm">`;
+    v.load(); showScreen('intro'); return true;
+  },
+  play() {
+    const v = $('#intro-video'); this.playing = true;
+    $('#intro-play').hidden = true; $('#intro-skip').hidden = false; $('#scr-intro').classList.add('rolling');
+    try { v.currentTime = 0; const p = v.play(); if (p && p.catch) p.catch(() => this.done()); } catch (e) { this.done(); }
+  },
+  done() {
+    const scr = $('#scr-intro'); if (!scr.classList.contains('active') || scr.classList.contains('leaving')) return;
+    this.playing = false; try { $('#intro-video').pause(); } catch (e) {}
+    scr.classList.add('leaving');
+    setTimeout(() => { scr.classList.remove('leaving', 'rolling'); if (!scr.classList.contains('active')) return;
+      showTitle(); $('#scr-title').classList.add('from-intro'); setTimeout(() => $('#scr-title').classList.remove('from-intro'), 900); Music.start(); }, 450);
+  },
+};
+$('#intro-play').addEventListener('click', () => Intro.play());
+$('#intro-skip').addEventListener('click', () => Intro.done());
+$('#intro-video').addEventListener('ended', () => Intro.done());
+
 /* ---------- title, name, closet ---------- */
 function showTitle() {
   Voice.stop(); run = null; showScreen('title');
@@ -130,6 +158,7 @@ function openGrownups() {
     ${tg('voice', 'Read aloud', 'Rules, coaching and questions are spoken')}
     ${tg('sound', 'Sound effects')}
     ${tg('music', 'Background music', 'Spooky lo-fi loop, quieter while the voice talks')}
+    ${tg('intro', 'Intro video', 'Plays when the game opens (she can skip it)')}
     ${tg('mistakes', 'Mistakes cost ½ heart', 'Off = gentle mode: wrong answers only coach')}
     ${tg('monsters', 'Monsters', 'Off = calm rooms with no wandering monsters')}
     ${tg('readTiles', 'Read each tile when stepped on', 'Extra support for early readers')}
@@ -139,7 +168,8 @@ function openGrownups() {
       <li>No reading to get started: the first room is three easy matches, and rules, facts and coaching are all read aloud.</li>
       <li>Every mistake gets a picture and a named strategy (doubles, make ten, count on, think addition). It cracks half a heart, and her next right answer mends it.</li>
       <li>Mistakes come back: one is shown on the run-over screen, the next run starts with a room built around it, and getting it right is celebrated.</li>
-      <li>No timers. Monsters only move when she walks, footprints show exactly where they'll step, and right answers make them dizzy.</li>
+      <li>No timers. Monsters only move when she walks, footprints show exactly where they'll step, and right answers make them dizzy. Running into one starts a one-question "squash" fight.</li>
+      <li>Boss fights and squash fights mix problem types: take-away on the number rack, doubles, ten-friends, ten-frame quick looks, even/odd and skip counting.</li>
       <li>Adapts: a skill levels up at 90%+ and eases off below 60%. Rooms mix skills and favor her weaker ones.</li>
       <li>Stars are always kept, even when a run ends.</li></ul>
     <div class="stack"><button class="btn mint" data-close>Done</button><button class="btn small ghost" data-act="reset">Reset all progress</button></div></div>`,
@@ -267,7 +297,8 @@ $('#btn-closet').addEventListener('click', () => openCloset());
 })();
 window.addEventListener('resize', () => { fit(); if (run && room) renderMap(); });
 if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('#stage'));
-document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); Sound.pause(); } else { if (Sound.ctx) Sound.wake(false); if (run) run.tick = Date.now(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden && Intro.playing) Intro.done();   // leaving mid-intro: come back to the title
+  if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); Sound.pause(); } else { if (Sound.ctx) Sound.wake(false); if (run) run.tick = Date.now(); } });
 
 window.DD = { get run() { return run; }, get room() { return room; }, get hero() { return hero; }, get save() { return save; }, tryMove, chomp, goThrough, enterRoom, bossPick, bossAnswer, trapdoor, takeItem, openShop, buy, closeOverlay, newRun, endRun, planMonsters };
 /* Zoom guard. A double-tap or two-finger pinch can zoom Safari in, and the game screen (which blocks browser
@@ -304,4 +335,4 @@ const ZoomGuard = {
 document.addEventListener('DOMContentLoaded', () => { ZoomGuard.init();
   if (!save.seen) save.seen = [...save.unlocks];   // first time with the bigger Closet: what she had before isn't NEW
   checkUnlocks(true); persist();
-  Clips.init(); Music.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });
+  Clips.init(); Music.init(); if (!Intro.show()) showTitle(); else { $('#title-hero').innerHTML = heroSVG(); } loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });

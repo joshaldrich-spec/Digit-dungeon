@@ -78,7 +78,7 @@ function applyArt() {
   if (D.doorClosed && D.doorOpen) { root.setProperty('--door-closed', abs(D.doorClosed)); root.setProperty('--door-open', abs(D.doorOpen)); b.add('has-doors'); }
   if (ART.skin && Object.keys(ART.skin).length === 19) b.add('skin');
   if (U.logo) $$('.logo').forEach(l => { l.innerHTML = `<img class="logo-img" src="${U.logo}" alt="Digit Dungeon" draggable="false">`; });
-  ['#btn-pause', '#btn-say', '#btn-closet', '#btn-grownups', '#btn-chomp'].forEach(s => { const e = $(s); if (e && !e.dataset.art) { e.dataset.art = 1; e.innerHTML = artify(e.innerHTML); } });
+  ['#btn-pause', '#btn-say', '#btn-closet', '#btn-grownups', '#btn-chomp', '#intro-play', '#intro-skip'].forEach(s => { const e = $(s); if (e && !e.dataset.art) { e.dataset.art = 1; e.innerHTML = artify(e.innerHTML); } });
 }
 const icon = (src, emoji, cls = 'ico') => (src ? `<img class="${cls}" src="${src}" alt="" draggable="false">` : emoji);
 const itemIcon = (id, cls) => icon(ART.items && ART.items[id], ITEMS[id] ? ITEMS[id].icon : '', cls);
