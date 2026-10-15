@@ -33,7 +33,8 @@ const ART = {
   shopkeeper: 'art/shopkeeper.webp', trapdoor: 'art/trapdoor.webp',
   title: 'art/title.webp',   // title screen picture (shown by index.html + css; listed here so it preloads)
   icons: files('icons', ['speaker', 'mute', 'pause', 'music', 'music-off', 'home', 'lock', 'target', 'arrow', 'swords', 'bag', 'gift', 'shirt', 'bulb', 'comeback', 'gear']),
-  fx: files('fx', ['flame', 'popper', 'sparkles', 'zap', 'snip', 'moon', 'bomb', 'burst', 'smoke', 'dizzy', 'up', 'down', 'candle', 'paws', 'gem-empty', 'gem']),
+  fx: files('fx', ['flame', 'popper', 'sparkles', 'zap', 'snip', 'moon', 'bomb', 'burst', 'smoke', 'dizzy', 'up', 'down', 'candle', 'paws', 'gem-empty', 'gem', 'splat', 'surprise', 'peek']),
+  powers: files('powers', ['double', 'friends', 'flash', 'parity', 'hop', 'fact']),   // attack-card icons (js/powers.js)
   math: files('math', ['heart', 'heart-empty', 'heart-crack', 'counter-red', 'counter-blue', 'board', 'bead-red', 'bead-cream', 'rack']),
   props: files('props', ['pillar', 'torch', 'barrel', 'heap', 'coins', 'boulder', 'rocks', 'grass', 'arch', 'slab']),
   // used only by css/skin.css (listed so they preload; the skin switches on when they all load)
@@ -53,9 +54,9 @@ const EMOJI_ART = () => {
     '🔒': I.lock, '🎯': I.target, '➜': I.arrow, '▶': I.arrow, '⚔': I.swords, '🛒': I.bag, '🎁': I.gift, '👕': I.shirt, '💡': I.bulb, '🔁': I.comeback, '⚙': I.gear,
     '🔥': F.flame, '🎉': F.popper, '✨': F.sparkles, '⚡': F.zap, '✂': F.snip, '🌗': F.moon, '💣': F.bomb, '💥': F.burst, '💨': F.smoke, '💫': F.dizzy,
     '⬆': F.up, '⬇': F.down, '🕯': F.candle, '❤': M.heart, '💖': T.heart, '🧠': U.brain, '🏆': U.trophy, '🏅': U.star, '👑': ART.chest, '🦉': ART.shopkeeper,
-    '🫧': T.bubble, '🔦': T.flashlight, '🥽': T.specs, '🧦': T.socks, '🐸': T.frog, '🍀': T.clover, '🐌': T.snail, '🚪': ART.props && ART.props.arch };
+    '🫧': T.bubble, '🔦': T.flashlight, '🥽': T.specs, '🧦': T.socks, '🐸': T.frog, '🍀': T.clover, '🐌': T.snail, '🚪': ART.props && ART.props.arch, '👀': F.peek };
 };
-const EMOJI_RE = /(⭐|🪙|🔊|🔇|⏸|🎵|🎶|🔕|💾|🏠|🔒|🎯|➜|▶|⚔|🛒|🎁|👕|💡|🔁|⚙|🔥|🎉|✨|⚡|✂|🌗|💣|💥|💨|💫|⬆|⬇|🕯|❤|💖|🧠|🏆|🏅|👑|🦉|🫧|🔦|🥽|🧦|🐸|🍀|🐌|🚪)️?/gu;
+const EMOJI_RE = /(⭐|🪙|🔊|🔇|⏸|🎵|🎶|🔕|💾|🏠|🔒|🎯|➜|▶|⚔|🛒|🎁|👕|💡|🔁|⚙|🔥|🎉|✨|⚡|✂|🌗|💣|💥|💨|💫|⬆|⬇|🕯|❤|💖|🧠|🏆|🏅|👑|🦉|🫧|🔦|🥽|🧦|🐸|🍀|🐌|🚪|👀)️?/gu;
 function artify(html) {
   if (typeof html !== 'string') return html;
   const map = EMOJI_ART();

@@ -120,6 +120,19 @@ function poofAt(x, y, ch = '💨') {
   f.style.left = `calc(var(--cell) * ${x})`; f.style.top = `calc(var(--cell) * ${y})`;
   $('#actors').appendChild(f); setTimeout(() => f.remove(), 550);
 }
+/* squash leaves a goo splat on the floor for a moment; a monster jumping out gets a "!" burst */
+function splatAt(x, y) {
+  if (!(ART.fx && ART.fx.splat)) return poofAt(x, y, '⭐');
+  const f = document.createElement('div'); f.className = 'splat-fx'; f.innerHTML = `<img src="${ART.fx.splat}" alt="" draggable="false">`;
+  f.style.left = `calc(var(--cell) * ${x})`; f.style.top = `calc(var(--cell) * ${y})`;
+  $('#actors').appendChild(f); setTimeout(() => f.remove(), 2400);
+}
+function surpriseAt(x, y) {
+  if (!(ART.fx && ART.fx.surprise)) return;
+  const f = document.createElement('img'); f.className = 'surprise-fx'; f.src = ART.fx.surprise; f.alt = '';
+  f.style.left = `calc(var(--cell) * ${x + .5})`; f.style.top = `calc(var(--cell) * ${y - .3})`;
+  $('#actors').appendChild(f); setTimeout(() => f.remove(), 900);
+}
 function pawSVG(c) {
   if (ART.fx && ART.fx.paws) {
     const tint = { '#ff5a6e': 'hue-rotate(105deg) saturate(3.2) brightness(.95)', '#ffb08a': 'hue-rotate(140deg) saturate(2.2) brightness(1.05)' }[c] || 'none';

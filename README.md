@@ -26,6 +26,7 @@ A math roguelite for 2nd grade (Bridges in Mathematics, Grade 2, Unit 1). Plain 
 | `tests/check.py` | One command that checks the math (including kid-style play by real button presses), monsters, learning loop, input, voice, music, a full run and layouts |
 | `tools/voice/` | How the recording was cut (alignment, clip list) |
 | `tools/cut_ui.py`, `tools/cut_sheets.py` | Cut Gemini sprite sheets into game art |
+| `tools/cut_powers.py` | Cut the math-power icons, squash splat, surprise burst and peek eyes (the ten-frame icons are built from the game's own board and counters) |
 | `tools/cut_closet.py` | Cut the Closet sheets: hats, tops (fitted to the hero's belly) and shoes (front shoe split out and mirrored) |
 | `tools/music.py` | Composes and renders the background music |
 | `tools/process_art.py` | Turns a Gemini image into a game sprite (removes background, crops, recolors hero) |

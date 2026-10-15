@@ -123,3 +123,4 @@ function problemHTML(p, wrong = [], hinted = false) {
     ${hinted ? `<div class="hint">${p.hint.pic ? `<div class="hpic">${p.hint.pic}</div>` : ''}💡 ${p.hint.text}</div>` : ''}`;
 }
 const peekAgain = el => { el.classList.remove('flashpic'); void el.offsetWidth; el.classList.add('flashpic'); };
+const powerIcon = p => (ART.powers && ART.powers[p.id] ? `<img class="pwi" src="${ART.powers[p.id]}" alt="" draggable="false">` : p.icon);

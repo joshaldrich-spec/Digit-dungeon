@@ -284,12 +284,23 @@ img{object-fit:contain}
 .hint .hpic{max-width:200px;margin:0 auto 6px}.hint .hpic svg{max-height:96px}.hint .hpic svg{width:100%;height:auto;display:block}
 .boss-wrap.compact .boss-spr{width:min(24vw,96px)}
 .boss-wrap.has-pic .rack{display:none}
-.fight-spr{width:min(34vw,140px);margin:0 auto;animation:bob 1.4s ease-in-out infinite}
+.fight-stage{position:relative;width:min(34vw,140px);margin:0 auto}
+.fight-spr{width:100%;animation:bob 1.4s ease-in-out infinite}
+.fight-stage .surprise{position:absolute;right:-34%;top:-10%;width:50%;z-index:2;animation:surprisePop .45s cubic-bezier(.3,1.6,.5,1) both}
+.fight-stage .splat{position:absolute;left:50%;bottom:-4%;width:150%;transform:translateX(-50%);z-index:-1;animation:splatIn .4s .12s ease-out both}
+@keyframes surprisePop{from{transform:scale(.2) rotate(-25deg);opacity:0}}
+@keyframes splatIn{from{transform:translateX(-50%) scale(.3);opacity:0}}
+.atk .ai img.pwi{display:block;height:46px;width:auto;max-width:76px;object-fit:contain;margin:0 auto 2px}
+.splat-fx{position:absolute;width:var(--cell);height:var(--cell);display:flex;align-items:flex-end;justify-content:center;z-index:1;pointer-events:none;animation:splatFx 2.4s ease-out forwards}
+.splat-fx img{width:105%;height:auto;margin-bottom:4%}
+@keyframes splatFx{0%{transform:scale(.3);opacity:0}12%{transform:scale(1.08);opacity:1}20%{transform:scale(1)}75%{opacity:1}100%{opacity:0}}
+.surprise-fx{position:absolute;width:calc(var(--cell) * .6);transform:translate(-10%,0);z-index:9;pointer-events:none;animation:surprisePop .45s cubic-bezier(.3,1.6,.5,1) both}
+.peek-tag img.ei{height:1.6em;vertical-align:-.45em;margin-right:4px}
 .fight-spr svg,.fight-spr img{width:100%;height:auto;display:block}
-.fight-wrap.compact .fight-spr{width:min(22vw,86px)}
+.fight-wrap.compact .fight-stage{width:min(22vw,86px)}
 .fight-wrap.won .fight-spr{animation:squashed .5s ease-in forwards;transform-origin:50% 100%}
 @keyframes squashed{30%{transform:scale(1.15,.85)}100%{transform:scale(1.6,.12);opacity:.85}}
-@media (min-height:1000px){.boss-wrap.compact .boss-spr{width:150px}.fight-wrap.compact .fight-spr{width:130px}.hint .hpic{max-width:280px}.hint .hpic svg{max-height:140px}}
+@media (min-height:1000px){.boss-wrap.compact .boss-spr{width:150px}.fight-wrap.compact .fight-stage{width:130px}.hint .hpic{max-width:280px}.hint .hpic svg{max-height:140px}}
 .squash-t{font-size:44px!important;font-weight:700;color:var(--gold);margin:6px 0!important;animation:pop .3s ease-out}
 /* grown-ups */
 .gu{text-align:left}

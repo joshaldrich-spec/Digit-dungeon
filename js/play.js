@@ -32,7 +32,7 @@ function endTurn() {
   const hit = room.type === 'normal' && !room.cleared && room.monsters && room.monsters.length ? runMonsters() : null;
   renderActors(); renderTelegraph(); saveRun();
   if (hit) {          // a monster stepped onto her footprint square: it's a squash fight (after its lunge shows)
-    const token = uid(); run.fight = { pending: true, ambush: true, token };
+    const token = uid(); run.fight = { pending: true, ambush: true, token }; surpriseAt(hit.x, hit.y);
     if (typeof stopWalk === 'function') stopWalk();
     setTimeout(() => { if (run && run.fight && run.fight.token === token) startFight(hit, true); }, 300);
   }
@@ -99,11 +99,11 @@ function startFight(m, ambush) {
 function renderFight() {
   const f = run.fight; if (!f) return;
   let body = '';
-  if (f.step === 'choose') body = `<p>Pick an attack!</p><div class="attacks">${f.moves.map((p, i) => `<button class="atk pow" data-act="atk" data-i="${i}"><span class="ai">${p.icon}</span><b>${p.name}</b></button>`).join('')}</div>`;
+  if (f.step === 'choose') body = `<p>Pick an attack!</p><div class="attacks">${f.moves.map((p, i) => `<button class="atk pow" data-act="atk" data-i="${i}"><span class="ai">${powerIcon(p)}</span><b>${p.name}</b></button>`).join('')}</div>`;
   else if (f.step === 'answer') body = problemHTML(f.prob, f.wrong, f.hinted);
   else body = `<p class="squash-t">SQUASH!</p><p>+1 ⭐ &nbsp; +1 🪙</p>`;
   openOverlay(`<div class="fight-wrap ${f.step === 'won' ? 'won' : ''}${f.step === 'answer' && (f.prob.pic || f.hinted) ? ' compact' : ''}"><div class="boss-hearts">${heartsHTML()}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div>
-    <div class="fight-spr ${f.kind}">${f.kind === 'grumble' ? grumbleSVG() : wispSVG()}</div><div class="boss-name">${f.ambush ? 'A monster jumped out!' : 'Squash it!'}</div>${body}</div>`,
+    <div class="fight-stage">${f.ambush && f.step !== 'won' && ART.fx && ART.fx.surprise ? `<img class="surprise" src="${ART.fx.surprise}" alt="">` : ''}<div class="fight-spr ${f.kind}">${f.kind === 'grumble' ? grumbleSVG() : wispSVG()}</div>${f.step === 'won' && ART.fx && ART.fx.splat ? `<img class="splat" src="${ART.fx.splat}" alt="">` : ''}</div><div class="boss-name">${f.ambush ? 'A monster jumped out!' : 'Squash it!'}</div>${body}</div>`,
     { cls: 'boss-card fight-card', actions: { atk: el => fightPick(+el.dataset.i), ans: el => fightAnswer(el.dataset.v), peek: peekAgain } });
 }
 function fightPick(i) {
@@ -134,7 +134,7 @@ function squash(mid) {
   const m = room.monsters.find(x => x.id === mid); run.fight = null;
   if (m) {
     room.monsters = room.monsters.filter(o => o !== m);
-    poofAt(m.x, m.y, '⭐'); floatAt(m.x, m.y, 'SQUASH!');
+    splatAt(m.x, m.y); floatAt(m.x, m.y, 'SQUASH!');
     room.pickups.push({ id: uid(), type: 'coin', x: m.x, y: m.y });
   }
   hero.safe = Math.max(hero.safe, 1); heroMood('cheer', 1000);
@@ -392,7 +392,7 @@ function renderBoss() {
   const b = run.boss, B = BOSSES[run.floor - 1];
   let body = '';
   if (b.step === 'intro') body = `<p><b>${B.name}</b> blocks the way!</p><p class="sub">Shrink its health to 0 with your number powers.</p><button class="btn red big" data-act="go">Fight!</button>`;
-  else if (b.step === 'choose') body = `${b.last ? `<p class="lasthit">${b.last.from} − ${b.last.dmg} = ${b.last.from - b.last.dmg}</p>` : ''}<p>Pick an attack!</p><div class="attacks">${b.moves.map((m, i) => `<button class="atk${m.kind === 'power' ? ' pow' : ''}" data-act="atk" data-i="${i}"><span class="ai">${m.icon}</span><b>${m.name}</b><span class="ak">${m.kind === 'take' ? '−' + m.k : '−?'}</span></button>`).join('')}</div>`;
+  else if (b.step === 'choose') body = `${b.last ? `<p class="lasthit">${b.last.from} − ${b.last.dmg} = ${b.last.from - b.last.dmg}</p>` : ''}<p>Pick an attack!</p><div class="attacks">${b.moves.map((m, i) => `<button class="atk${m.kind === 'power' ? ' pow' : ''}" data-act="atk" data-i="${i}"><span class="ai">${m.kind === 'power' ? powerIcon(m) : m.icon}</span><b>${m.name}</b><span class="ak">${m.kind === 'take' ? '−' + m.k : '−?'}</span></button>`).join('')}</div>`;
   else if (b.step === 'answer') body = problemHTML(b.prob, b.wrong, b.hinted);
   else if (b.step === 'win') body = `<p><b>You beat ${B.name}!</b> 🎉</p><p>+10 ⭐ &nbsp; +5 🪙</p><button class="btn gold big" data-act="trap">${run.floor < 3 ? 'Jump down the trapdoor ⬇️' : 'Claim your trophy 🏆'}</button>`;
   const hearts = heartsHTML(), ans = b.step === 'answer' && b.prob;
