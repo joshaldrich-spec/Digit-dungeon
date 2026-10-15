@@ -206,8 +206,9 @@ async def main():
 
         await page.evaluate("Voice.log = []")
         v = await page.evaluate(VOICE); report(f"every generated sentence has recorded clips ({v['checked']} checked)", not v['missing'], ' | '.join(v['missing']))
-        art = await page.evaluate("loadArt().then(() => ({ sprites: Object.keys(ART).length, heroes: Object.keys(ART.hero || {}).length + Object.keys(ART.heroChomp || {}).length }))")
-        report('art files all load', art['sprites'] == 12 and art['heroes'] == 12, json.dumps(art))
+        n_files = sum(1 for _, _, fs in os.walk(os.path.join(ROOT, 'art')) for f in fs if f.endswith('.webp'))
+        art = await page.evaluate("loadArt().then(() => { const n = o => Object.values(o).reduce((s, v) => s + (typeof v === 'string' ? 1 : n(v)), 0); return { loaded: n(ART), tile: document.body.classList.contains('has-tile'), floor: document.body.classList.contains('has-floor'), doors: document.body.classList.contains('has-doors') }; })")
+        report(f'all {n_files} art files load and are used', art['loaded'] == n_files and art['tile'] and art['floor'] and art['doors'], json.dumps(art))
         m = await page.evaluate(MATH); report(f"math is true in {m['rooms']} generated rooms", not m['problems'], '; '.join(m['problems']))
         h = await page.evaluate(HONEST); report(f"footprints predict every monster step ({h['hits']} hits, all on footprints)", not h['problems'], '; '.join(h['problems']))
         lp = await page.evaluate(LOOP)

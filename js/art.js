@@ -10,6 +10,15 @@ const HERO_COLORS = ['mint', 'sky', 'peach', 'grape', 'pink', 'gold'];
 const ART = {
   hero: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}.webp`])),
   heroChomp: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}-chomp.webp`])),
+  heroOuch: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}-ouch.webp`])),
+  heroCheer: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}-cheer.webp`])),
+  heroSad: Object.fromEntries(HERO_COLORS.map(c => [c, `art/hero/${c}-sad.webp`])),
+  chestOpen: 'art/chest-open.webp',
+  items: Object.fromEntries(['specs', 'socks', 'frog', 'heart', 'clover', 'snail', 'bubble', 'flashlight'].map(k => [k, `art/items/${k}.webp`])),
+  hats: Object.fromEntries(['bow', 'party', 'crown', 'wizard', 'viking'].map(k => [k, `art/hats/${k}.webp`])),
+  ui: { star: 'art/ui/star.webp', trophy: 'art/ui/trophy.webp', brain: 'art/ui/brain.webp', tile: 'art/ui/tile.webp' },
+  dungeon: { floor1: 'art/dungeon/floor-1.webp', floor2: 'art/dungeon/floor-2.webp', floor3: 'art/dungeon/floor-3.webp',
+             doorClosed: 'art/dungeon/door-closed.webp', doorOpen: 'art/dungeon/door-open.webp' },
   wisp: 'art/wisp.webp', grumble: 'art/grumble.webp',
   boss1: 'art/boss1.webp', boss2: 'art/boss2.webp', boss3: 'art/boss3.webp',
   coin: 'art/coin.webp', heart: 'art/heart.webp', chest: 'art/chest.webp',
@@ -20,7 +29,25 @@ function loadArt() {
   const jobs = [];
   const check = (obj, k) => jobs.push(new Promise(res => { const im = new Image(); im.onload = res; im.onerror = () => { delete obj[k]; res(); }; im.src = obj[k]; }));
   for (const k of Object.keys(ART)) { if (typeof ART[k] === 'string') check(ART, k); else for (const c of Object.keys(ART[k])) check(ART[k], c); }
-  return Promise.all(jobs).then(() => { ['hero', 'heroChomp'].forEach(k => { if (ART[k] && !Object.keys(ART[k]).length) delete ART[k]; }); });
+  return Promise.all(jobs).then(() => { Object.keys(ART).forEach(k => { if (typeof ART[k] === 'object' && !Object.keys(ART[k]).length) delete ART[k]; }); applyArt(); });
+}
+/* textures (tablets, floors, doors) are CSS backgrounds: switch them on only for files that loaded */
+function applyArt() {
+  const root = document.documentElement.style, b = document.body.classList, abs = p => `url("${new URL(p, document.baseURI).href}")`;
+  const D = ART.dungeon || {}, U = ART.ui || {};
+  if (U.tile) { root.setProperty('--tile-img', abs(U.tile)); b.add('has-tile'); }
+  if (D.floor1 && D.floor2 && D.floor3) { [1, 2, 3].forEach(i => root.setProperty(`--floor${i}`, abs(D['floor' + i]))); b.add('has-floor'); }
+  if (D.doorClosed && D.doorOpen) { root.setProperty('--door-closed', abs(D.doorClosed)); root.setProperty('--door-open', abs(D.doorOpen)); b.add('has-doors'); }
+}
+const icon = (src, emoji, cls = 'ico') => (src ? `<img class="${cls}" src="${src}" alt="" draggable="false">` : emoji);
+const itemIcon = (id, cls) => icon(ART.items && ART.items[id], ITEMS[id] ? ITEMS[id].icon : '', cls);
+/* where each hat sits on the hero (percent of the hero box): width, centre x, bottom y, tilt */
+const HAT_FIT = { bow: { w: 34, x: 68, y: 31, r: 16 }, party: { w: 30, x: 50, y: 27, r: 0 }, crown: { w: 40, x: 50, y: 28, r: 0 },
+                  wizard: { w: 58, x: 50, y: 29, r: -4 }, viking: { w: 66, x: 50, y: 34, r: 0 } };
+function hatHTML(k) {
+  if (!k || k === 'none') return '';
+  if (ART.hats && ART.hats[k]) { const f = HAT_FIT[k]; return `<img class="hat" src="${ART.hats[k]}" alt="" draggable="false" style="width:${f.w}%;left:${f.x}%;top:${f.y}%;transform:translate(-50%,-100%) rotate(${f.r}deg)">`; }
+  return `<svg viewBox="0 0 100 100">${hatSVG(k)}</svg>`;
 }
 
 
@@ -54,11 +81,12 @@ function hatSVG(h) {
   }
   return '';
 }
-function heroSVG(colorKey = save.cosmetics.color, hatKey = save.cosmetics.hat, open = false) {
+function heroSVG(colorKey = save.cosmetics.color, hatKey = save.cosmetics.hat, open = false, mood = null) {
   if (ART.hero) {
     const pickC = set => set && (set[colorKey] || set.mint);
-    const src = (open && pickC(ART.heroChomp)) || pickC(ART.hero);
-    return `<div class="hero-art">${img(src)}<svg viewBox="0 0 100 100">${hatSVG(hatKey)}</svg></div>`;
+    const moodSet = mood && ART['hero' + mood[0].toUpperCase() + mood.slice(1)];
+    const src = (moodSet && pickC(moodSet)) || (open && pickC(ART.heroChomp)) || pickC(ART.hero);
+    return `<div class="hero-art">${img(src)}${hatHTML(hatKey)}</div>`;
   }
   const col = COLORS[colorKey] || COLORS.mint;
   const mouth = open

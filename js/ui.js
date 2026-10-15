@@ -64,7 +64,7 @@ function openCloset() {
   const sw = Object.entries(COLORS).map(([k, c]) => { const lock = save.stars < c.need;
     return `<button class="sw ${save.cosmetics.color === k ? 'sel' : ''}" data-act="color" data-k="${k}" ${lock ? 'disabled' : ''}><span class="dot" style="background:${c.c}"></span>${lock ? `🔒 ${c.need}⭐` : c.name}</button>`; }).join('');
   const hats = Object.entries(HATS).map(([k, h]) => { const lock = save.stars < h.need;
-    return `<button class="sw ${save.cosmetics.hat === k ? 'sel' : ''}" data-act="hat" data-k="${k}" ${lock ? 'disabled' : ''}><svg viewBox="16 -2 68 38">${k === 'none' ? '<text x="50" y="26" text-anchor="middle" font-size="22" fill="#bfaed8">—</text>' : hatSVG(k)}</svg>${lock ? `🔒 ${h.need}⭐` : h.name}</button>`; }).join('');
+    return `<button class="sw ${save.cosmetics.hat === k ? 'sel' : ''}" data-act="hat" data-k="${k}" ${lock ? 'disabled' : ''}>${k !== 'none' && ART.hats && ART.hats[k] ? `<img class="swh" src="${ART.hats[k]}" alt="">` : `<svg viewBox="16 -2 68 38">${k === 'none' ? '<text x="50" y="26" text-anchor="middle" font-size="22" fill="#bfaed8">—</text>' : hatSVG(k)}</svg>`}${lock ? `🔒 ${h.need}⭐` : h.name}</button>`; }).join('');
   openOverlay(`<h2>👕 Closet</h2><div class="closet-hero">${heroSVG()}</div><p class="sub">⭐ ${save.stars} stars · earn more by chomping!</p><h3>Colors</h3><div class="swatches">${sw}</div><h3>Hats</h3><div class="swatches">${hats}</div><div class="stack"><button class="btn mint" data-close>Done</button></div>`,
     { actions: { color: el => { save.cosmetics.color = el.dataset.k; persist(); openCloset(); }, hat: el => { save.cosmetics.hat = el.dataset.k; persist(); openCloset(); } },
       onClose: () => $('#title-hero').innerHTML = heroSVG() });
@@ -196,4 +196,4 @@ if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('#stage'));
 document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); } else if (run) run.tick = Date.now(); });
 
 window.DD = { get run() { return run; }, get room() { return room; }, get hero() { return hero; }, get save() { return save; }, tryMove, chomp, goThrough, enterRoom, bossPick, bossAnswer, trapdoor, takeItem, openShop, buy, closeOverlay, newRun, endRun, planMonsters };
-document.addEventListener('DOMContentLoaded', () => { Clips.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); }); });
+document.addEventListener('DOMContentLoaded', () => { Clips.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); else if (run && room) { fit(); clearActors(); renderAll(); } }); });

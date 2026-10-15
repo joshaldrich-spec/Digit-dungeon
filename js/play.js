@@ -78,7 +78,7 @@ function planMonsters() {
 function monsterHurt() {
   if (run.shield) { run.shield = false; Sound.play('hit'); floatAt(hero.x, hero.y, '🫧 blocked!'); Voice.say('Bubble blocked it!'); renderHUD(); return false; }
   run.hearts = Math.max(0, run.hearts - 1); hero.safe = 3; run.lastHurt = 'monster';
-  Sound.play('hurt'); heartFx(); floatAt(hero.x, hero.y, '−½ ❤️', 'bad'); Voice.say('Ouch!');
+  Sound.play('hurt'); heartFx(); heroMood('ouch', 800); floatAt(hero.x, hero.y, '−½ ❤️', 'bad'); Voice.say('Ouch!');
   const r = $('#room'); r.classList.remove('shake'); void r.offsetWidth; r.classList.add('shake');
   const el = actorEls.get('hero'); if (el) { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); }
   renderHUD();
@@ -200,7 +200,7 @@ function remembered(key, said) {
   const i = save.comeback.findIndex(c => c.key === key); if (i < 0) return;
   save.comeback.splice(i, 1); save.remembered = (save.remembered || 0) + 1;
   save.stars += 3; run.stars += 3; run.justRemembered = Date.now(); persist();
-  Sound.play('item'); banner('🧠', 'You remembered!', strip(said)); floatAt(hero.x, hero.y, '+3 ⭐', '', 1);
+  Sound.play('item'); banner(icon(ART.ui && ART.ui.brain, '🧠', 'big'), 'You remembered!', strip(said)); heroMood('cheer', 1500); floatAt(hero.x, hero.y, '+3 ⭐', '', 1);
   Voice.say(`You remembered! ${said}`);
 }
 function record(skill, ok, t) {
@@ -228,7 +228,7 @@ function checkClear() {
   const msg = pick(room.mistakes ? PRAISE_FIX : PRAISE_CLEAN);
   toast(`${msg} +3 ⭐`);
   if (!(run.justRemembered > Date.now() - 1500)) Voice.say(`${msg} Nice one!`);
-  checkUnlocks(); renderAll(); saveRun();
+  checkUnlocks(); renderAll(); saveRun(); heroMood('cheer', 1400);
   $$('.door.open').forEach(d => { d.classList.add('burst'); setTimeout(() => d.classList.remove('burst'), 1600); });
   return true;
 }
@@ -249,13 +249,13 @@ function useGlow() {
 /* ---------- treasure / shop ---------- */
 function openTreasure() {
   if (!room.offers) room.offers = pickItemOffers(2);
-  openOverlay(`<h2>👑 Treasure!</h2><p>Pick <b>one</b> prize:</p><div class="offers">${room.offers.map(id => `<button class="offer" data-act="take" data-id="${id}"><div class="ic">${ITEMS[id].icon}</div><b>${ITEMS[id].name}</b><span>${ITEMS[id].desc}</span></button>`).join('')}</div><button class="btn ghost" data-close>Not now</button>`,
+  openOverlay(`<h2>${icon(ART.chestOpen, '👑', 'hd')} Treasure!</h2><p>Pick <b>one</b> prize:</p><div class="offers">${room.offers.map(id => `<button class="offer" data-act="take" data-id="${id}"><div class="ic">${itemIcon(id, 'big')}</div><b>${ITEMS[id].name}</b><span>${ITEMS[id].desc}</span></button>`).join('')}</div><button class="btn ghost" data-close>Not now</button>`,
     { actions: { take: el => takeItem(el.dataset.id) } });
   Voice.say('Treasure! Pick one prize.');
 }
 function takeItem(id) {
   run.items.push(id); room.taken = true; applyItem(id); Sound.play('item'); closeOverlay();
-  banner(ITEMS[id].icon, ITEMS[id].name, ITEMS[id].desc); Voice.say(ITEMS[id].say);
+  banner(itemIcon(id, 'big'), ITEMS[id].name, ITEMS[id].desc); Voice.say(ITEMS[id].say);
   renderAll(); saveRun();
 }
 function openShop() {
@@ -265,7 +265,7 @@ function openShop() {
     if (it) room.stock.push({ id: it, icon: ITEMS[it].icon, name: ITEMS[it].name, desc: ITEMS[it].desc, price: 10, item: true });
   }
   const can = s => run.coins >= s.price && !s.sold && !(s.id === 'refill' && run.hearts >= run.maxHearts);
-  openOverlay(`<h2>🦉 Hoot's Shop</h2><p>You have <b>${run.coins} 🪙</b></p><div class="offers">${room.stock.map((s, i) => `<button class="offer" data-act="buy" data-i="${i}" ${can(s) ? '' : 'disabled'}><div class="ic">${s.icon}</div><b>${s.name}</b><span>${s.desc}</span><div class="price">${s.sold ? 'Sold!' : s.price + ' 🪙'}</div></button>`).join('')}</div><button class="btn mint" data-close>Done shopping</button>`,
+  openOverlay(`<h2>🦉 Hoot's Shop</h2><p>You have <b>${run.coins} 🪙</b></p><div class="offers">${room.stock.map((s, i) => `<button class="offer" data-act="buy" data-i="${i}" ${can(s) ? '' : 'disabled'}><div class="ic">${s.id === 'refill' ? icon(ART.heart, '❤️', 'big') : s.id === 'flashlight' ? icon(ART.items && ART.items.flashlight, '🔦', 'big') : itemIcon(s.id, 'big')}</div><b>${s.name}</b><span>${s.desc}</span><div class="price">${s.sold ? 'Sold!' : s.price + ' 🪙'}</div></button>`).join('')}</div><button class="btn mint" data-close>Done shopping</button>`,
     { actions: { buy: el => buy(+el.dataset.i) } });
   if (!room.shopSpoke) { room.shopSpoke = true; Voice.say(`Welcome to Hoot's shop! You have ${run.coins} coins.`); }
 }
@@ -326,7 +326,7 @@ function renderBoss() {
   else if (b.step === 'answer') body = `<p class="boss-q">${b.hp} − ${b.move.k} = <span class="qmark">?</span></p><div class="choices">${b.choices.map(v => `<button class="ch" data-act="ans" data-v="${v}" ${b.wrong.includes(v) ? 'disabled' : ''}>${v}</button>`).join('')}</div>${b.hint ? `<p class="hint">💡 ${b.hint}</p>` : ''}`;
   else if (b.step === 'win') body = `<p><b>You beat ${B.name}!</b> 🎉</p><p>+10 ⭐ &nbsp; +5 🪙</p><button class="btn gold big" data-act="trap">${run.floor < 3 ? 'Jump down the trapdoor ⬇️' : 'Claim your trophy 🏆'}</button>`;
   const hearts = heartsHTML();
-  openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}"><div class="boss-hearts">${hearts}${run.shield ? '<span class="shield">🫧</span>' : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackSVG(b.hp, b.gone || 0)}</div>${body}</div>`,
+  openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}"><div class="boss-hearts">${hearts}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackSVG(b.hp, b.gone || 0)}</div>${body}</div>`,
     { cls: 'boss-card', actions: {
       go: () => { b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); Voice.say('Pick an attack!'); saveRun(); },
       atk: el => bossPick(+el.dataset.i), ans: el => bossAnswer(+el.dataset.v),
@@ -386,9 +386,9 @@ function endRun(won) {
   const miss = [...(r.misses || [])].reverse().find(m => save.comeback.some(c => c.key === m.key));
   const card = miss ? itemCard(miss) : null;
   const monsterTip = !won && r.lastHurt === 'monster';
-  openOverlay(`${won ? '<div class="trophy">🏆</div><h2>Dungeon Champion!</h2>' : `<div class="name-hero">${heroSVG()}</div><h2>Run over!</h2>`}
+  openOverlay(`${won ? `<div class="trophy">${icon(ART.ui && ART.ui.trophy, '🏆', 'trophy-img')}</div><h2>Dungeon Champion!</h2>` : `<div class="name-hero">${heroSVG(undefined, undefined, false, 'sad')}</div><h2>Run over!</h2>`}
     <div class="sumgrid"><div><b>${r.floor}</b><span>floor</span></div><div><b>${r.roomsCleared}</b><span>rooms</span></div><div><b>${r.correct}</b><span>right</span></div><div><b>+${r.stars}</b><span>⭐ kept</span></div></div>
-    ${card ? `<div class="remember"><div class="remember-h">🧠 Remember for next time</div><div class="paper">${card.model}</div><div class="remember-t${card.title.length > 14 ? ' long' : ''}">${card.title}</div><div class="sub">🔁 You'll see it again next run!</div></div>` : ''}
+    ${card ? `<div class="remember"><div class="remember-h">${icon(ART.ui && ART.ui.brain, '🧠')} Remember for next time</div><div class="paper">${card.model}</div><div class="remember-t${card.title.length > 14 ? ' long' : ''}">${card.title}</div><div class="sub">🔁 You'll see it again next run!</div></div>` : ''}
     ${monsterTip ? `<div class="tipline"><span class="tp">${pawSVG('#d9c8ff')}</span><span>Monsters step on the footprints!</span></div>` : ''}
     ${newU.length ? `<p class="sub">🎁 New in the Closet: <b>${newU.join(', ')}</b></p>` : ''}
     <div class="stack"><button class="btn mint big" data-act="again">Play again</button><button class="btn" data-act="home">Home</button></div>`,

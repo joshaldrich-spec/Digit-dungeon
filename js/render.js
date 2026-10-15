@@ -11,7 +11,7 @@ function showScreen(n) {
 }
 function fit() {
   const st = $('#stage'); if (!st || !st.clientWidth) return;
-  const c = Math.floor(clamp(Math.min(st.clientWidth / 5.84, st.clientHeight / 5.84), 36, 128));
+  const c = Math.floor(clamp(Math.min(st.clientWidth / 6.16, st.clientHeight / 6.16), 36, 128));
   document.documentElement.style.setProperty('--cell', c + 'px');
 }
 function renderAll() { renderHUD(); renderRule(); renderGrid(); renderDoors(); renderRoomMsg(); renderActors(true); renderTelegraph(); renderPeek(); renderMap(); }
@@ -22,11 +22,11 @@ function heartsHTML() {
 }
 function heartFx() { const h = $('#hearts'); h.classList.remove('thump'); void h.offsetWidth; h.classList.add('thump'); }
 function renderHUD() {
-  $('#hearts').innerHTML = heartsHTML() + (run.shield ? '<span class="shield">🫧</span>' : '');
-  $('#coins').textContent = `🪙 ${run.coins}`;
-  $('#stars').textContent = `⭐ ${save.stars}`;
-  $('#items').innerHTML = run.items.map(id => `<span title="${esc(ITEMS[id].name)}">${ITEMS[id].icon}</span>`).join('');
-  const g = $('#btn-glow'); g.hidden = !(run.glow > 0 && room && room.type === 'normal' && !room.cleared); g.innerHTML = `🔦<small>×${run.glow}</small>`;
+  $('#hearts').innerHTML = heartsHTML() + (run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : '');
+  $('#coins').innerHTML = `${icon(ART.coin, '🪙')} ${run.coins}`;
+  $('#stars').innerHTML = `${icon(ART.ui && ART.ui.star, '⭐')} ${save.stars}`;
+  $('#items').innerHTML = run.items.map(id => `<span title="${esc(ITEMS[id].name)}">${itemIcon(id)}</span>`).join('');
+  const g = $('#btn-glow'); g.hidden = !(run.glow > 0 && room && room.type === 'normal' && !room.cleared); g.innerHTML = `${icon(ART.items && ART.items.flashlight, '🔦')}<small>×${run.glow}</small>`;
 }
 function ruleInfo() {
   const r = room;
@@ -64,9 +64,9 @@ function renderDoors() {
     const el = $('#door-' + d);
     if (!room.doors[d]) { el.className = `door ${d} none`; el.innerHTML = ''; return; }
     const nb = neighbor(room, d);
-    const icon = nb.type === 'treasure' ? '👑' : nb.type === 'shop' ? '🛒' : nb.type === 'boss' ? '⚔️' : '';
+    const badge = nb.type === 'treasure' ? '👑' : nb.type === 'shop' ? '🛒' : nb.type === 'boss' ? '⚔️' : '';
     el.className = `door ${d} ${room.cleared ? 'open' : 'closed'} ${nb.type}`;
-    el.innerHTML = icon;
+    el.innerHTML = `<span class="dimg"></span>${badge ? `<span class="dicon">${badge}</span>` : ''}`;
   });
 }
 function renderRoomMsg() { $('#room-msg').innerHTML = ''; }
@@ -75,12 +75,13 @@ function clearActors() { actorEls.forEach(el => el.remove()); actorEls.clear(); 
 function renderActors(instant) {
   const layer = $('#actors'), want = [];
   if (room.type === 'treasure' && !room.taken) want.push({ id: 'chest', x: 2, y: 2, cls: 'prop', html: chestSVG });
+  if (room.type === 'treasure' && room.taken && ART.chestOpen) want.push({ id: 'chestopen', x: 2, y: 2, cls: 'prop', html: () => img(ART.chestOpen) });
   if (room.type === 'shop') want.push({ id: 'owl', x: 2, y: 2, cls: 'prop', html: owlSVG });
   if (room.type === 'boss' && room.cleared) want.push({ id: 'trap', x: 2, y: 2, cls: 'prop trap', html: trapSVG });
   (room.pickups || []).forEach(p => { const t = tileAt(p.x, p.y); want.push({ id: 'p' + p.id, x: p.x, y: p.y, cls: 'pickup' + (t && !t.chomped ? ' corner' : ''), html: p.type === 'coin' ? coinSVG : heartPickupSVG }); });
   (room.monsters || []).forEach(m => want.push({ id: m.id, x: m.x + (m.lunge ? m.lunge[0] * .45 : 0), y: m.y + (m.lunge ? m.lunge[1] * .45 : 0),
     cls: `monster ${m.kind}${m.dizzy > 0 ? ' dizzy' : ''}${m.kind === 'wisp' && m.dir && m.dir[0] < 0 ? ' left' : ''}`, html: m.kind === 'wisp' ? wispSVG : grumbleSVG }));
-  want.push({ id: 'hero', x: hero.x, y: hero.y, cls: 'hero' + (hero.safe > 0 ? ' safe' : '') + (hero.face === 'left' ? ' left' : ''), html: () => heroSVG() });
+  want.push({ id: 'hero', x: hero.x, y: hero.y, cls: 'hero' + (hero.safe > 0 ? ' safe' : '') + (hero.face === 'left' ? ' left' : ''), html: () => heroHTML() });
   for (const [id, el] of actorEls) if (!want.some(w => w.id === id)) { el.remove(); actorEls.delete(id); }
   want.forEach(w => {
     let el = actorEls.get(w.id), fresh = false;
@@ -96,7 +97,15 @@ function chompAnim() {
   const el = actorEls.get('hero'); if (!el) return;
   const spr = el.querySelector('.spr'); spr.innerHTML = heroSVG(undefined, undefined, true);
   el.classList.remove('chomping'); void el.offsetWidth; el.classList.add('chomping');
-  setTimeout(() => { spr.innerHTML = heroSVG(); el.classList.remove('chomping'); }, 240);
+  setTimeout(() => { spr.innerHTML = heroHTML(); el.classList.remove('chomping'); }, 240);
+}
+/* hero moods: ouch when bonked, cheer on a clear or a remembered fact */
+let heroMoodState = { m: null, until: 0 }, moodTimer = null;
+function heroHTML() { return heroSVG(undefined, undefined, false, heroMoodState.until > Date.now() ? heroMoodState.m : null); }
+function heroMood(m, ms) {
+  heroMoodState = { m, until: Date.now() + ms };
+  const el = actorEls.get('hero'); if (el) el.querySelector('.spr').innerHTML = heroHTML();
+  clearTimeout(moodTimer); moodTimer = setTimeout(() => { const e = actorEls.get('hero'); if (e) e.querySelector('.spr').innerHTML = heroHTML(); }, ms + 30);
 }
 function floatAt(x, y, text, cls = '', dy = 0) {
   const f = document.createElement('div'); f.className = 'float ' + cls; f.textContent = text;
