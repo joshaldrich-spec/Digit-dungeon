@@ -32,7 +32,7 @@ const ART = {
   skin: Object.assign(files('bg', ['wall', 'room', 'brick', 'cobble']), files('panels', ['tablet', 'sign', 'frame', 'plaque', 'bubble', 'ribbon', 'parchment', 'card', 'ring']),
                       files('buttons', ['chomp', 'dpad', 'square', 'gold', 'green', 'purple'])),
 };
-ART.ui.logo = 'art/ui/logo.webp';
+ART.ui.logo = 'art/ui/logo.webp?' + BUILD;   // versioned so iPads drop the old cut
 function files(dir, names) { return Object.fromEntries(names.map(n => [dir + ':' + n, `art/${dir}/${n}.webp`]).map(([k, v]) => [k.split(':')[1].replace(/-(\w)/g, (_, c) => c.toUpperCase()), v])); }
 /* geometry measured from the art by tools/cut_ui.py (art/math/layout.json) */
 const BOARD = { x0: 0.0725, x1: 0.925, y0: 0.1298, y1: 0.7981, aspect: 1.9231 };

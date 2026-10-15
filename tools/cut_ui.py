@@ -1,6 +1,7 @@
 """Cut the round-2/3 Gemini sheets (UI, icons, effects, math pieces, props, backgrounds) into game art.
 
-    python3 tools/cut_ui.py UPLOAD_DIR
+    python3 tools/cut_ui.py UPLOAD_DIR          # every sheet
+    python3 tools/cut_ui.py UPLOAD_DIR logo     # just the logo
 
 Sheets are split into grid cells (row bands, then items within each row). Within a cell, only strongly
 drawn shapes are kept (faint smudges are dropped), small bits like sparkles stay with their cell, and
@@ -52,7 +53,9 @@ def sprite(path, box, strong=200, pad=30, holes=False, keep_frac=0.004):
         areas = ndimage.sum(s, lab, range(1, n + 1)); keep = [i + 1 for i, a in enumerate(areas) if a >= max(25, keep_frac * areas.max())]
         mask = ndimage.binary_fill_holes(ndimage.binary_dilation(np.isin(lab, keep), iterations=6))
         rgba[:, :, 3] = np.where(mask, rgba[:, :, 3], 0)
-    if holes:   # enclosed near-white areas (the middle of a frame) become see-through
+    if holes == 'outlined':   # white gaps ringed by the dark outline (inside a D, between letters) become see-through
+        rgba = clear_ringed(rgb, rgba)
+    elif holes:   # enclosed near-white areas (the middle of a frame) become see-through
         white = (rgb.min(axis=2) >= 225) & (rgba[:, :, 3] > 0)
         hl, hn = ndimage.label(white); big = rgba.shape[0] * rgba.shape[1] * 0.01
         cy, cx = rgba.shape[0] // 2, rgba.shape[1] // 2
@@ -66,17 +69,44 @@ def sprite(path, box, strong=200, pad=30, holes=False, keep_frac=0.004):
     a = rgba[:, :, 3] > 20; ys, xs = np.where(a)
     return Image.fromarray(rgba).crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
 
+def clear_ringed(rgb, rgba, need=0.9, need_small=0.4, small=100, min_px=30):
+    """Make white pockets see-through when they're surrounded by dark outline (tiny gaps between letters: mostly
+    surrounded). Shine on letters is surrounded by gold or cream, and a sparkle sitting on the outline has a yellow
+    glow around it, so those stay."""
+    white = (rgb.min(axis=2) >= 228) & (np.ptp(rgb, axis=2) <= 22) & (rgba[:, :, 3] > 0)
+    lab, n = ndimage.label(white); dark = rgb.max(axis=2) < 150
+    holes = np.zeros(white.shape, bool)
+    for i, sl in enumerate(ndimage.find_objects(lab), 1):
+        y0, y1 = max(0, sl[0].start - 8), sl[0].stop + 8; x0, x1 = max(0, sl[1].start - 8), sl[1].stop + 8
+        reg = lab[y0:y1, x0:x1] == i
+        size = reg.sum()
+        if size < min_px: continue
+        ring = ndimage.binary_dilation(reg, iterations=6) & ~ndimage.binary_dilation(reg, iterations=2)
+        if dark[y0:y1, x0:x1][ring].mean() >= (need_small if size < small else need): holes[y0:y1, x0:x1] |= reg
+    out = rgba.copy(); out[:, :, 3][holes] = 0
+    band = ndimage.binary_dilation(holes, iterations=4) & ~holes & (out[:, :, 3] > 0)
+    p = rgb[band].astype(np.float32)
+    a = np.clip((255 - p.min(axis=1)) / 198.0, 0, 1)                # 198 = how far the outline's darkest channel is from white
+    out[:, :, 3][band] = np.minimum(out[:, :, 3][band], (a * 255).astype(np.uint8))
+    aa = np.maximum(a, 0.02)[:, None]
+    out[:, :, :3][band] = np.clip((p - 255 * (1 - aa)) / aa, 0, 255).astype(np.uint8)   # un-blend the white fringe
+    print('logo: cleared', int(holes.sum()), 'px of white in', len(np.unique(lab[holes])), 'pockets')
+    return out
+
 def fit(img, side):
     s = side / max(img.size)
     return img if s >= 1 else img.convert('RGBa').resize((round(img.width * s), round(img.height * s)), Image.LANCZOS).convert('RGBA')
 
-def run(U):
-    f = lambda name: os.path.join(U, name)
-    out = {}
-    # ---- logo: everything (letters + sparkles)
-    lp = f('ee07283d-image.jpg'); rgb = np.asarray(Image.open(lp).convert('RGB'))
+def cut_logo(lp):
+    """logo: everything (letters + sparkles), with the white inside and between the letters cleared"""
+    rgb = np.asarray(Image.open(lp).convert('RGB'))
     b = grid_cells(rgb, strong=235, gap=400); x0 = min(c[0] for c in b); y0 = min(c[1] for c in b); x1 = max(c[2] for c in b); y1 = max(c[3] for c in b)
-    out['logo'] = save(fit(sprite(lp, (x0, y0, x1, y1), strong=235, keep_frac=0.0002), 900), 'ui/logo.webp')
+    return save(fit(sprite(lp, (x0, y0, x1, y1), strong=235, keep_frac=0.0002, holes='outlined'), 900), 'ui/logo.webp')
+
+def run(U, only=None):
+    f = lambda name: os.path.join(U, name)
+    out = {'logo': cut_logo(f('ee07283d-image.jpg'))}
+    if only == 'logo': return out
     # ---- screen background (seamless-ish): mirror tile 2x2 so edges always match
     wl = Image.open(f('4bd0d689-image.jpg')).convert('RGB').resize((384, 384), Image.LANCZOS)
     tile = Image.new('RGB', (768, 768)); tile.paste(wl, (0, 0)); tile.paste(wl.transpose(Image.FLIP_LEFT_RIGHT), (384, 0))
@@ -148,4 +178,4 @@ def run(U):
     print(len(out), 'pieces written'); return out
 
 if __name__ == '__main__':
-    run(sys.argv[1])
+    run(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else None)

@@ -74,11 +74,15 @@ body.skin{background:linear-gradient(180deg,rgba(22,14,34,.55),rgba(18,11,28,.78
 .skin .offer span,.skin .atk b,.skin .sw{color:#3a2a4a}.skin .offer .price,.skin .atk .ak{color:#a05a00}
 .skin .sw.sel{border-image-source:url(../art/panels/card.webp);filter:drop-shadow(0 0 6px var(--gold)) drop-shadow(0 0 2px var(--gold))}
 .skin .ch{background:url(../art/props/slab.webp) center/100% 100% no-repeat;box-shadow:none;border-radius:0;padding-bottom:12px;filter:drop-shadow(0 5px 0 rgba(0,0,0,.35))}
-.skin .remember{background:url(../art/panels/parchment.webp) center/100% 100% no-repeat;color:#3a2a1a;padding:44px 20px 22px;border-radius:0}
+.skin .remember{background:url(../art/panels/parchment.webp) center/100% 100% no-repeat;color:#3a2a1a;padding:60px 26px 24px;border-radius:0}   /* top: clear of the pin (its tip is 18% down the art) */
 .skin .remember-h{color:#8a4b12}.skin .remember .sub{color:#6b5236}.skin .remember .paper{background:rgba(255,248,234,.7)}
 .skin .toast{background:url(../art/panels/bubble.webp) center/100% 100% no-repeat;box-shadow:none;border-radius:0;padding:14px 26px 26px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
 .skin .banner .bx{background:none;border:0 solid transparent;border-image:url(../art/panels/tablet.webp) 70 fill / 26px stretch;padding:18px 28px 20px}
-.skin .banner .bt{display:inline-block;background:url(../art/panels/ribbon.webp) center/100% 100% no-repeat;color:#4a2a04;padding:8px 46px 18px;margin:4px 0}
+/* ribbon: the tails keep their shape (left/right 150px of the art), only the flat middle stretches with the words;
+   the words sit inside the band, which is the top ~half of the art */
+.skin .banner .bt{display:inline-block;box-sizing:border-box;font-size:26px;height:2.9em;line-height:1.1;padding:.36em 2px 0;margin:2px 0 0;white-space:nowrap;
+  background:none;border:0 solid transparent;border-width:0 2.23em;border-image:url(../art/panels/ribbon.webp) 0 150 fill / 0 2.23em stretch;
+  color:#4a2604;text-shadow:0 1px 0 rgba(255,238,180,.65)}
 .banner .bi img.ei{height:64px}
 
 /* ---- room effects ---- */

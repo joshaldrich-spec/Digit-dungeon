@@ -19,6 +19,9 @@ function nextToast() {
 let bannerT = null;
 function banner(icon, title, sub) {
   const b = $('#banner'); b.innerHTML = artify(`<div class="bx"><div class="bi">${icon}</div><div class="bt">${esc(title)}</div><div class="bs">${esc(sub || '')}</div></div>`);
+  // long titles shrink so the ribbon (which grows with the words) still fits on a phone
+  const bt = b.querySelector('.bt'), room = Math.min(window.innerWidth * .88, 560) - 64;
+  for (let fs = parseFloat(getComputedStyle(bt).fontSize); bt.offsetWidth > room && fs > 14; ) bt.style.fontSize = --fs + 'px';
   b.classList.add('show'); clearTimeout(bannerT); bannerT = setTimeout(() => b.classList.remove('show'), 1700);
 }
 function confetti() {

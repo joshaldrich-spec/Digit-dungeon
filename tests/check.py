@@ -195,6 +195,11 @@ LAYOUT = r"""() => { const vw = innerWidth, vh = innerHeight, box = e => e.getBo
   const g = box(document.querySelector('#grid')), c = box(document.querySelector('#btn-chomp'));
   return { hscroll: document.scrollingElement.scrollWidth > vw + 1, grid_in_view: g.left >= 0 && g.right <= vw && g.top >= 0 && g.bottom <= vh,
            chomp_in_view: c.right <= vw && c.bottom <= vh, cell: Math.round(g.width / 5) }; }"""
+# floor, remembered and item banners: the ribbon (which grows with the words) stays on the popup and on screen
+BANNERS = r"""() => { const bad = [], titles = ['Floor 1', 'Floor 3', 'You remembered!', ...Object.values(ITEMS).map(i => i.name)];
+  for (const t of titles) { banner('', t, 'x'); const bt = document.querySelector('#banner .bt').getBoundingClientRect(), bx = document.querySelector('#banner .bx').getBoundingClientRect();
+    if (bt.left < bx.left || bt.right > bx.right || bx.left < 0 || bx.right > innerWidth) bad.push(t); }
+  return { skin: document.body.classList.contains('skin'), titles: titles.length, bad }; }"""
 
 
 # ---- kid-style play: read the rule + tiles off the screen, walk with real d-pad presses, press CHOMP
@@ -303,6 +308,8 @@ async def main():
             await pg.wait_for_timeout(2000)
             lay = await pg.evaluate(LAYOUT)
             report(f'layout fits on {name} ({w}x{hgt})', not lay['hscroll'] and lay['grid_in_view'] and lay['chomp_in_view'], json.dumps(lay))
+            ban = await pg.evaluate(BANNERS)
+            report(f'every banner title fits its ribbon on {name}', ban['skin'] and not ban['bad'], json.dumps(ban))
             if WANT_SHOTS: await pg.screenshot(path=f'{SHOTS}/{name}-room.png')
             await pg.context.close()
         await b.close()
