@@ -9,7 +9,7 @@
    ===================================================================== */
 
 
-const BUILD = 'v3';   // bump with the ?v3 tags in index.html on every release
+const BUILD = 'v4';   // bump with the ?v3 tags in index.html on every release
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -88,16 +88,82 @@ function mathSpeech(t) {
   return strip(t).replace(/\p{Extended_Pictographic}|️/gu, '')
     .replace(/ \? /g, ' what ').replace(/−/g, ' minus ').replace(/\+/g, ' plus ').replace(/=/g, ' equals ').replace(/ /g, ' ').replace(/…/g, '');
 }
+/* Voice: recorded clips (audio/voice.mp3 + audio/voice.js) are strung together to say each
+   sentence, e.g. "Double" + "6" + "is" + "12". Anything the recording can't cover falls back to
+   the device's built-in voice. */
+const NUM_WORDS = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12,
+  thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20 };
+function speechTokens(text) {
+  return mathSpeech(text).toLowerCase().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').filter(Boolean)
+    .map(w => (w in NUM_WORDS ? String(NUM_WORDS[w]) : w));
+}
+const Clips = {
+  map: null, index: {}, raw: null, buf: null, decoding: false, nodes: [], endAt: 0, waiting: null,
+  init() {
+    const V = window.VOICE; if (!V) return;
+    this.map = V.clips;
+    for (const [id, c] of Object.entries(V.clips)) {
+      if (/^n\d+$/.test(id)) continue;
+      const tk = speechTokens(c[2]); (this.index[tk[0]] = this.index[tk[0]] || []).push({ id, tk });
+    }
+    Object.values(this.index).forEach(a => a.sort((x, y) => y.tk.length - x.tk.length));
+    try { fetch(V.file).then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { this.raw = b; this.decode(); }).catch(() => {}); } catch (e) {}
+  },
+  decode() {
+    if (this.buf || this.decoding || !this.raw) return;
+    Sound.init(); if (!Sound.ctx) return;
+    this.decoding = true;
+    const done = b => { this.buf = b; this.decoding = false; const w = this.waiting; this.waiting = null; if (w) Voice.say(w.text, w.opts); };
+    try { const p = Sound.ctx.decodeAudioData(this.raw.slice(0), done, () => { this.decoding = false; }); if (p && p.catch) p.catch(() => {}); } catch (e) { this.decoding = false; }
+  },
+  ids(text) {                      // longest-phrase-first match; null if any word isn't recorded
+    if (!this.map) return null;
+    const tk = speechTokens(text), out = [];
+    for (let i = 0; i < tk.length;) {
+      const hit = (this.index[tk[i]] || []).find(p => p.tk.every((w, k) => tk[i + k] === w));
+      if (hit) { out.push(hit.id); i += hit.tk.length; continue; }
+      if (/^\d+$/.test(tk[i]) && this.map['n' + tk[i]]) { out.push('n' + tk[i]); i++; continue; }
+      return null;
+    }
+    return out.length ? out : null;
+  },
+  play(ids, queue) {
+    const ctx = Sound.ctx; if (ctx.state === 'suspended') ctx.resume();
+    let t = ctx.currentTime + 0.03;
+    if (queue && this.endAt > t) t = this.endAt + 0.08; else this.stop();
+    for (const id of ids) {
+      const [off, dur] = this.map[id], s = ctx.createBufferSource(), g = ctx.createGain();
+      s.buffer = this.buf; g.gain.value = 0.95; s.connect(g).connect(ctx.destination);
+      s.start(t, off, dur); this.nodes.push(s); t += dur - 0.03;
+    }
+    this.endAt = t;
+  },
+  stop() { this.nodes.forEach(n => { try { n.stop(); } catch (e) {} }); this.nodes = []; this.endAt = 0; },
+};
 const Voice = {
-  v: null, unlocked: false,
+  v: null, unlocked: false, log: null,
   pick() { try { const vs = speechSynthesis.getVoices(); const pref = ['Samantha', 'Karen', 'Moira', 'Google US English', 'Aria', 'Jenny'];
     this.v = pref.map(n => vs.find(v => v.name.includes(n) && /^en/i.test(v.lang))).find(Boolean) || vs.find(v => /^en[-_]US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null; } catch (e) {} },
   unlock() { if (this.unlocked || !('speechSynthesis' in window)) return; this.unlocked = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) {} },
-  say(text) {
-    if (!save.settings.voice || !('speechSynthesis' in window) || !text) return;
-    try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(mathSpeech(text)); if (!this.v) this.pick(); if (this.v) u.voice = this.v; u.rate = .95; u.pitch = 1.1; speechSynthesis.speak(u); } catch (e) {}
+  say(text, opts = {}) {
+    if (!text) return;
+    if (this.log) this.log.push(text);
+    if (!save.settings.voice) return;
+    const ids = Clips.ids(text);
+    if (ids && Clips.buf && Sound.ctx) { if (!opts.queue) this.ttsStop(); Clips.play(ids, opts.queue); return; }
+    if (ids && (Clips.decoding || (Clips.raw && !Clips.buf))) {           // recording still loading: wait briefly
+      Clips.waiting = { text, opts }; Clips.decode();
+      setTimeout(() => { if (Clips.waiting && Clips.waiting.text === text) { Clips.waiting = null; this.tts(text, opts); } }, 1500);
+      return;
+    }
+    this.tts(text, opts);
   },
-  stop() { try { speechSynthesis.cancel(); } catch (e) {} }
+  tts(text, opts = {}) {
+    if (!('speechSynthesis' in window)) return;
+    try { if (!opts.queue) { speechSynthesis.cancel(); Clips.stop(); } const u = new SpeechSynthesisUtterance(mathSpeech(text)); if (!this.v) this.pick(); if (this.v) u.voice = this.v; u.rate = .95; u.pitch = 1.1; speechSynthesis.speak(u); } catch (e) {}
+  },
+  ttsStop() { try { speechSynthesis.cancel(); } catch (e) {} },
+  stop() { this.ttsStop(); Clips.stop(); }
 };
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => Voice.pick();
-document.addEventListener('pointerdown', () => { Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume(); Voice.unlock(); }, true);
+document.addEventListener('pointerdown', () => { Sound.init(); if (Sound.ctx && Sound.ctx.state === 'suspended') Sound.ctx.resume(); Clips.decode(); Voice.unlock(); }, true);

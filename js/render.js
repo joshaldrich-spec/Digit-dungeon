@@ -35,7 +35,7 @@ function ruleInfo() {
   if (r.type === 'start') return { small: `Floor ${run.floor} · ${FLOOR_NAMES[run.floor - 1]}`, title: 'Pick a door ➜', say: 'Pick a door!' };
   if (r.type === 'treasure') return { small: 'Treasure room', title: r.taken ? 'Pick a door ➜' : 'Step on the chest!', say: r.taken ? 'Pick a door.' : 'Step on the treasure chest!' };
   if (r.type === 'shop') return { small: 'Shop', title: 'Step on Hoot to shop', say: 'Step on Hoot the owl to shop.' };
-  if (r.type === 'boss') return r.cleared ? { small: 'Boss beaten!', title: 'Step on the trapdoor!', say: 'Step on the trapdoor!' } : { small: 'Boss', title: BOSSES[run.floor - 1].name, say: BOSSES[run.floor - 1].name };
+  if (r.type === 'boss') return r.cleared ? { small: 'Boss beaten!', title: 'Step on the trapdoor!', say: 'Step on the trapdoor!' } : { small: 'Boss', title: BOSSES[run.floor - 1].name, say: `${BOSSES[run.floor - 1].name} appears!` };
   return { small: '', title: '', say: '' };
 }
 function renderRule() {

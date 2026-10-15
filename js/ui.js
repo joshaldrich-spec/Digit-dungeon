@@ -196,4 +196,4 @@ if (window.ResizeObserver) new ResizeObserver(() => fit()).observe($('#stage'));
 document.addEventListener('visibilitychange', () => { if (document.hidden) { tickTime(); Voice.stop(); saveRun(); persist(); } else if (run) run.tick = Date.now(); });
 
 window.DD = { get run() { return run; }, get room() { return room; }, get hero() { return hero; }, get save() { return save; }, tryMove, chomp, goThrough, enterRoom, bossPick, bossAnswer, trapdoor, takeItem, openShop, buy, closeOverlay, newRun, endRun, planMonsters };
-document.addEventListener('DOMContentLoaded', () => { showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); }); });
+document.addEventListener('DOMContentLoaded', () => { Clips.init(); showTitle(); loadArt().then(() => { if ($('#scr-title').classList.contains('active')) $('#title-hero').innerHTML = heroSVG(); }); });

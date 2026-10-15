@@ -2,6 +2,7 @@
 /* Digit Dungeon · coaching.js: Strategy coaching (Bridges strategies), mistake cards, remember cards. */
 
 /* --- strategy coaching: named Bridges strategies, short enough to hear in one breath --- */
+const STEP_WORD = { 2: 'twos', 5: 'fives', 10: 'tens' };
 const countList = (from, n, dir) => Array.from({ length: n }, (_, i) => from + dir * (i + 1)).join(', ');
 function addStrategy(a, b) {
   const s = a + b, big = Math.max(a, b), small = Math.min(a, b);
@@ -22,7 +23,7 @@ function subStrategy(a, b) {
   if (a > 10 && a <= 20 && b === 10) return { name: 'Take ten', text: `${a} is 10 and ${a - 10}. Take the 10: ${r} left.` };
   if (a > 10 && a <= 20 && b === a - 10) return { name: 'Back to ten', text: `${a} is 10 and ${b}. Take the ${b}: 10 left.` };
   if (b <= 3) return { name: 'Count back', text: `Start at ${a}. Count back: ${countList(a, b, -1)}.` };
-  if (a > 10 && a <= 20 && b > a - 10) { const first = a - 10, rest = b - first; return { name: 'Down to ten', text: `Take ${first} to get to 10. Take ${rest} more: ${r}.` }; }
+  if (a > 10 && a <= 20 && b > a - 10) { const first = a - 10, rest = b - first; return { name: 'Down to ten', text: `Take ${first} to get to 10. Then take ${rest} more. That leaves ${r}.` }; }
   return { name: 'Think addition', text: `${b} + ${r} = ${a}, so ${a} − ${b} = ${r}.` };
 }
 function describeFrame(n) {
@@ -56,9 +57,9 @@ function coachContent(rule, t) {
   }
   if (rule.kind === 'skip') {
     const n = t.value, from = rule.offset ? ` from ${rule.offset}` : '';
-    if (n < rule.start) return { title: `We start at ${rule.start}`, model, line: `${n} comes before ${rule.start}.`, say: `Counting by ${rule.step}s${from}, we start at ${rule.start}.` };
+    if (n < rule.start) return { title: `We start at ${rule.start}`, model, line: `${n} comes before ${rule.start}.`, say: `We start at ${rule.start}.` };
     const k = Math.floor((n - rule.start) / rule.step), prev = rule.start + k * rule.step, next = prev + rule.step;
-    return { title: `We skip ${n}`, model, line: `By ${rule.step}s: ${prev}, ${next}…`, say: `Counting by ${rule.step}s we say ${prev}, ${next}. We skip ${n}.` };
+    return { title: `We skip ${n}`, model, line: `By ${rule.step}s: ${prev}, ${next}…`, say: `Counting by ${STEP_WORD[rule.step]}, we say ${prev}, ${next}. We skip ${n}.` };
   }
   const line = describeFrame(t.value);
   return { title: `This is ${t.value}`, model, line, say: `This ten frame shows ${t.value}. ${line}` };
@@ -74,5 +75,5 @@ function itemCard(item) {
   if (item.type === 'parity') { const w = item.n % 2 ? 'odd' : 'even'; return { title: `${item.n} is ${w}`, say: `${item.n} is ${w}`, model: item.n <= 20 ? pairsSVG(item.n, 16) : onesSVG(item.n) }; }
   if (item.type === 'frame') return { title: `This is ${item.n}`, say: `This ten frame shows ${item.n}`, model: framesSVG(item.segs || [{ n: item.n, cls: 'a' }], { cell: 20, frames: item.frames || (item.n > 10 ? 2 : 1) }) };
   const start = item.offset || item.step, seq = [0, 1, 2, 3].map(i => start + i * item.step);
-  return { title: `By ${item.step}s: ${seq.join(', ')}…`, say: `Counting by ${item.step}s: ${seq.join(', ')}`, model: pathSVG(item.step, start, start + 2 * item.step) };
+  return { title: `By ${item.step}s: ${seq.join(', ')}…`, say: `Counting by ${STEP_WORD[item.step]}, we say ${seq.join(', ')}`, model: pathSVG(item.step, start, start + 2 * item.step) };
 }

@@ -76,9 +76,9 @@ function planMonsters() {
   });
 }
 function monsterHurt() {
-  if (run.shield) { run.shield = false; Sound.play('hit'); floatAt(hero.x, hero.y, '🫧 blocked!'); renderHUD(); return false; }
+  if (run.shield) { run.shield = false; Sound.play('hit'); floatAt(hero.x, hero.y, '🫧 blocked!'); Voice.say('Bubble blocked it!'); renderHUD(); return false; }
   run.hearts = Math.max(0, run.hearts - 1); hero.safe = 3; run.lastHurt = 'monster';
-  Sound.play('hurt'); heartFx(); floatAt(hero.x, hero.y, '−½ ❤️', 'bad');
+  Sound.play('hurt'); heartFx(); floatAt(hero.x, hero.y, '−½ ❤️', 'bad'); Voice.say('Ouch!');
   const r = $('#room'); r.classList.remove('shake'); void r.offsetWidth; r.classList.add('shake');
   const el = actorEls.get('hero'); if (el) { el.classList.remove('hurt'); void el.offsetWidth; el.classList.add('hurt'); }
   renderHUD();
@@ -86,7 +86,7 @@ function monsterHurt() {
 }
 function bonk(m) {
   room.monsters = room.monsters.filter(o => o !== m);
-  Sound.play('hit'); poofAt(m.x, m.y, '⭐'); floatAt(m.x, m.y, 'BONK!');
+  Sound.play('hit'); poofAt(m.x, m.y, '⭐'); floatAt(m.x, m.y, 'BONK!'); Voice.say('Bonk!');
   room.pickups.push({ id: uid(), type: 'coin', x: m.x, y: m.y });
 }
 function die(cause) { run.over = true; run.lastHurt = cause; renderHUD(); setTimeout(() => endRun(false), 900); }
@@ -141,7 +141,7 @@ function chomp() {
     const k = itemKeyFor(rule, t);
     if (k && save.comeback.some(c => c.key === k)) remembered(k, rightSpeech(rule, t)); else Voice.say(rightSpeech(rule, t));
     updateCell(t); renderRule(); renderHUD(); renderPeek();
-    if (run.streak && run.streak % 6 === 0) toast(pick(['On fire! 🔥', 'Six in a row!', 'Chomp champ! 🏅']));
+    if (run.streak && run.streak % 6 === 0) { const cheer = pick(['On fire!', 'Six in a row!', 'Chomp champ!']); toast(cheer + ' 🔥'); Voice.say(cheer, { queue: true }); }
     if (checkClear()) return;
     endTurn();
   } else {
@@ -168,7 +168,7 @@ function wrongCost() {
 function mend() {
   if (!run.crack) return;
   run.crack = false;
-  if (run.hearts < run.maxHearts) { run.hearts++; Sound.play('item'); floatAt(hero.x, hero.y, '💖', 'heal', 1); heartFx(); }
+  if (run.hearts < run.maxHearts) { run.hearts++; Sound.play('item'); floatAt(hero.x, hero.y, '💖', 'heal', 1); heartFx(); Voice.say('Your heart is all better!', { queue: true }); }
   renderHUD();
 }
 function missItem(rule, t) {
@@ -212,7 +212,7 @@ function record(skill, ok, t) {
 }
 function maybeLevel(id) {
   const s = sk(id), max = SKILLS[id].max;
-  if (s.recent.length >= 15 && mean(s.recent.slice(-15)) >= .9 && s.level < max) { s.level++; s.recent = []; toast(`⬆️ ${SKILLS[id].short} is now level ${s.level}! Your brain is growing!`); }
+  if (s.recent.length >= 15 && mean(s.recent.slice(-15)) >= .9 && s.level < max) { s.level++; s.recent = []; toast(`⬆️ ${SKILLS[id].short} is now level ${s.level}! Your brain is growing!`); Voice.say('Level up! Your brain is growing!', { queue: true }); }
   else if (s.recent.length >= 10 && mean(s.recent.slice(-10)) < .6 && s.level > 1) { s.level--; s.recent = []; }
 }
 const PRAISE_CLEAN = ['You checked every tile!', 'Sharp eyes!', 'Careful chomping!', 'Perfect room!', 'Great thinking!'];
@@ -224,10 +224,10 @@ function checkClear() {
   (room.monsters || []).forEach(m => poofAt(m.x, m.y)); room.monsters = [];
   dropLoot(); if (room.special !== 'lesson') maybeLevel(room.rule.skill);
   Sound.play('clear');
-  if (room.rule.kind === 'skip' && !room.mistakes) { const k = `s:${room.rule.step}:${room.rule.offset || 0}`; if (save.comeback.some(c => c.key === k)) remembered(k, `${room.rule.title}!`); }
+  if (room.rule.kind === 'skip' && !room.mistakes) { const k = `s:${room.rule.step}:${room.rule.offset || 0}`; if (save.comeback.some(c => c.key === k)) remembered(k, itemCard({ type: 'skip', step: room.rule.step, offset: room.rule.offset }).say); }
   const msg = pick(room.mistakes ? PRAISE_FIX : PRAISE_CLEAN);
   toast(`${msg} +3 ⭐`);
-  if (!(run.justRemembered > Date.now() - 1500)) Voice.say(save.name ? `${msg} Nice one, ${save.name}!` : msg);
+  if (!(run.justRemembered > Date.now() - 1500)) Voice.say(`${msg} Nice one!`);
   checkUnlocks(); renderAll(); saveRun();
   $$('.door.open').forEach(d => { d.classList.add('burst'); setTimeout(() => d.classList.remove('burst'), 1600); });
   return true;
@@ -251,11 +251,11 @@ function openTreasure() {
   if (!room.offers) room.offers = pickItemOffers(2);
   openOverlay(`<h2>👑 Treasure!</h2><p>Pick <b>one</b> prize:</p><div class="offers">${room.offers.map(id => `<button class="offer" data-act="take" data-id="${id}"><div class="ic">${ITEMS[id].icon}</div><b>${ITEMS[id].name}</b><span>${ITEMS[id].desc}</span></button>`).join('')}</div><button class="btn ghost" data-close>Not now</button>`,
     { actions: { take: el => takeItem(el.dataset.id) } });
-  Voice.say(`Treasure! Pick one prize. ${room.offers.map(id => ITEMS[id].name).join(', or ')}.`);
+  Voice.say('Treasure! Pick one prize.');
 }
 function takeItem(id) {
   run.items.push(id); room.taken = true; applyItem(id); Sound.play('item'); closeOverlay();
-  banner(ITEMS[id].icon, ITEMS[id].name, ITEMS[id].desc); Voice.say(`${ITEMS[id].name}! ${ITEMS[id].desc}`);
+  banner(ITEMS[id].icon, ITEMS[id].name, ITEMS[id].desc); Voice.say(ITEMS[id].say);
   renderAll(); saveRun();
 }
 function openShop() {
@@ -267,7 +267,7 @@ function openShop() {
   const can = s => run.coins >= s.price && !s.sold && !(s.id === 'refill' && run.hearts >= run.maxHearts);
   openOverlay(`<h2>🦉 Hoot's Shop</h2><p>You have <b>${run.coins} 🪙</b></p><div class="offers">${room.stock.map((s, i) => `<button class="offer" data-act="buy" data-i="${i}" ${can(s) ? '' : 'disabled'}><div class="ic">${s.icon}</div><b>${s.name}</b><span>${s.desc}</span><div class="price">${s.sold ? 'Sold!' : s.price + ' 🪙'}</div></button>`).join('')}</div><button class="btn mint" data-close>Done shopping</button>`,
     { actions: { buy: el => buy(+el.dataset.i) } });
-  if (!room.shopSpoke) { room.shopSpoke = true; Voice.say(`Welcome to the shop! You have ${run.coins} coins.`); }
+  if (!room.shopSpoke) { room.shopSpoke = true; Voice.say(`Welcome to Hoot's shop! You have ${run.coins} coins.`); }
 }
 function buy(i) {
   const s = room.stock[i], before = run.coins; run.coins -= s.price; Sound.play('coin');
@@ -283,12 +283,12 @@ function coinQuestion(before, price) {
   const ch = shuffle([...set]);
   const ask = () => openOverlay(`<h2>Bonus question! 🪙</h2><p>You had <b>${before}</b> coins.<br>You spent <b>${price}</b>.</p><p>How many coins are left?</p><div class="choices">${ch.map(v => `<button class="ch" data-act="pick" data-v="${v}">${v}</button>`).join('')}</div>`,
     { actions: { pick: el => {
-      if (+el.dataset.v === ans) { run.coins++; Sound.play('good'); toast('Math bonus! +1 🪙'); renderHUD(); saveRun(); openShop(); }
+      if (+el.dataset.v === ans) { run.coins++; Sound.play('good'); toast('Math bonus! +1 🪙'); Voice.say('Math bonus! One more coin!'); renderHUD(); saveRun(); openShop(); }
       else { Sound.play('bad'); const st = before <= 20 ? subStrategy(before, price) : { name: 'Count back', text: `Count back ${price} from ${before}.` };
         openOverlay(`<h2>Let's see!</h2><p><b>${before} − ${price} = ${ans}</b></p><p><span class="strat">${st.name}</span> ${st.text}</p><button class="btn mint big" data-act="back">Back to shop</button>`, { actions: { back: openShop } });
         Voice.say(`${before} minus ${price} equals ${ans}. ${st.text}`); }
     } } });
-  ask(); Voice.say(`You had ${before} coins. You spent ${price}. How many coins are left?`);
+  ask(); Voice.say(`Bonus question! You had ${before} coins. You spent ${price}. How many coins are left?`);
 }
 
 /* ---------- boss: number-rack take-away ---------- */
@@ -312,10 +312,10 @@ function bossMoves(hp) {
 }
 function bossHint(hp, m) {
   const r = hp - m.k;
-  if (m.id === 'ten') return `Slide away the whole top row of 10. ${hp} is a ten and ${hp - 10} more, so ${r} are left.`;
-  if (m.id === 'ones') return `Take away the ${m.k} beads on the bottom row. Just the full ten is left: 10!`;
+  if (m.id === 'ten') return `Slide away the top row of ten. ${hp} is 10 and ${hp - 10}. ${r} left.`;
+  if (m.id === 'ones') return 'Slide away the beads on the bottom row. The full ten is left!';
   if (m.id === 'half') return `Half of ${hp}: ${m.k} + ${m.k} = ${hp}. So ${hp} − ${m.k} = ${m.k}.`;
-  if (m.id === 'final') return `Take away all ${hp} beads. Nothing is left: 0!`;
+  if (m.id === 'final') return 'Take them all away. Zero left!';
   return subStrategy(hp, m.k).text;
 }
 function renderBoss() {
@@ -393,7 +393,7 @@ function endRun(won) {
     ${newU.length ? `<p class="sub">🎁 New in the Closet: <b>${newU.join(', ')}</b></p>` : ''}
     <div class="stack"><button class="btn mint big" data-act="again">Play again</button><button class="btn" data-act="home">Home</button></div>`,
     { actions: { again: () => { closeOverlay(); newRun(); }, home: () => { closeOverlay(); showTitle(); } } });
-  Voice.say(won ? 'You are the Dungeon Champion!' : card ? `Remember: ${card.say}. You'll see it again next run!` : monsterTip ? 'Watch the footprints. Monsters step where the footprints are!' : `Run over! You kept ${r.stars} stars.`);
+  Voice.say(won ? 'You are the Dungeon Champion!' : card ? `Remember: ${card.say}. You'll see it again next run!` : monsterTip ? 'Watch the footprints! Monsters step where the footprints are.' : 'Run over! Great try!');
 }
 function unlocksBetween(a, b) {
   const out = [];
@@ -403,5 +403,5 @@ function unlocksBetween(a, b) {
 }
 function checkUnlocks(silent) {
   [...Object.entries(COLORS).map(([k, c]) => ['c:' + k, c.need, c.name + ' color']), ...Object.entries(HATS).map(([k, h]) => ['h:' + k, h.need, h.name])]
-    .forEach(([id, need, name]) => { if (need && save.stars >= need && !save.unlocks.includes(id)) { save.unlocks.push(id); if (!silent) toast(`🎁 New in the Closet: ${name}!`); } });
+    .forEach(([id, need, name]) => { if (need && save.stars >= need && !save.unlocks.includes(id)) { save.unlocks.push(id); if (!silent) { toast(`🎁 New in the Closet: ${name}!`); Voice.say('Something new in the closet!', { queue: true }); } } });
 }

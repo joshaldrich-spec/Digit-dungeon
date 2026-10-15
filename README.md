@@ -17,9 +17,11 @@ A math roguelite for 2nd grade (Bridges in Mathematics, Grade 2, Unit 1). Plain 
 | `js/render.js` | Drawing the room, HUD, footprints, minimap |
 | `js/ui.js` | Overlays, title, closet, grown-ups panel, input, start-up |
 | `art/` | Sprites (`.webp`, backgrounds removed); `art/hero/` has one per Closet color |
+| `audio/voice.mp3`, `audio/voice.js` | The Gemini voice recording cut into 232 clips, and the index the game uses to string them into sentences |
 | `audio/voice-lines.json` | Master list of voice clips (id, recording part, text) |
 | `docs/` | Gemini voice script and art prompts |
 | `tests/check.py` | One command that checks the math, monsters, learning loop, a full run and layouts |
+| `tools/voice/` | How the recording was cut (alignment, clip list) |
 | `tools/process_art.py` | Turns a Gemini image into a game sprite (removes background, crops, recolors hero) |
 
 Scripts are loaded in order by `index.html` and share globals; there are no imports.

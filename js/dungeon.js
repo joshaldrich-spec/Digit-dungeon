@@ -5,13 +5,13 @@
    ITEMS (helper items = picture supports that fade each new run)
    ===================================================================== */
 const ITEMS = {
-  specs:  { name: 'Ten-Frame Specs', icon: '🥽', desc: 'Shows ten-frame pictures of facts.', skills: ['add', 'sub', 'frames'] },
-  socks:  { name: 'Pair Socks', icon: '🧦', desc: 'Shows numbers as pairs: even or odd?', skills: ['evenOdd'] },
-  frog:   { name: 'Hop Frog', icon: '🐸', desc: 'Shows skip-counting hops.', skills: ['skip10', 'skip5', 'skip2'] },
-  heart:  { name: 'Big Heart', icon: '💖', desc: 'One more heart, and it heals you.', repeat: true },
-  clover: { name: 'Lucky Clover', icon: '🍀', desc: 'Rooms drop an extra coin.' },
-  snail:  { name: 'Sleepy Snail', icon: '🐌', desc: 'Monsters move slower.' },
-  bubble: { name: 'Bubble Shield', icon: '🫧', desc: 'Blocks one hit in every room.' },
+  specs:  { name: 'Ten-Frame Specs', icon: '🥽', desc: 'Shows ten-frame pictures of facts.', say: 'Ten-Frame Specs! They show ten-frame pictures of facts.', skills: ['add', 'sub', 'frames'] },
+  socks:  { name: 'Pair Socks', icon: '🧦', desc: 'Shows numbers as pairs: even or odd?', say: 'Pair Socks! They show numbers as pairs.', skills: ['evenOdd'] },
+  frog:   { name: 'Hop Frog', icon: '🐸', desc: 'Shows skip-counting hops.', say: 'Hop Frog! It shows skip-counting hops.', skills: ['skip10', 'skip5', 'skip2'] },
+  heart:  { name: 'Big Heart', icon: '💖', desc: 'One more heart, and it heals you.', say: 'Big Heart! One more heart.', repeat: true },
+  clover: { name: 'Lucky Clover', icon: '🍀', desc: 'Rooms drop an extra coin.', say: 'Lucky Clover! Rooms drop an extra coin.' },
+  snail:  { name: 'Sleepy Snail', icon: '🐌', desc: 'Monsters move slower.', say: 'Sleepy Snail! Monsters move slower.' },
+  bubble: { name: 'Bubble Shield', icon: '🫧', desc: 'Blocks one monster hit in every room.', say: 'Bubble Shield! It blocks one monster hit in every room.' },
 };
 const PEEK_ITEM = { add: 'specs', sub: 'specs', frames: 'specs', evenOdd: 'socks', skip10: 'frog', skip5: 'frog', skip2: 'frog' };
 function itemWeight(id) {

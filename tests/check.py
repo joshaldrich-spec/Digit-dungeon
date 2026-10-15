@@ -5,11 +5,16 @@
 
 Needs: pip install playwright (Chromium is used headless).
 """
-import asyncio, json, os, sys, time
+import asyncio, functools, http.server, json, os, sys, threading, time
 from playwright.async_api import async_playwright
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-URL = 'file://' + os.path.join(os.path.dirname(HERE), 'index.html')
+ROOT = os.path.dirname(HERE)
+class _Quiet(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *a): pass
+_srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(_Quiet, directory=ROOT))
+threading.Thread(target=_srv.serve_forever, daemon=True).start()
+URL = f'http://127.0.0.1:{_srv.server_address[1]}/index.html'   # served over http so the voice recording can load
 SHOTS = os.path.join(HERE, 'shots')
 WANT_SHOTS = '--shots' in sys.argv
 results, errors = [], []
@@ -18,6 +23,26 @@ def report(name, ok, detail=''):
     results.append((name, ok)); print(('PASS ' if ok else 'FAIL ') + name + (f'  {detail}' if detail else ''))
 
 FRESH = "localStorage.clear(); save = defaultSave(); save.name = 'T'; save.settings.voice = false; save.settings.sound = false; persist();"
+
+# ---- 0. every sentence the game can say is built from recorded clips
+VOICE = r"""() => {
+  const missing = new Set(), texts = [];
+  const add = t => { texts.push(t); if (!Clips.ids(t)) missing.add(t); };
+  run = { lastSkill: null, lastTarget: null, items: [], floor: 1, roomsCleared: 0, comebackQueue: [] };
+  for (const [skill, maxL] of [['add', 4], ['sub', 3], ['evenOdd', 3], ['skip10', 2], ['skip5', 2], ['skip2', 3], ['frames', 3]])
+    for (let lv = 1; lv <= maxL; lv++) for (let i = 0; i < 60; i++) {
+      const m = makeRule(skill, lv, 5, 13); add(m.rule.speak); add('Comeback room! ' + m.rule.speak);
+      m.tiles.forEach(t => { if (t.correct) add(rightSpeech(m.rule, t)); else add(coachContent(m.rule, t).say); if (t.kind !== 'frame') add(t.label); });
+    }
+  for (let a = 0; a <= 10; a++) for (let b = 0; b <= 10; b++) { add(addStrategy(a, b).text); add(itemCard({ type: 'fact', a, b, op: '+', val: a + b }).say); }
+  for (let a = 0; a <= 20; a++) for (let b = 0; b <= Math.min(a, 10); b++) { add(subStrategy(a, b).text); add(itemCard({ type: 'fact', a, b, op: '−', val: a - b }).say); }
+  for (let f = 1; f <= 3; f++) { run.floor = f; for (let hp = 1; hp <= 20; hp++) for (let i = 0; i < 20; i++) bossMoves(hp).forEach(m => { add(bossHint(hp, m)); add(`${hp} minus ${m.k} equals what?`); add(`Hit! ${hp - m.k} left.`); }); }
+  [[2, 0], [2, 1], [5, 0], [10, 0], [10, 7]].forEach(([step, offset]) => add(itemCard({ type: 'skip', step, offset }).say));
+  for (let n = 1; n <= 40; n++) add(itemCard({ type: 'parity', n }).say);
+  for (let n = 1; n <= 20; n++) add(itemCard({ type: 'frame', n }).say);
+  Object.values(ITEMS).forEach(it => add(it.say));
+  return { checked: texts.length, missing: [...missing].slice(0, 12) };
+}"""
 
 # ---- 1. math truth: judge every tile from its label + the room title, never from the generator's own fields
 MATH = r"""() => {
@@ -179,13 +204,22 @@ async def main():
         page.on('pageerror', lambda e: errors.append(str(e)))
         await page.goto(URL); await page.wait_for_timeout(500)
 
+        await page.evaluate("Voice.log = []")
+        v = await page.evaluate(VOICE); report(f"every generated sentence has recorded clips ({v['checked']} checked)", not v['missing'], ' | '.join(v['missing']))
         art = await page.evaluate("loadArt().then(() => ({ sprites: Object.keys(ART).length, heroes: Object.keys(ART.hero || {}).length + Object.keys(ART.heroChomp || {}).length }))")
         report('art files all load', art['sprites'] == 12 and art['heroes'] == 12, json.dumps(art))
         m = await page.evaluate(MATH); report(f"math is true in {m['rooms']} generated rooms", not m['problems'], '; '.join(m['problems']))
         h = await page.evaluate(HONEST); report(f"footprints predict every monster step ({h['hits']} hits, all on footprints)", not h['problems'], '; '.join(h['problems']))
         lp = await page.evaluate(LOOP)
         for k, v in lp.items(): report(k.replace('_', ' '), v)
-        trophy, log = await smoke(page); report('full run: 3 floors, treasure, shop, bosses, trophy', trophy, '' if trophy else ' > '.join(log[-8:]))
+        trophy, log = await smoke(page)
+        said = await page.evaluate("[...new Set(Voice.log)].filter(t => !Clips.ids(t))")
+        report('everything said in a full run uses recorded clips', not said, ' | '.join(said[:8]))
+        played = await page.evaluate("""new Promise(res => { Sound.init(); Clips.decode(); const t0 = Date.now();
+            (function wait() { if (Clips.buf) { save.settings.voice = true; Voice.say('Double 6 is 12!'); res({ dur: Clips.buf.duration, scheduled: Clips.nodes.length }); }
+              else if (Date.now() - t0 > 8000) res(null); else setTimeout(wait, 100); })(); })""")
+        report('voice recording decodes and plays', bool(played) and played['scheduled'] == 4, json.dumps(played))
+        report('full run: 3 floors, treasure, shop, bosses, trophy', trophy, '' if trophy else ' > '.join(log[-8:]))
 
         for (w, hgt, name) in [(390, 844, 'phone'), (375, 667, 'small-phone'), (820, 1180, 'ipad'), (1180, 820, 'ipad-landscape')]:
             pg = await (await b.new_context(viewport={'width': w, 'height': hgt}, has_touch=True)).new_page()

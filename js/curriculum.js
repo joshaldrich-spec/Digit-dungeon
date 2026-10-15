@@ -115,8 +115,8 @@ function ruleSkip(step, level, nC, nT, force) {
   seq.forEach(v => [-2, -1, 1, 2, 3, step === 10 ? 5 : 4].forEach(d => { const n = v + d; if (n >= 1 && n <= max + 4 && !inSeq(n)) cand.add(n); }));
   const good = takeCycle(shuffle(seq.slice()), nC), bad = takeCycle(shuffle([...cand]), nT - nC);
   const t = (n, ok) => ({ kind: 'num', label: String(n), value: n, correct: ok });
-  const from = offset ? ` from ${offset}` : '';
-  return { rule: { skill: 'skip' + step, kind: 'skip', step, start, max, offset, title: `Count by ${step}s${from}`, speak: `Chomp the numbers we say when we count by ${step}s${from}!` },
+  const from = offset ? ` from ${offset}` : '', word = { 2: 'twos', 5: 'fives', 10: 'tens' }[step];
+  return { rule: { skill: 'skip' + step, kind: 'skip', step, start, max, offset, title: `Count by ${step}s${from}`, speak: `Chomp the numbers we say when we count by ${word}${offset ? `, starting at ${offset}` : ''}!` },
     tiles: [...good.map(n => t(n, true)), ...bad.map(n => t(n, false))] };
 }
 function frameSegs(v, level) {
