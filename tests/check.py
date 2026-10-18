@@ -410,10 +410,15 @@ async def main():
         report('number clips match their numbers (s-sound check)', s_ok and q_ok, json.dumps(hiss))
         report('full run: 3 floors, treasure, shop, bosses, trophy', trophy, '' if trophy else ' > '.join(log[-8:]))
 
-        for (w, hgt, name) in [(390, 844, 'phone'), (375, 667, 'small-phone'), (820, 1180, 'ipad'), (1180, 820, 'ipad-landscape')]:
+        for (w, hgt, name) in [(390, 844, 'phone'), (375, 667, 'small-phone'), (844, 390, 'phone-landscape'), (820, 1180, 'ipad'), (1180, 820, 'ipad-landscape'), (1366, 1024, 'big-ipad-landscape')]:
             pg = await (await b.new_context(viewport={'width': w, 'height': hgt}, has_touch=True)).new_page()
             pg.on('pageerror', lambda e, n=name: errors.append(f'{n}: {e}'))
             await pg.goto(URL); await pg.wait_for_timeout(300)
+            iv = await pg.evaluate("""(() => { const r = e => document.querySelector(e).getBoundingClientRect(), p = r('#intro-play'), v = r('.intro-frame'), l = r('.intro-logo');
+              return { play: p.top >= 0 && p.bottom <= innerHeight && p.left >= 0 && p.right <= innerWidth, video: v.top >= 0 && v.bottom <= innerHeight, logo: l.top >= 0, videoW: Math.round(v.width) }; })()""")
+            report(f'intro Play screen fits on {name} ({w}x{hgt})', iv['play'] and iv['video'] and iv['logo'], json.dumps(iv))
+            if WANT_SHOTS: os.makedirs(SHOTS, exist_ok=True); await pg.screenshot(path=f'{SHOTS}/{name}-intro.png')
+            if name == 'phone-landscape': await pg.context.close(); continue      # the game itself is laid out for upright phones and any iPad
             if WANT_SHOTS: os.makedirs(SHOTS, exist_ok=True); await pg.screenshot(path=f'{SHOTS}/{name}-title.png')
             await pg.evaluate(FRESH + r""" save.roomsEver = 9; newRun(); closeOverlay(); run.floorRoomsCleared = 2;
               const r = Object.values(run.map.rooms).find(x => x.type === 'normal' && !x.gen); hero.x = 2; hero.y = 0; enterRoom(r, { x: 2, y: 0 });""")

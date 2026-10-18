@@ -39,9 +39,10 @@ input{font:inherit;-webkit-user-select:text;user-select:text}
 /* intro video */
 #scr-intro{flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(120% 80% at 50% 40%,#2a1d3c,#0c0812);transition:opacity .45s}
 #scr-intro.leaving{opacity:0}
-.intro-box{width:100%;max-width:1100px;display:flex;flex-direction:column;align-items:center;gap:22px}
-.intro-logo{width:min(72vw,440px);transition:opacity .4s,transform .4s}
-.intro-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 18px 44px rgba(0,0,0,.65),0 0 0 3px rgba(255,213,74,.35)}
+/* sized by height as well as width, so logo + video + Play always fit (landscape iPads were pushing Play off-screen) */
+.intro-box{width:100%;max-width:1100px;display:flex;flex-direction:column;align-items:center;gap:min(22px,2.5vh)}
+.intro-logo{width:min(72vw,440px,40vh);width:min(72vw,440px,40dvh);transition:opacity .4s,transform .4s}
+.intro-frame{position:relative;width:min(100%,calc((79vh - 150px) * 16 / 9));width:min(100%,calc((79dvh - 150px) * 16 / 9));aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 18px 44px rgba(0,0,0,.65),0 0 0 3px rgba(255,213,74,.35)}
 .intro-frame video{width:100%;height:100%;object-fit:cover;display:block}
 #intro-play{animation:introPulse 1.4s ease-in-out infinite}
 @keyframes introPulse{50%{transform:scale(1.06)}}
