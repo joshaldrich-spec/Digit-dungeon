@@ -31,7 +31,7 @@ function confetti() {
 function showCoach(rule, t, after) {
   const c = coachContent(rule, t);
   openOverlay(`<div class="coach-head"><button class="say" data-act="say" aria-label="Hear it again">🔊</button><h2 class="coach-title">${c.title}</h2></div>
-    <div class="model"><div class="paper">${c.model}</div></div>
+    <div class="model"><div class="paper">${c.model}</div>${c.model2 ? `<div class="paper nline">${c.model2}</div>` : ''}</div>
     <p class="coach-line">${c.strat ? `<span class="strat">${c.strat}</span> ` : ''}${c.line}</p>
     <div class="need-chip">🎯 ${esc(rule.title)}</div><br>
     <button class="btn mint big" data-close>OK!</button>`,
@@ -162,6 +162,8 @@ function openGrownups() {
     ${tg('mistakes', 'Mistakes cost ½ heart', 'Off = gentle mode: wrong answers only coach')}
     ${tg('monsters', 'Monsters', 'Off = calm rooms with no wandering monsters')}
     ${tg('readTiles', 'Read each tile when stepped on', 'Extra support for early readers')}
+    <h3>This week</h3>
+    ${tg('focus', `Focus: ${FOCUS.name}`, 'Number-rack quick looks, even/odd beads, how many more, story problems, number cards, sums and differences to 20')}
     <h3>Skills in the mix</h3>${Object.keys(SKILLS).map(stg).join('')}
     <h3>How it teaches</h3><ul>
       <li>Uses Bridges' own models: ten-frames, the number rack, pairs, and number paths.</li>

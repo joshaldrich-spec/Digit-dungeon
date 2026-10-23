@@ -27,7 +27,8 @@ FRESH = "localStorage.clear(); save = defaultSave(); save.name = 'T'; save.setti
 # ---- 0. every sentence the game can say is built from recorded clips
 # phrases written into the game but not recorded yet (docs/voice-script-2.txt); until they are, those sentences use the
 # device voice. A sentence passes if everything except these phrases is recorded.
-PENDING = []   # docs/voice-script-2.txt (part six) is recorded
+PENDING = ['How many beads?', 'How many more?', 'The difference between', 'You found', 'Hoot found', 'How many altogether?',   # docs/voice-script-3.txt
+           'You gave some to Hoot.', 'Now you have', 'How many did you give away?', 'gems', 'apples', 'Use two cards to make']
 OK_SAID = "const PENDING = %s; const okSaid = t => { if (Clips.ids(t)) return true; const rest = PENDING.reduce((s, p) => s.split(p).join(' '), t).replace(/\\s+/g, ' ').trim(); return rest !== t.trim() && (!rest || !!Clips.ids(rest)); };" % json.dumps(PENDING)
 VOICE = r"""() => { OK_SAID
   const missing = new Set(), texts = [];
@@ -144,9 +145,17 @@ POWER_MATH = r"""() => {
     if (id === 'flash') truth = p.miss.segs.reduce((a, g) => a + g.n, 0);
     if (id === 'parity' && (m = q.match(/^(\d+) Even or odd\?$/))) truth = m[1] % 2 ? 'odd' : 'even';
     if (id === 'hop' && (m = q.match(/^(\d+), (\d+), (\d+), \?$/))) { const st = m[2] - m[1]; if (m[3] - m[2] === st && [2, 5, 10].includes(st)) truth = +m[3] + st; }
+    if (id === 'rack') { truth = p.split[0] + p.split[1]; const w = p.hint.text.match(/Another way: (\d+) \+ (\d+) = (\d+)/); if (!w || +w[1] + +w[2] !== truth || +w[3] !== truth) problems.push(`rack: second way wrong: ${p.hint.text}`); }
+    if (id === 'rackParity') truth = (p.split[0] + p.split[1]) % 2 ? 'odd' : 'even';
+    if (id === 'compare') { truth = p.bars[0] > p.bars[1] ? p.bars[0] - p.bars[1] : null; }
+    if (id === 'story') { const t = q.replace(/[^\x20-\x7e]/g, ''); if ((m = t.match(/^You found (\d+) *\. Hoot found (\d+) *\. How many altogether\?$/))) truth = +m[1] + +m[2];
+      else if ((m = t.match(/^You had (\d+) *\. You gave some to Hoot\. Now you have (\d+)\. How many did you give away\?$/))) truth = m[1] - m[2]; }
+    if (id === 'cards') { const ok = p.ways.length >= 2 && p.ways.every(([x, y]) => x + y === p.target && p.cards.includes(x) && p.cards.includes(y)) && new Set(p.cards).size === 5
+        && p.cards.every((x, i) => p.cards.every((y, j) => i === j || x + y !== p.target || p.ways.some(w => w.includes(x) && w.includes(y)))) && q === `Use two cards to make ${p.target}`;
+      truth = ok ? 'ok' : null; }
     if (truth === null || String(truth) !== p.ans) problems.push(`${id}: "${q}" answer ${p.ans}, really ${truth}`);
-    if (p.choices.filter(c => c === p.ans).length !== 1 || new Set(p.choices).size !== p.choices.length) problems.push(`${id}: choices ${p.choices}`);
-    if (p.choices.length !== (id === 'parity' ? 2 : 3) || p.choices.some(c => /^-/.test(c))) problems.push(`${id}: choices ${p.choices}`);
+    if (id !== 'cards' && (p.choices.filter(c => c === p.ans).length !== 1 || new Set(p.choices).size !== p.choices.length)) problems.push(`${id}: choices ${p.choices}`);
+    if (id !== 'cards' && (p.choices.length !== (p.words ? 2 : 3) || p.choices.some(c => /^-/.test(c)))) problems.push(`${id}: choices ${p.choices}`);
     if (id !== 'fact' && (p.power < 1 || p.power > cap)) problems.push(`${id}: hits for ${p.power} with ${cap} health`);
     if (/undefined|NaN/.test(p.q + p.say + p.right + p.hint.say + p.hint.text)) problems.push(`${id}: broken text`);
     if (id === 'double' && +p.ans < 4) problems.push('double 1 asked');
@@ -164,9 +173,30 @@ BOSS_MIX = r"""() => {
       pows.forEach(p => { kinds.add(p.id); run.boss.lastPower = p.id; if (p.power > hp) problems.push(`${p.id} hits for ${p.power} with ${hp} health`); });
       takes.forEach(t => { if (t.k > hp || t.k < 1) problems.push(`take-away ${t.k} with ${hp} health`); }); } }
   save.settings.skills.evenOdd = false; let parity = 0;
-  for (let i = 0; i < 300; i++) { run.boss.hp = rnd(2, 20); parity += bossMoves(run.boss.hp).filter(m => m.id === 'parity').length; }
+  for (let i = 0; i < 300; i++) { run.boss.hp = rnd(2, 20); parity += bossMoves(run.boss.hp).filter(m => m.id === 'parity' || m.id === 'rackParity').length; }
   save.settings.skills.evenOdd = true; run.boss = null; closeOverlay();
   return { kinds: [...kinds].sort(), problems: [...new Set(problems)].slice(0, 8), parity_when_off: parity };
+}""".replace('FRESH;', FRESH)
+# this week's focus: test topics come up most, take-away is unlocked, all facts to 20; off = back to her own levels
+FOCUS_T = r"""() => {
+  FRESH; save.roomsEver = 9; newRun(); closeOverlay(); const out = {};
+  sk('add').level = 1; sk('sub').level = 1;
+  const tally = on => { save.settings.focus = on; const c = {}; for (let i = 0; i < 3000; i++) { const id = pickSkill(); c[id] = (c[id] || 0) + 1; } return c; };
+  const on = tally(true), off = tally(false);
+  save.settings.focus = true; out.on = on; out.off = off;
+  out.take_away_unlocked = (on.sub || 0) > 400 && !off.sub;
+  out.test_topics_lead = (on.add + on.sub + on.evenOdd) / 3000 > .8 && ((on.skip2 || 0) + (on.skip5 || 0) + (on.skip10 || 0)) / 3000 < .1;
+  out.facts_to_20 = lvl('add') === 4 && lvl('sub') === 3 && lvl('evenOdd') >= 2;
+  const pw = {}; for (let i = 0; i < 2000; i++) pickPowers(Object.keys(POWERS), 2, 20).forEach(p => pw[p.id] = (pw[p.id] || 0) + 1);
+  out.fights_favor_test_types = FOCUS.powers.reduce((a, id) => a + (pw[id] || 0), 0) / Object.values(pw).reduce((a, b) => a + b, 0) > .7;
+  save.settings.focus = false; out.off_uses_her_levels = lvl('add') === 1 && !availableSkills().includes('sub'); save.settings.focus = true;
+  // Card Combo: any pair that makes the number counts, and another way is shown
+  let p; do { p = makeProblem('cards', 20); } while (!p);
+  const [x, y] = p.ways[0], i = p.cards.indexOf(x), j = p.cards.indexOf(y), bad = p.cards.findIndex((v, k) => k !== i && v + x !== p.target);
+  out.card_first_tap_waits = pickCard(p, i) === null;
+  out.card_pair_counts = pickCard(p, j) === 'ok' && !!p.other && p.other[0] + p.other[1] === p.target;
+  pickCard(p, i); out.card_wrong_pair_misses = pickCard(p, bad) !== 'ok';
+  return out;
 }""".replace('FRESH;', FRESH)
 SQUASH = r"""() => {
   FRESH; save.roomsEver = 9; newRun(); closeOverlay(); const out = {};
@@ -318,16 +348,19 @@ async def main():
         await page.goto(URL); await page.wait_for_timeout(500)
 
         await page.evaluate("Voice.log = []")
-        v = await page.evaluate(VOICE); report(f"every generated sentence has recorded clips ({v['checked']} checked)", not v['missing'], ' | '.join(v['missing']))
+        v = await page.evaluate(VOICE); report(f"every generated sentence has recorded clips ({v['checked']} checked" + (f", {len(PENDING)} new phrases waiting to be recorded" if PENDING else '') + ")", not v['missing'], ' | '.join(v['missing']))
         n_files = sum(1 for _, _, fs in os.walk(os.path.join(ROOT, 'art')) for f in fs if f.endswith('.webp'))
         art = await page.evaluate("loadArt().then(() => { const n = o => Object.values(o).reduce((s, v) => s + (typeof v === 'string' ? 1 : n(v)), 0); return { loaded: n(ART), tile: document.body.classList.contains('has-tile'), floor: document.body.classList.contains('has-floor'), doors: document.body.classList.contains('has-doors') }; })")
         report(f'all {n_files} art files load and are used', art['loaded'] == n_files and art['tile'] and art['floor'] and art['doors'], json.dumps(art))
         m = await page.evaluate(MATH); report(f"math is true in {m['rooms']} generated rooms", not m['problems'], '; '.join(m['problems']))
         h = await page.evaluate(HONEST); report(f"footprints predict every monster step ({h['hits']} hits, all on footprints)", not h['problems'], '; '.join(h['problems']))
         pm = await page.evaluate(POWER_MATH)
-        report(f"power math is true ({sum(pm['kinds'].values())} problems: {', '.join(sorted(pm['kinds']))})", not pm['problems'] and len(pm['kinds']) == 6, '; '.join(pm['problems']))
+        report(f"power math is true ({sum(pm['kinds'].values())} problems, {len(pm['kinds'])} kinds)", not pm['problems'] and len(pm['kinds']) == 11, '; '.join(pm['problems']) or ', '.join(sorted(pm['kinds'])))
         bm = await page.evaluate(BOSS_MIX)
-        report(f"boss turns mix problems: take-away + one of {len(bm['kinds'])} powers", not bm['problems'] and len(bm['kinds']) == 5 and bm['parity_when_off'] == 0, json.dumps(bm))
+        report(f"boss turns mix problems: take-away + one of {len(bm['kinds'])} powers", not bm['problems'] and len(bm['kinds']) >= 8 and bm['parity_when_off'] == 0, json.dumps(bm))
+        fo = await page.evaluate(FOCUS_T)
+        for k in ['take_away_unlocked', 'test_topics_lead', 'facts_to_20', 'fights_favor_test_types', 'off_uses_her_levels', 'card_first_tap_waits', 'card_pair_counts', 'card_wrong_pair_misses']:
+            report('this week: ' + k.replace('_', ' '), fo[k], json.dumps({'on': fo['on'], 'off': fo['off']}) if k == 'test_topics_lead' else '')
         sq = await page.evaluate(SQUASH); await page.wait_for_timeout(1600)
         sq['squashed_monster_drops_a_coin'] = await page.evaluate("!DD.room.monsters.length && DD.room.pickups.some(p => p.type === 'coin' && p.x === 1 && p.y === 0) && !DD.run.fight && !document.querySelector('#ov').classList.contains('show')")
         for k, v in sq.items(): report('squash: ' + k.replace('_', ' '), v)

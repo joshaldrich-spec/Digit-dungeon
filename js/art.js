@@ -54,9 +54,9 @@ const EMOJI_ART = () => {
     '🔒': I.lock, '🎯': I.target, '➜': I.arrow, '▶': I.arrow, '⚔': I.swords, '🛒': I.bag, '🎁': I.gift, '👕': I.shirt, '💡': I.bulb, '🔁': I.comeback, '⚙': I.gear,
     '🔥': F.flame, '🎉': F.popper, '✨': F.sparkles, '⚡': F.zap, '✂': F.snip, '🌗': F.moon, '💣': F.bomb, '💥': F.burst, '💨': F.smoke, '💫': F.dizzy,
     '⬆': F.up, '⬇': F.down, '🕯': F.candle, '❤': M.heart, '💖': T.heart, '🧠': U.brain, '🏆': U.trophy, '🏅': U.star, '👑': ART.chest, '🦉': ART.shopkeeper,
-    '🫧': T.bubble, '🔦': T.flashlight, '🥽': T.specs, '🧦': T.socks, '🐸': T.frog, '🍀': T.clover, '🐌': T.snail, '🚪': ART.props && ART.props.arch, '👀': F.peek };
+    '🫧': T.bubble, '🔦': T.flashlight, '🥽': T.specs, '🧦': T.socks, '🐸': T.frog, '🍀': T.clover, '🐌': T.snail, '🚪': ART.props && ART.props.arch, '👀': F.peek, '💎': F.gem, '🍎': ART.hats && ART.hats.apple };
 };
-const EMOJI_RE = /(⭐|🪙|🔊|🔇|⏸|🎵|🎶|🔕|💾|🏠|🔒|🎯|➜|▶|⚔|🛒|🎁|👕|💡|🔁|⚙|🔥|🎉|✨|⚡|✂|🌗|💣|💥|💨|💫|⬆|⬇|🕯|❤|💖|🧠|🏆|🏅|👑|🦉|🫧|🔦|🥽|🧦|🐸|🍀|🐌|🚪|👀)️?/gu;
+const EMOJI_RE = /(⭐|🪙|🔊|🔇|⏸|🎵|🎶|🔕|💾|🏠|🔒|🎯|➜|▶|⚔|🛒|🎁|👕|💡|🔁|⚙|🔥|🎉|✨|⚡|✂|🌗|💣|💥|💨|💫|⬆|⬇|🕯|❤|💖|🧠|🏆|🏅|👑|🦉|🫧|🔦|🥽|🧦|🐸|🍀|🐌|🚪|👀|💎|🍎)️?/gu;
 function artify(html) {
   if (typeof html !== 'string') return html;
   const map = EMOJI_ART();
@@ -274,18 +274,49 @@ function pathSVG(step, start, n) {
   if (!inSeq) { const x = X(n); s += `<circle cx="${x}" cy="62" r="7" fill="#ff5a6e"/><text x="${x}" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#b8293f" font-family="Fredoka,sans-serif">${n}</text>`; }
   return `<svg viewBox="0 0 ${W} 94" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
 }
-function rackSVG(hp, gone = 0) {
+function rackSVG(hp, gone = 0, split = null) {
   const r = 9, gap = 20, W = 14 + 9 * gap + 40 + 14; let s = '';
   for (let row = 0; row < 2; row++) {
     const y = 20 + row * 30;
     s += `<line x1="4" y1="${y}" x2="${W - 4}" y2="${y}" stroke="#8a7aa3" stroke-width="3"/>`;
     for (let i = 0; i < 10; i++) {
-      const idx = row * 10 + i, on = idx < hp, was = idx < hp + gone, red = i < 5, x = 14 + i * gap + (on ? 0 : 40);
+      const idx = row * 10 + i, on = split ? i < split[row] : idx < hp, was = !split && idx < hp + gone, red = i < 5, x = 14 + i * gap + (on ? 0 : 40);
       s += `<circle class="${!on && was ? 'bead-gone' : ''}" cx="${x}" cy="${y}" r="${r}" fill="${red ? '#ff5a6e' : '#fff3da'}" stroke="${red ? '#b8293f' : '#b9a98a'}" stroke-width="2" opacity="${on ? 1 : .25}"/>`;
     }
   }
   return `<svg viewBox="0 0 ${W} 70" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
 }
+
+/* open number line with jumps, the way her class draws it: 8 →(+2) 10 →(+5) 15, or count up 9 →(+1) 10 →(+6) 16 */
+function jumpLineSVG(start, jumps) {
+  const pts = [start]; jumps.forEach(j => pts.push(pts[pts.length - 1] + j));
+  const lo = Math.min(...pts), hi = Math.max(...pts), W = 300, pad = 34, X = v => pad + (v - lo) / Math.max(1, hi - lo) * (W - 2 * pad);
+  const ink = '#2a1f3a', f = 'font-family="Fredoka,sans-serif" font-weight="700" text-anchor="middle"';
+  let s = `<path d="M8 72H${W - 8}M16 65L8 72L16 79M${W - 16} 65L${W - 8} 72L${W - 16} 79" fill="none" stroke="${ink}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  jumps.forEach((j, i) => { const a = X(pts[i]), b = X(pts[i + 1]), h = Math.min(50, 16 + Math.abs(b - a) * .28);
+    s += `<path d="M${a} 68Q${(a + b) / 2} ${68 - h * 2} ${b} 68" fill="none" stroke="#2e9c72" stroke-width="3"/><text x="${(a + b) / 2}" y="${66 - h - 4}" font-size="17" fill="#2e9c72" ${f}>${j > 0 ? '+' : '−'}${Math.abs(j)}</text>`; });
+  pts.forEach((v, i) => { const x = X(v); s += `<path d="M${x} 64V80" stroke="${ink}" stroke-width="2.5"/><text x="${x}" y="100" font-size="18" fill="${i === pts.length - 1 ? '#c2410c' : ink}" ${f}>${v}</text>`; });
+  return `<svg class="nl" viewBox="0 0 ${W} 108" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+/* jumps through ten: a + b (start at the bigger one), or count up from b to a for a − b */
+function makeTenJumps(a, b) { const big = Math.max(a, b), small = Math.min(a, b), need = 10 - big; return big < 10 && small > need && need > 0 ? { start: big, jumps: [need, small - need] } : null; }
+function countUpJumps(a, b) { return b < 10 && a > 10 ? { start: b, jumps: [10 - b, a - 10] } : null; }
+/* "how many more": two strips of 10 boxes; show = color the extra boxes on the top strip */
+function compareSVG(a, b, show = false) {
+  const c = 26, gx = 40, W = gx + 10 * c + 6, ink = '#2a1f3a', H = ART.hero && ART.hero.mint, O = ART.shopkeeper;
+  let s = '';
+  [[a, '#ff5a6e', H], [b, '#3d8bff', O]].forEach(([n, col, face], row) => {
+    const y = 6 + row * (c + 12);
+    s += face ? `<image href="${face}" x="2" y="${y - 3}" width="${c + 6}" height="${c + 6}"/>` : '';
+    for (let i = 0; i < 10; i++) {
+      const extra = show && row === 0 && i >= b && i < a;
+      s += `<rect x="${gx + i * c}" y="${y}" width="${c}" height="${c}" fill="${i < n ? (extra ? '#ffc84a' : col) : '#fff'}" stroke="${ink}" stroke-width="2"/>`;
+    }
+  });
+  return `<svg viewBox="0 0 ${W} ${2 * c + 20}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
+}
+/* number cards (Card Combo) */
+const numCardSVG = (v, sel) => `<svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="54" height="74" rx="9" fill="${sel ? '#ffe08a' : '#fff8ea'}" stroke="#2a1f3a" stroke-width="4"/><text x="30" y="55" font-size="40" font-family="Fredoka,sans-serif" font-weight="700" text-anchor="middle" fill="#2a1f3a">${v}</text></svg>`;
 
 /* ---- math pictures drawn with the Gemini pieces (positions are still exact) ---- */
 function framesArt(segs, o = {}) {
@@ -315,12 +346,12 @@ function pairsArt(n, size) {
   return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${s}</svg>`;
 }
 /* boss number rack: wooden frame (stretched by css) with 5 red + 5 cream beads on each rod */
-function rackHTML(hp, gone = 0) {
+function rackHTML(hp, gone = 0, split = null) {     // split = [top row, bottom row] (quick looks); otherwise the top row fills first
   const M = ART.math;
-  if (!(M && M.rack && M.beadRed && M.beadCream && document.body.classList.contains('skin'))) return rackSVG(hp, gone);
+  if (!(M && M.rack && M.beadRed && M.beadCream && document.body.classList.contains('skin'))) return rackSVG(hp, gone, split);
   let h = '';
   for (let row = 0; row < 2; row++) for (let i = 0; i < 10; i++) {
-    const idx = row * 10 + i, on = idx < hp, was = idx < hp + gone;
+    const idx = row * 10 + i, on = split ? i < split[row] : idx < hp, was = !split && idx < hp + gone;
     h += `<img class="bead${on ? '' : ' off'}${!on && was ? ' gone' : ''}" src="${i < 5 ? M.beadRed : M.beadCream}" style="left:${1 + i * 7.7 + (on ? 0 : 21)}%;top:${RACK.rods[row] * 100}%" alt="">`;
   }
   return `<div class="rackA"><div class="rods">${h}</div></div>`;

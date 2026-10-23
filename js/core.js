@@ -9,7 +9,7 @@
    ===================================================================== */
 
 
-const BUILD = 'v15';   // bump with the ?v3 tags in index.html on every release
+const BUILD = 'v16';   // bump with the ?v3 tags in index.html on every release
 
 /* ---------- helpers ---------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -39,7 +39,7 @@ const SAVE_KEY = 'digit-dungeon-v1';
 function defaultSave() {
   return { v: 1, name: '', stars: 0, cosmetics: { color: 'mint', hat: 'none', top: 'none', shoes: 'none' }, unlocks: [], seen: null, best: { floor: 0, wins: 0 },
     runsPlayed: 0, roomCount: 0, roomsEver: 0, chompsEver: 0, remembered: 0, comeback: [], skills: {}, facts: {}, days: {},
-    settings: { voice: true, sound: true, music: true, intro: true, mistakes: true, monsters: true, readTiles: false,
+    settings: { voice: true, sound: true, music: true, intro: true, focus: true, mistakes: true, monsters: true, readTiles: false,
       skills: { frames: true, evenOdd: true, skip10: true, skip5: true, skip2: true, add: true, sub: true } },
     run: null };
 }

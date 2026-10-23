@@ -22,9 +22,17 @@ const LEVEL_NOTES = {
   add: ['sums to 10: +0/1/2, doubles, ten-friends', 'doubles to 20, +10, count on', 'near doubles, +9', 'all facts to 20'],
   sub: ['within 10: −1/2/3, halves', 'teens: −10, back to ten', 'all facts to 20'],
 };
+/* This week's focus (a Grown-ups switch): the Unit 1 practice test. Rooms lean to sums and differences to 20
+   (take-away unlocked, all facts in the mix) and even/odd to 20; fights favor the test-style powers: number-rack
+   quick looks, even/odd beads, how many more, story problems and number cards. Skip counting and ten-frames rest. */
+const FOCUS = { name: 'Unit 1 practice test', levels: { add: 4, sub: 3, evenOdd: 2 },
+  weights: { add: 1.5, sub: 2.2, evenOdd: 1.6, frames: .5, skip10: .25, skip5: .25, skip2: .35 },
+  powers: ['rack', 'rackParity', 'compare', 'story', 'cards', 'fact'] };
+const focusOn = () => !!(save.settings && save.settings.focus);
+function lvl(id) { const l = sk(id).level; return focusOn() && FOCUS.levels[id] ? Math.max(l, FOCUS.levels[id]) : l; }
 function sk(id) { return save.skills[id] || (save.skills[id] = { level: 1, recent: [], correct: 0, tries: 0, last: -99 }); }
 function availableSkills() {
-  const ids = Object.keys(SKILLS).filter(id => save.settings.skills[id] !== false && (!SKILLS[id].gate || SKILLS[id].gate()));
+  const ids = Object.keys(SKILLS).filter(id => save.settings.skills[id] !== false && (!SKILLS[id].gate || SKILLS[id].gate() || (focusOn() && FOCUS.levels[id])));
   return ids.length ? ids : ['add'];
 }
 function recentAcc(id, n = 12, dflt = .8) { const r = sk(id).recent.slice(-n); return r.length >= 4 ? mean(r) : dflt; }
@@ -36,6 +44,7 @@ function pickSkill() {
     const s = sk(id);
     let w = 1 + clamp(.9 - recentAcc(id), -.3, .6) * 2.5;
     if (id === 'add') w *= 2.2; if (id === 'sub') w *= 1.4;
+    if (focusOn()) w *= FOCUS.weights[id] || 1;
     if (id === run.lastSkill && ids.length > 1) w *= .15;
     const since = save.roomCount - s.last; w *= 1 + clamp(since, 0, 8) * .08;
     return Math.max(.05, w);

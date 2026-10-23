@@ -316,6 +316,17 @@ img{object-fit:contain}
 .fight-wrap.won .fight-spr{animation:squashed .5s ease-in forwards;transform-origin:50% 100%}
 @keyframes squashed{30%{transform:scale(1.15,.85)}100%{transform:scale(1.6,.12);opacity:.85}}
 @media (min-height:1000px){.boss-wrap.compact .boss-spr{width:150px}.fight-wrap.compact .fight-stage{width:130px}.hint .hpic{max-width:280px}.hint .hpic svg{max-height:140px}}
+.cards{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.ncard{border:0;background:none;padding:0;width:min(64px,17vw);aspect-ratio:3/4;transition:transform .12s}
+.ncard svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.3))}
+.ncard.sel{transform:translateY(-9px)}
+.story{display:block;font-size:22px;line-height:1.35;font-weight:600;max-width:440px;margin:0 auto}
+.story b{color:var(--gold);font-size:1.25em}.story img.ei{height:1.3em}
+.pwsvg{display:block;height:46px;width:76px;margin:0 auto 2px}.pwsvg svg{width:100%;height:100%;display:block}
+.trio{display:flex;gap:2px;height:100%;justify-content:center}.trio svg{width:auto;height:100%}
+.ppic .rackA{margin:4px auto}
+.model .paper.nline{margin-top:8px;padding:6px 10px}.model .paper.nline svg{max-height:110px}
+.hint .hpic:has(svg.nl){max-width:min(100%,320px);background:var(--paper);border-radius:12px;padding:2px 8px}.hint .hpic svg.nl{max-height:none;width:100%}
 .squash-t{font-size:44px!important;font-weight:700;color:var(--gold);margin:6px 0!important;animation:pop .3s ease-out}
 /* grown-ups */
 .gu{text-align:left}

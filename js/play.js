@@ -102,9 +102,10 @@ function renderFight() {
   if (f.step === 'choose') body = `<p>Pick an attack!</p><div class="attacks">${f.moves.map((p, i) => `<button class="atk pow" data-act="atk" data-i="${i}"><span class="ai">${powerIcon(p)}</span><b>${p.name}</b></button>`).join('')}</div>`;
   else if (f.step === 'answer') body = problemHTML(f.prob, f.wrong, f.hinted);
   else body = `<p class="squash-t">SQUASH!</p><p>+1 ⭐ &nbsp; +1 🪙</p>`;
-  openOverlay(`<div class="fight-wrap ${f.step === 'won' ? 'won' : ''}${f.step === 'answer' && (f.prob.pic || f.hinted) ? ' compact' : ''}"><div class="boss-hearts">${heartsHTML()}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div>
+  openOverlay(`<div class="fight-wrap ${f.step === 'won' ? 'won' : ''}${f.step === 'answer' && (f.prob.pic || f.prob.story || f.prob.cards || f.hinted) ? ' compact' : ''}"><div class="boss-hearts">${heartsHTML()}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div>
     <div class="fight-stage">${f.ambush && f.step !== 'won' && ART.fx && ART.fx.surprise ? `<img class="surprise" src="${ART.fx.surprise}" alt="">` : ''}<div class="fight-spr ${f.kind}">${f.kind === 'grumble' ? grumbleSVG() : wispSVG()}</div>${f.step === 'won' && ART.fx && ART.fx.splat ? `<img class="splat" src="${ART.fx.splat}" alt="">` : ''}</div><div class="boss-name">${f.ambush ? 'A monster jumped out!' : 'Squash it!'}</div>${body}</div>`,
-    { cls: 'boss-card fight-card', actions: { atk: el => fightPick(+el.dataset.i), ans: el => fightAnswer(el.dataset.v), peek: peekAgain } });
+    { cls: 'boss-card fight-card', actions: { atk: el => fightPick(+el.dataset.i), ans: el => fightAnswer(el.dataset.v), peek: peekAgain,
+      card: el => { const r = pickCard(run.fight.prob, +el.dataset.i); if (r === null) renderFight(); else fightAnswer(r); } } });
 }
 function fightPick(i) {
   const f = run.fight; tickTime();
@@ -116,6 +117,7 @@ function fightAnswer(v) {
   if (String(v) === p.ans) {
     record(p.skill, true, p.fact); save.stars++; run.stars++; run.correct++; run.streak++; mend();
     f.step = 'won'; Sound.play('hit'); renderFight(); saveRun();
+    if (p.other) toast(`Another way: ${p.other[0]} + ${p.other[1]} = ${p.target}!`);
     Voice.say(p.right); if (Clips.ids('Squash!')) Voice.say('Squash!', { queue: true });
     setTimeout(() => { if (run && run.fight === f) { closeOverlay(); squash(f.mid); } }, 1300);
   } else {
@@ -365,7 +367,8 @@ function takeMoves(hp) {
 }
 function bossMoves(hp) {
   const takes = shuffle(takeMoves(hp)), b = run.boss || {};
-  const power = pickPowers(['double', 'friends', 'flash', 'parity', 'hop'], 1, Math.min(hp, 10), BOSS_FAVOR[run.floor - 1] || [], b.lastPower)[0];
+  const ids = Object.keys(POWERS).filter(id => id !== 'fact');   // bosses use the rack for plain take-away facts
+  const power = pickPowers(ids, 1, Math.min(hp, 10), focusOn() ? [] : BOSS_FAVOR[run.floor - 1] || [], b.lastPower)[0];
   const out = [takes[0]];
   if (power) out.push({ ...power, kind: 'power' });
   else { const t2 = takes.find(m => m.k !== takes[0].k); if (t2) out.push(t2); }
@@ -396,11 +399,12 @@ function renderBoss() {
   else if (b.step === 'answer') body = problemHTML(b.prob, b.wrong, b.hinted);
   else if (b.step === 'win') body = `<p><b>You beat ${B.name}!</b> 🎉</p><p>+10 ⭐ &nbsp; +5 🪙</p><button class="btn gold big" data-act="trap">${run.floor < 3 ? 'Jump down the trapdoor ⬇️' : 'Claim your trophy 🏆'}</button>`;
   const hearts = heartsHTML(), ans = b.step === 'answer' && b.prob;
-  const fit = ans && (b.prob.pic || b.hinted) ? (b.prob.kind === 'take' ? ' compact' : ' compact has-pic') : '';   // room for the picture + hint on a phone
+  const fit = ans && (b.prob.pic || b.prob.story || b.prob.cards || b.hinted) ? (b.prob.kind === 'take' ? ' compact' : ' compact has-pic') : '';   // room for the picture + hint on a phone
   openOverlay(`<div class="boss-wrap ${b.step === 'win' ? 'won' : ''}${fit}"><div class="boss-hearts">${hearts}${run.shield ? `<span class="shield">${icon(ART.items && ART.items.bubble, '🫧')}</span>` : ''}</div><div class="boss-spr ${b.flash ? 'flash' : ''}">${bossSVG(run.floor)}</div><div class="boss-name">${B.name}</div><div class="boss-hp"><span>Health</span><b>${b.hp}</b></div><div class="rack">${rackHTML(b.hp, b.gone || 0)}</div>${body}</div>`,
     { cls: 'boss-card', actions: {
       go: () => { b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); Voice.say('Pick an attack!'); saveRun(); },
       atk: el => bossPick(+el.dataset.i), ans: el => bossAnswer(el.dataset.v), peek: peekAgain,
+      card: el => { const r = pickCard(b.prob, +el.dataset.i); if (r === null) renderBoss(); else bossAnswer(r); },
       trap: () => { closeOverlay(); trapdoor(); } } });
   b.flash = false; b.gone = 0;
 }
@@ -419,6 +423,7 @@ function bossAnswer(v) {
     b.last = p.kind === 'power' ? { from, dmg: from - b.hp } : null;
     if (b.hp === 0) return bossWin();
     b.step = 'choose'; b.moves = bossMoves(b.hp); renderBoss(); saveRun();
+    if (p.other) toast(`Another way: ${p.other[0]} + ${p.other[1]} = ${p.target}!`);
     Voice.say(`${p.right ? p.right + ' ' : ''}Hit! ${b.hp} left.`);
   } else {
     record(p.skill, false, p.fact); run.wrong++; Sound.play('bad');

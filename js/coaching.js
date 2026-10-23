@@ -44,11 +44,19 @@ function modelFor(rule, t, big) {
   }
   return '';
 }
+/* the number line her class uses, when the strategy goes through ten: 8 + 7 = 8 +2 → 10 +5 → 15;
+   17 − 9 counts back 17 −7 → 10 −2 → 8; 16 − 7 (think addition) counts up 7 +3 → 10 +6 → 16 */
+function factLine(a, b, op, strat) {
+  if (op === '+') { const j = makeTenJumps(a, b); return j ? jumpLineSVG(j.start, j.jumps) : ''; }
+  if (strat === 'Down to ten' && a > 10 && b > a - 10) return jumpLineSVG(a, [-(a - 10), -(b - (a - 10))]);
+  if (strat === 'Think addition') { const j = countUpJumps(a, b); if (j) return jumpLineSVG(j.start, j.jumps); }
+  return '';
+}
 function coachContent(rule, t) {
   const model = modelFor(rule, t, true);
   if (rule.kind === 'equals') {
     const st = t.op === '+' ? addStrategy(t.a, t.b) : subStrategy(t.a, t.b);
-    return { title: `${show(t.label)} = ${t.value}`, model, strat: st.name, line: st.text, say: `${t.label} is ${t.value}. ${st.text}` };
+    return { title: `${show(t.label)} = ${t.value}`, model, model2: factLine(t.a, t.b, t.op, st.name), strat: st.name, line: st.text, say: `${t.label} is ${t.value}. ${st.text}` };
   }
   if (rule.kind === 'parity') {
     const n = t.value, word = n % 2 ? 'odd' : 'even';

@@ -134,7 +134,7 @@ function spawnMonsters(r, entry) {
   }
 }
 function layRoom(r, made, entry) {
-  r.rule = made.rule; r.rule.level = r.rule.level || sk(r.rule.skill).level;
+  r.rule = made.rule; r.rule.level = r.rule.level || lvl(r.rule.skill);
   const cells = []; for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) if (!(x === entry.x && y === entry.y)) cells.push({ x, y });
   shuffle(cells);
   r.tiles = made.tiles.slice(0, cells.length).map((t, i) => ({ ...t, x: cells[i].x, y: cells[i].y, chomped: false, missed: false, glow: false }));
@@ -145,7 +145,7 @@ function genRoom(r, entry) {
   const { nC, nT } = roomSize();
   const cb = Math.random() < .6 ? nextComeback() : null;
   let made = cb ? comebackRule(cb, nC, nT) : null;
-  if (!made) { const skill = pickSkill(); made = makeRule(skill, sk(skill).level, nC, nT); }
+  if (!made) { const skill = pickSkill(); made = makeRule(skill, lvl(skill), nC, nT); }
   const s = sk(made.rule.skill); s.last = save.roomCount; save.roomCount++; run.lastSkill = made.rule.skill;
   layRoom(r, made, entry);
 }
@@ -179,8 +179,8 @@ function comebackRule(item, nC, nT) {
     made = { rule: { skill: item.op === '+' ? 'add' : 'sub', kind: 'equals', op: item.op, target: item.val, title: `Make ${item.val}`,
       speak: item.op === '+' ? `Chomp the facts that make ${item.val}!` : `Chomp the take-away facts that make ${item.val}!` },
       tiles: [tile(item), ...same.map(tile), ...near.map(tile)] };
-  } else if (item.type === 'parity') made = ruleParity(sk('evenOdd').level, nC, nT, item.n);
-  else if (item.type === 'frame') made = ruleFrames(sk('frames').level, nC, nT, item.n);
+  } else if (item.type === 'parity') made = ruleParity(lvl('evenOdd'), nC, nT, item.n);
+  else if (item.type === 'frame') made = ruleFrames(lvl('frames'), nC, nT, item.n);
   else if (item.type === 'skip') { made = ruleSkip(item.step, item.level || 1, nC, nT, item.offset || undefined); made.rule.level = item.level || 1; }
   if (made) made.rule.comeback = item.key;
   return made;

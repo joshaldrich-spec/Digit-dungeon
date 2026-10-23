@@ -1188,5 +1188,77 @@
   "id": "s_monster_jumped",
   "part": 6,
   "text": "A monster jumped out!"
+ },
+ {
+  "id": "s_how_many_beads",
+  "part": 7,
+  "text": "How many beads?",
+  "pending": true
+ },
+ {
+  "id": "s_how_many_more",
+  "part": 7,
+  "text": "How many more?",
+  "pending": true
+ },
+ {
+  "id": "s_difference",
+  "part": 7,
+  "text": "The difference between",
+  "pending": true
+ },
+ {
+  "id": "s_you_found",
+  "part": 7,
+  "text": "You found",
+  "pending": true
+ },
+ {
+  "id": "s_hoot_found",
+  "part": 7,
+  "text": "Hoot found",
+  "pending": true
+ },
+ {
+  "id": "s_altogether",
+  "part": 7,
+  "text": "How many altogether?",
+  "pending": true
+ },
+ {
+  "id": "s_gave_hoot",
+  "part": 7,
+  "text": "You gave some to Hoot.",
+  "pending": true
+ },
+ {
+  "id": "s_now_you_have",
+  "part": 7,
+  "text": "Now you have",
+  "pending": true
+ },
+ {
+  "id": "s_give_away",
+  "part": 7,
+  "text": "How many did you give away?",
+  "pending": true
+ },
+ {
+  "id": "s_gems",
+  "part": 7,
+  "text": "gems.",
+  "pending": true
+ },
+ {
+  "id": "s_apples",
+  "part": 7,
+  "text": "apples.",
+  "pending": true
+ },
+ {
+  "id": "s_two_cards",
+  "part": 7,
+  "text": "Use two cards to make",
+  "pending": true
  }
 ]
