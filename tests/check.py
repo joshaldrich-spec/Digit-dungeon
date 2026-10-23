@@ -27,8 +27,7 @@ FRESH = "localStorage.clear(); save = defaultSave(); save.name = 'T'; save.setti
 # ---- 0. every sentence the game can say is built from recorded clips
 # phrases written into the game but not recorded yet (docs/voice-script-2.txt); until they are, those sentences use the
 # device voice. A sentence passes if everything except these phrases is recorded.
-PENDING = ['How many beads?', 'How many more?', 'The difference between', 'You found', 'Hoot found', 'How many altogether?',   # docs/voice-script-3.txt
-           'You gave some to Hoot.', 'Now you have', 'How many did you give away?', 'gems', 'apples', 'Use two cards to make']
+PENDING = []   # docs/voice-script-3.txt (part seven) is recorded
 OK_SAID = "const PENDING = %s; const okSaid = t => { if (Clips.ids(t)) return true; const rest = PENDING.reduce((s, p) => s.split(p).join(' '), t).replace(/\\s+/g, ' ').trim(); return rest !== t.trim() && (!rest || !!Clips.ids(rest)); };" % json.dumps(PENDING)
 VOICE = r"""() => { OK_SAID
   const missing = new Set(), texts = [];

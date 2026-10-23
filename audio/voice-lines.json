@@ -1192,73 +1192,61 @@
  {
   "id": "s_how_many_beads",
   "part": 7,
-  "text": "How many beads?",
-  "pending": true
+  "text": "How many beads?"
  },
  {
   "id": "s_how_many_more",
   "part": 7,
-  "text": "How many more?",
-  "pending": true
+  "text": "How many more?"
  },
  {
   "id": "s_difference",
   "part": 7,
-  "text": "The difference between",
-  "pending": true
+  "text": "The difference between"
  },
  {
   "id": "s_you_found",
   "part": 7,
-  "text": "You found",
-  "pending": true
+  "text": "You found"
  },
  {
   "id": "s_hoot_found",
   "part": 7,
-  "text": "Hoot found",
-  "pending": true
+  "text": "Hoot found"
  },
  {
   "id": "s_altogether",
   "part": 7,
-  "text": "How many altogether?",
-  "pending": true
+  "text": "How many altogether?"
  },
  {
   "id": "s_gave_hoot",
   "part": 7,
-  "text": "You gave some to Hoot.",
-  "pending": true
+  "text": "You gave some to Hoot."
  },
  {
   "id": "s_now_you_have",
   "part": 7,
-  "text": "Now you have",
-  "pending": true
+  "text": "Now you have"
  },
  {
   "id": "s_give_away",
   "part": 7,
-  "text": "How many did you give away?",
-  "pending": true
+  "text": "How many did you give away?"
  },
  {
   "id": "s_gems",
   "part": 7,
-  "text": "gems.",
-  "pending": true
+  "text": "gems."
  },
  {
   "id": "s_apples",
   "part": 7,
-  "text": "apples.",
-  "pending": true
+  "text": "apples."
  },
  {
   "id": "s_two_cards",
   "part": 7,
-  "text": "Use two cards to make",
-  "pending": true
+  "text": "Use two cards to make"
  }
 ]
